@@ -1,0 +1,23 @@
+/*
+================================================================================
+Lists
+================================================================================
+*/
+
+dd {
+    margin-bottom: $spacer * 0.5;
+    margin-left: 0;
+}
+
+dt {
+    font-weight: $font-weight-bold;
+}
+
+ol, ul {
+    margin-left: $spacer * 1.2;
+    padding-left: 0;
+
+    li > & {
+        margin-bottom: 0;
+    }
+}

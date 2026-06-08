@@ -1,0 +1,63 @@
+/*
+================================================================================
+Radio
+================================================================================
+
+The custom radio component allows for a better cross browser positioning
+and the use of the `invalid` variant.
+
+Note that although IE11 ignores the basic styles, the component is still
+completely functional and accessible.
+*/
+
+
+// Size of the component.
+
+$radio-size: 14px;
+
+
+// Color for when the component is checked.
+
+$radio-color: saturate($color-blue, 15%);
+
+
+/*
+ * Add the class directly to any radio input.
+ */
+.radio {
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid $color-gray;
+    border-radius: 50%;
+    height: $radio-size;
+    @include position(relative, 0.1em null null null);
+    transition: border 100ms ease-out;
+    width: $radio-size;
+
+    &:checked {
+        background-color: #fff;
+        border: 5px solid $radio-color;
+    }
+
+    &:focus {
+        border-color: $color-blue;
+        box-shadow: 0 0 0 3px $color-blue-lighten-3;
+        outline: 0;
+    }
+
+    &:active {
+        filter: brightness(0.95) saturate(2);
+    }
+}
+
+
+/* Validation
+============================================================================= */
+
+/*
+ * Styles for radio components that failed validation.
+ */
+.radio--invalid {
+    border-color: $color-danger;
+    box-shadow: 0 0 4px lighten($color-danger, 10%);
+}

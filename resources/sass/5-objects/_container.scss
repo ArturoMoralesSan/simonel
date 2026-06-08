@@ -1,0 +1,56 @@
+/*
+================================================================================
+Container
+================================================================================
+
+The container object is widely used in a project to wrap the content and
+provide some padding between the elements and the edge of the window.
+
+Two types of containers are provided: the `.fluid-container` will
+always stretch to fill the full width of the browser window, while
+the `.container` is limited to the defined max-width.
+*/
+
+
+// The maximum width for the `.container` object.
+// A default of 1170 px is provided, which is the sum
+// of 12 columns of 70 px each, using the default gutter of 30 px.
+// Modify this value as you like.
+
+$container-max-width: 1170px !default;
+
+
+// Define if the `.container` object should be horizontally centered.
+
+$container-centered: true !default;
+
+
+.container,
+.fluid-container,
+.container-sm_fw {
+    @include fluid(padding-left, ($gutter / 2), $gutter, 320px, bp(md));
+    @include fluid(padding-right, ($gutter / 2), $gutter, 320px, bp(md));
+    width: 100%;
+}
+
+.container, .container-sm_fw {
+    @if ($container-centered) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    max-width: $container-max-width;
+}
+
+.container-sm_fw {
+    @if ($container-centered) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @include media(200px, 479px) {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+}

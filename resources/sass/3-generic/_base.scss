@@ -1,0 +1,103 @@
+/*
+================================================================================
+Base
+================================================================================
+
+Resets and basic styles on top of Normalize.css.
+*/
+
+/*
+ * Set up vertical rhythm in block elements.
+ * A recommendation by Harry Roberts:
+ * http://csswizardry.com/2012/06/single-direction-margin-declarations
+ */
+address, blockquote, figure,
+h1, h2, h3, h4, h5, h6,
+dl, ol, ul, p, pre,
+form, fieldset {
+    margin-bottom: $spacer;
+    margin-top: 0;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ * https://github.com/h5bp/html5-boilerplate/issues/440
+ */
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+/*
+ * Work around a Firefox/IE bug where the transparent button background
+ * results in a loss of the default button focus styles.
+ * Credit: https://github.com/suitcss/base
+ */
+button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+fieldset {
+    border: 0;
+    padding: 0;
+}
+
+iframe {
+    border: 0;
+}
+
+img,
+embed,
+object,
+audio,
+video {
+    max-width: 100%;
+}
+
+img,
+video {
+    height: auto;
+}
+
+/*
+ * Add the correct display for IE 11.
+ */
+main {
+    display: block;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-top: 0;
+}
+
+caption,
+td,
+th {
+    text-align: left;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/*
+ * Suppress the focus outline on elements that cannot be accessed via keyboard.
+ * This prevents an unwanted focus outline from appearing around elements that
+ * might still respond to pointer events.
+ * Credit: https://github.com/suitcss/base
+ */
+[tabindex="-1"]:focus {
+    outline: none !important;
+}

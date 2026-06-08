@@ -1,0 +1,117 @@
+/*
+================================================================================
+Alignment
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("text-alignment") {
+    @include media($min-width) {
+
+        #{set-affix("text-center", $affix)} { text-align: center !important; }
+        #{set-affix("text-left", $affix)}   { text-align: left !important; }
+        #{set-affix("text-right", $affix)}  { text-align: right !important; }
+
+    }
+}
+
+
+/*
+================================================================================
+Color
+================================================================================
+*/
+
+
+// The colors used for generating text-color utility classes.
+// By default, the `$utility-colors` defined in `1-settings/_utilities`
+// are used, along with a couple more specifically for text.
+//
+// The following class is generated for each one of these colors:
+//
+// .color-{name}
+
+$utility-text-colors: map-merge($utility-colors,
+    (
+        "text": $color-text,
+        "link-focus": $color-link-focus
+    )
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("text-color") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-text-colors {
+            #{set-affix("color-" + $name, $affix)} {
+                color: $value;
+            }
+        }
+
+    }
+}
+
+
+/*
+================================================================================
+Leading
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("leading") {
+    @include media($min-width) {
+
+        #{set-affix("leading-none", $affix)}   { line-height: 1; }
+        #{set-affix("leading-tight", $affix)}  { line-height: $line-height-tight; }
+        #{set-affix("leading-normal", $affix)} { line-height: $line-height; }
+        #{set-affix("leading-loose", $affix)}  { line-height: $line-height-loose; }
+
+    }
+}
+
+
+/*
+================================================================================
+Size
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("text-size") {
+    @include media($min-width) {
+
+        #{set-affix("size-base", $affix)}    { font-size: $font-size; }
+        #{set-affix("size-xs", $affix)}      { font-size: 65%; }
+        #{set-affix("size-sm", $affix)}      { font-size: 80%; }
+        #{set-affix("size-caption", $affix)} { font-size: 90%; }
+        #{set-affix("size-normal", $affix)}  { font-size: 100%; }
+        #{set-affix("size-lg", $affix)}      { font-size: 112%; }
+        #{set-affix("size-xl", $affix)}      { font-size: 125%; }
+
+    }
+}
+
+
+/*
+================================================================================
+Ellipsis
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("text-ellipsis") {
+    @include media($min-width) {
+
+        /*
+         * Truncate long text with an ellipsis.
+         */
+        #{set-affix("truncate", $affix)} {
+            @include truncate;
+        }
+
+        /*
+         * Reset the properties of the `truncate` class to default values.
+         */
+        #{set-affix("truncate-none", $affix)} {
+            @include truncate-none;
+        }
+
+    }
+}

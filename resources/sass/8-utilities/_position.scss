@@ -1,0 +1,26 @@
+/*
+================================================================================
+Position
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("position") {
+    @include media($min-width) {
+
+        #{set-affix("absolute", $affix)} { position: absolute !important; }
+        #{set-affix("fixed", $affix)}    { position: fixed !important; }
+        #{set-affix("relative", $affix)} { position: relative !important; }
+        #{set-affix("static", $affix)}   { position: static !important; }
+        #{set-affix("sticky", $affix)}   { position: sticky !important; }
+
+        #{set-affix("bottom-0", $affix)}    { bottom: 0 !important; }
+        #{set-affix("bottom-auto", $affix)} { bottom: auto !important; }
+        #{set-affix("left-0", $affix)}      { left: 0 !important; }
+        #{set-affix("left-auto", $affix)}   { left: auto !important; }
+        #{set-affix("right-0", $affix)}     { right: 0 !important; }
+        #{set-affix("right-auto", $affix)}  { right: auto !important; }
+        #{set-affix("top-0", $affix)}       { top: 0 !important; }
+        #{set-affix("top-auto", $affix)}    { top: auto !important; }
+
+    }
+}

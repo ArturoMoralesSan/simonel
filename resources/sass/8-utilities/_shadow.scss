@@ -1,0 +1,23 @@
+/*
+================================================================================
+Shadow
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("shadow") {
+    @include media($min-width) {
+
+        #{set-affix("shadow", $affix)} {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #{set-affix("shadow-lg", $affix)} {
+            box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        #{set-affix("shadow-none", $affix)} {
+            box-shadow: none !important;
+        }
+
+    }
+}

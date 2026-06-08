@@ -1,0 +1,100 @@
+// =============================================================================
+// Button
+// =============================================================================
+
+
+// Add color styles to a button.
+//
+// @param {map} $options
+// @prop {color} $options.background-color [#fff]
+// @prop {color} $options.background-color-hover [#f2f2f2]
+// @prop {color} $options.background-color-active [#fcfcfc]
+// @prop {color} $options.border-color [transparent]
+// @prop {color} $options.border-color-hover [transparent]
+// @prop {color} $options.border-color-active [transparent]
+// @prop {color} $options.text-color [rgba(#000, 0.7)]
+// @prop {color} $options.text-color-hover [rgba(#000, 0.7)]
+
+@mixin button($options: ()) {
+    $bg-color: map-get($options, background-color) or #fff;
+    $bg-color-hover: contrast-color($bg-color, darken($bg-color, 5%), lighten($bg-color, 5%));
+    $bg-color-active: contrast-color($bg-color, darken($bg-color, 10%), lighten($bg-color, 10%));
+
+    $props: map-merge((
+            background-color: $bg-color,
+            background-color-hover: if($bg-color == transparent, $bg-color, $bg-color-hover),
+            background-color-active: if($bg-color == transparent, $bg-color, $bg-color-active),
+            border-color: transparent,
+            border-color-hover: map-get($options, border-color) or transparent,
+            border-color-active: map-get($options, border-color) or transparent,
+            text-color: contrast-color($bg-color, rgba(#000, 0.7), #fff),
+            text-color-hover: null
+        ), $options
+    );
+
+    background-color: map-get($props, background-color);
+    border: 1px solid map-get($props, border-color);
+    color: map-get($props, text-color);
+    transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out;
+
+    &:focus,
+    &:hover,
+    &:active {
+        color: map-get($props, text-color-hover) or map-get($props, text-color);
+        text-decoration: none;
+    }
+
+    &:focus,
+    &:hover {
+        background-color: map-get($props, background-color-hover);
+        border-color: map-get($props, border-color-hover);
+    }
+
+    &:active {
+        background-color: map-get($props, background-color-active);
+        border-color: map-get($props, border-color-active);
+    }
+
+    &:disabled:focus,
+    &:disabled:hover,
+    &:disabled:active {
+        background-color: map-get($props, background-color);
+        border-color: map-get($props, border-color);
+        color: map-get($props, text-color);
+    }
+
+    &.btn--loading::after {
+        border-right-color: map-get($props, text-color);
+        border-top-color: map-get($props, text-color);
+    }
+}
+
+
+// Add color styles to an outlined button.
+//
+// @param {map} $options
+// @prop {color} $options.background-color [transparent]
+// @prop {color} $options.background-color-hover [transparent]
+// @prop {color} $options.background-color-active [transparent]
+// @prop {color} $options.border-color [$color-primary]
+// @prop {color} $options.border-color-hover [darken($text-color, 15%)]
+// @prop {color} $options.border-color-active [$color-primary]
+// @prop {color} $options.text-color [$color-primary]
+// @prop {color} $options.text-color-hover [darken($text-color, 15%)]
+
+@mixin button-outline($options: ()) {
+    $text-color: map-get($options, text-color) or $color-primary;
+    $text-color-hover: contrast-color($text-color, darken($text-color, 15%), lighten($text-color, 15%));
+
+    $props: map-merge((
+            background-color: transparent,
+            border-color: $text-color,
+            border-color-hover: $text-color-hover,
+            border-color-active: $text-color,
+            text-color: $text-color,
+            text-color-hover: $text-color-hover
+        ), $options
+    );
+
+    @include button($props);
+}

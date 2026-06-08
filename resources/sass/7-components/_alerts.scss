@@ -1,0 +1,187 @@
+/*
+================================================================================
+Alerts
+================================================================================
+
+Show feedback to users in a nice dedicated container.
+*/
+
+// Define the side for the `accent border` variant.
+// Accepted values: `top`, `left`, `right`, `bottom`.
+
+$alert-accent-border-side: "left";
+
+
+// Font size for the alert component. Use pixels or rems.
+
+$alert-font-size: 15px;
+
+
+// Define the `border-radius` property for the alert component.
+// The global `$radius` value is used by default.
+
+$alert-radius: $radius;
+
+
+// Horizontal padding.
+
+$alert-padding-x: 1em;
+
+
+// Vertical padding.
+
+$alert-padding-y: 0.75em;
+
+
+// Icon for "info" type alerts.
+
+$message-icon-info: icon-info($size: 23);
+
+
+// Icon for "info" type alerts with strong background.
+
+$message-icon-info-strong: icon-info(#fff, 23);
+
+
+// Icon for "danger" type alerts.
+
+$message-icon-danger: icon-error($size: 23);
+
+
+// Icon for "danger" type alerts with strong background.
+
+$message-icon-danger-strong: icon-error(#fff, 23);
+
+
+// Icon for "success" type alerts.
+
+$message-icon-success: icon-check();
+
+
+// Icon for "success" type alerts with strong background.
+
+$message-icon-success-strong: icon-check(#fff);
+
+
+// Icon for "warning" type alerts.
+
+$message-icon-warning: icon-solid-warning($color-warning);
+
+
+// Icon for "warning" type alerts with strong background.
+
+$message-icon-warning-strong: icon-warning($color-warning-text, 23);
+
+
+/*
+ * For simple messages, you can add the class directly to a paragraph element.
+ * Alternatively, it can be applied to a div tag with any content you wish.
+ */
+.alert {
+    background-color: $color-gray-lighten-4;
+    border-radius: $alert-radius;
+    font-size: rem($alert-font-size);
+    margin-bottom: $spacer;
+    padding: $alert-padding-y $alert-padding-x;
+
+    &--info {
+        background-color: $color-info-light;
+        color: $color-info-text;
+    }
+
+    &--danger {
+        background-color: $color-danger-light;
+        color: $color-danger-text;
+    }
+
+    &--success {
+        background-color: $color-success-light;
+        color: $color-success-text;
+    }
+
+    &--warning {
+        background-color: $color-warning-light;
+        color: $color-warning-text;
+    }
+    &--tiny {
+        font-size: rem(9px);
+    }
+}
+
+
+
+
+/* Bordered variant
+============================================================================= */
+
+/*
+ * Add a thin border for a better contrast in certain backgrounds.
+ */
+.alert--bordered {
+    border: 1px solid $color-border;
+
+    &.alert--info    { border-color: $color-info-border; }
+    &.alert--danger  { border-color: $color-danger-border; }
+    &.alert--success { border-color: $color-success-border; }
+    &.alert--warning { border-color: $color-warning-border; }
+}
+
+
+/* Accent border variant
+============================================================================= */
+
+/*
+ * Make one border stand out with color and size.
+ */
+.alert--has-accent-border {
+    border-#{$alert-accent-border-side}: 4px solid $color-gray-darken-4;
+
+    &.alert--info    { border-#{$alert-accent-border-side}-color: $color-info; }
+    &.alert--danger  { border-#{$alert-accent-border-side}-color: $color-danger; }
+    &.alert--success { border-#{$alert-accent-border-side}-color: $color-success; }
+    &.alert--warning { border-#{$alert-accent-border-side}-color: $color-warning; }
+}
+
+
+/* Strong background variant
+============================================================================= */
+
+/*
+ * Use a stronger background color.
+ */
+.alert--strong {
+    background-color: $color-gray-darken-4;
+    color: rgba(#fff, 0.95);
+
+    &.alert--danger  { background-color: $color-danger; }
+    &.alert--info    { background-color: $color-info; }
+    &.alert--success { background-color: $color-success; }
+
+    &.alert--warning {
+        background-color: $color-warning;
+        color: $color-warning-text;
+    }
+}
+
+
+/* With icons
+============================================================================= */
+
+/*
+ * Emphasize the text with a status icon.
+ */
+.alert--has-icon {
+    background-position: 1em 0.75em;
+    background-repeat: no-repeat;
+    padding-left: 50px;
+
+    &.alert--info    { background-image: url($message-icon-info); }
+    &.alert--success { background-image: url($message-icon-success); }
+    &.alert--warning { background-image: url($message-icon-warning); }
+    &.alert--danger  { background-image: url($message-icon-danger); }
+
+    &.alert--strong.alert--info    { background-image: url($message-icon-info-strong); }
+    &.alert--strong.alert--success { background-image: url($message-icon-success-strong); }
+    &.alert--strong.alert--warning { background-image: url($message-icon-warning-strong); }
+    &.alert--strong.alert--danger  { background-image: url($message-icon-danger-strong); }
+}

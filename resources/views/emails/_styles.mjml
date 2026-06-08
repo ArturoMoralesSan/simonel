@@ -1,0 +1,49 @@
+<mj-attributes>
+    <mj-button
+        color="#fff"
+        font-size="10px"
+        font-family="sans-serif"
+        line-height="18px"
+    />
+
+    <mj-text
+        color="#6f7d8a"
+        font-size="10px"
+        font-family="sans-serif"
+        line-height="23px"
+    />
+
+    <mj-divider
+        border-color="#adb5bd"
+        border-style="dotted"
+        border-width="1px"
+        padding-bottom="0"
+        padding-top="0"
+    />
+</mj-attributes>
+
+<mj-style inline="inline">
+.body-section {
+      -webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+      -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+      box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+
+      }
+</mj-style>
+    <mj-style inline="inline">
+    .text-link {
+      color: #5e6ebf
+      }
+      </mj-style>
+    <mj-style inline="inline">
+    .footer-link {
+      color:rgb(30, 44, 66);
+      }
+      </mj-style>
+
+<mj-style>
+.background-body {
+        background-color:rgb(30, 44, 66);
+        font-size: 10px;
+    }
+</mj-style>

@@ -1,0 +1,30 @@
+.directory__image {
+ 	max-width: 120px;
+    margin: 0 auto;
+    display: block;
+    background: #fbfbfb;
+    height: 120px;
+ }
+
+ .directory__contact {
+ 	color:#b1b1b1;
+ }
+
+.directory-column__image {
+	@include column(1/1);
+	
+	@include media(799) {
+		@include column(1/6);
+	}
+ }
+
+.direcory-column__description {
+	@include column(1/1);
+	text-align: center;
+    margin-top: 30px;
+	@include media(800) {
+		@include column(5/6);
+		text-align: left;
+   		margin-top: 0;
+	}
+ }

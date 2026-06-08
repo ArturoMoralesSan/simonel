@@ -1,0 +1,38 @@
+// =============================================================================
+// Fractions
+// =============================================================================
+
+
+// Specify if you want to use fractions in grid and width utility classes.
+// For example, if the value is set to true, the framework will generate
+// classes like .col-1/2 for the grid system. If false, the same
+// class would be written as .col-1-2.
+
+$fractions-in-class-names: true !default;
+
+
+// =============================================================================
+// Responsive class names
+// =============================================================================
+//
+// Sonata uses a prefix with a colon as separator for generating
+// responsive classes. For example, a padding-top utility class
+// with the default settings would look like this: .md:pt-1.
+//
+// You can change the way the class names are generated with the following
+// settings, so your classes look like .md-pt-1 or .pt-1@md.
+//
+// By default, responsive variants are generated for the grid system and
+// some utility classes, but may be used for any other class that you want.
+
+
+// Use a suffix instead of a prefix in responsive classes names.
+
+$use-responsive-suffix: false !default;
+
+
+// The separator between the affix and the rest of the name.
+// Be sure to escape css special characters like `:` or `@` with
+// double backslashes.
+
+$responsive-separator: "\\:" !default;

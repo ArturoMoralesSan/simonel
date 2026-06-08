@@ -1,0 +1,71 @@
+<mjml>
+  <mj-head>
+    <mj-title>El registro fue exitoso</mj-title>
+      <mj-include path="./_styles.mjml" />
+  </mj-head>
+  <mj-body css-class="background-body" width="600px">
+    <mj-include path="./_header.mjml" />
+    <mj-wrapper padding-top="0" padding-bottom="0px" css-class="body-section">
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column>
+            <mj-text font-size="12px">
+              
+                Estimado/a {{ $user->name }} {{ $user->last_name}} <br>
+                Nos complace informarte que la orden de trabajo #[Número de orden] ha sido completada con éxito. Nuestro equipo ha finalizado todas las tareas solicitadas y la orden ha sido cerrada. <br>
+              
+            </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px" padding-top="0">
+        <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+                <mj-text font-size="12px">
+                    
+                  <strong>Detalles de la Orden de Trabajo:</strong>
+                </mj-text>
+                <mj-table font-size="12px" color="#000" cellpadding="3" cellspacing="0" width="100%" >
+                            <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                                <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Número de Orden:</th>
+                                <td style="padding-bottom: 10px;">#{{ $order->id }}</td>
+                            </tr>
+                            <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                                <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Fecha de Finalización:</th>
+                                <td style="padding-bottom: 10px;">{{ $order->updated_at->format('d/m/Y') }}</td>
+                            </tr >
+                            <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                                <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Descripción de la order realizada:</th>
+                                <td style="padding-bottom: 10px;">
+                                    <strong>Producto:</strong> {{ $sale->product_name }}<br>
+                                    <strong>Material:</strong> {{ $sale->product->name }}<br>
+                                    <strong>Tipo:</strong> {{ $sale->product->type->name }}<br>
+                                    <strong>Corte:</strong> {{ $sale->product->cut->name }}<br>
+                                    <strong>Ancho:</strong> {{ $sale->width }} cm <br>
+                                    <strong>Alto:</strong> {{ $sale->height }} cm <br>
+                                    <strong>Total:</strong> {{ $sale->sale_price }}
+                                </td>
+                            </tr>
+                </mj-table>
+                
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column width="100%">
+         <mj-text font-size="12px"> 
+            Si tienes alguna pregunta, necesitas más información o algún ajuste adicional, no dudes en contactarnos.<br>
+
+            Agradecemos la confianza depositada en nuestros servicios.
+         </mj-text>
+        </mj-column>
+
+        <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+        </mj-column>
+          <mj-include path="./_footer.mjml" />
+
+      </mj-section>
+    </mj-wrapper>
+    
+  </mj-body>
+</mjml>

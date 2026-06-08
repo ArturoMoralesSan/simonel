@@ -1,0 +1,89 @@
+// =============================================================================
+// Media queries
+// =============================================================================
+
+
+// Wrap the content in a media query determined by the values of `$min-width`
+// and `$max-width` arguments:
+// - If only one argument is provided, the appropriate min-width or
+// max-width media query is used.
+// - If both arguments are provided, a media query ranging between the two
+// breakpoints is used.
+// - If both arguments are null, the content is returned without a media query.
+//
+// To prevent overlapping media queries, 1 pixel is subtracted from
+// `$max-width`.
+//
+// @param {number | string | null} $min-width - Accepts a key registered
+//     in the `$breakpoints` map or a value in ems or pixels.
+// @param {number | string | null} $max-width [null] - Accepts a key
+//     registered in the `$breakpoints` map or a value in ems or pixels.
+
+@mixin media($min-width, $max-width: null) {
+    $min-width: if(map-has-key($breakpoints, $min-width), bp($min-width, px), $min-width);
+    $min-width: if($min-width and $min-width <= 0, null, $min-width);
+
+    $max-width: if(map-has-key($breakpoints, $max-width), bp($max-width, px), $max-width);
+    $max-width: if($max-width and $max-width <= 0, null, $max-width);
+
+    @if ($max-width and unit($max-width) == "em") {
+        $max-width: px($max-width);
+    }
+
+    @if not $min-width and not $max-width {
+        @content
+    } @else if $min-width and not $max-width {
+        @media (min-width: em($min-width)) {
+            @content
+        }
+    } @else if not $min-width and $max-width {
+        @media (max-width: em($max-width - 1)) {
+            @content
+        }
+    } @else {
+        @media (min-width: em($min-width)) and (max-width: em($max-width - 1)) {
+            @content
+        }
+    }
+}
+
+
+// Wrap the content in a max-width media query.
+// To prevent overlapping media queries, 1 pixel is subtracted from
+// `$max-width`.
+//
+// @param {number | string} $max-width - Accepts a key registered in the
+//     `$breakpoints` map or a value in ems or pixels.
+
+@mixin media-until($max-width) {
+    @include media(null, $max-width) {
+        @content
+    }
+}
+
+
+// Wrap the content in a media query ranging between the given breakpoints.
+// To prevent overlapping media queries, 1 pixel is subtracted from
+// `$max-width`.
+//
+// @param {number | string} $min-width - Accepts a key registered in the
+//     `$breakpoints` map or a value in ems or pixels.
+// @param {number | string} $max-width - Accepts a key registered in the
+//     `$breakpoints` map or a value in ems or pixels.
+
+@mixin media-between($min-width, $max-width) {
+    @include media($min-width, $max-width) {
+        @content
+    }
+}
+
+
+// Wrap the content for high resolution displays.
+
+@mixin media-retina {
+    @media only screen and (min-device-pixel-ratio: 2),
+        only screen and (min-resolution: 192dpi),
+        only screen and (min-resolution: 2dppx) {
+            @content
+    }
+}

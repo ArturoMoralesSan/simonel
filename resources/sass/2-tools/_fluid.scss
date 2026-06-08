@@ -1,0 +1,64 @@
+// =============================================================================
+// Fluid
+// =============================================================================
+
+
+// Constrain a property between two values, between two breakpoints. e.g.:
+//
+// .element {
+//     @include fluid(padding, 1em, 2em, 320px, 600px);
+// }
+//
+// Credit: Luca Rosaldi
+// https://codepen.io/LucaRosaldi/pen/RgPbeR
+// https://css-tricks.com/between-the-lines/
+//
+// @author Luca Rosaldi
+// @param {string} $property
+// @param {number} $from-value - Minimum value
+// @param {number} $to-value - Maximum value
+// @param {number} $from-bp - Minimum viewport width in pixels or ems.
+// @param {number} $to-bp - Maximum viewport width in pixels or ems.
+
+@mixin fluid($property, $from-value, $to-value, $from-bp, $to-bp) {
+    $from-bp: px($from-bp);
+    $to-bp: px($to-bp);
+    $from-values: ();
+    $between-values: ();
+    $to-values: ();
+
+    @for $i from 1 through length($from-value) {
+        $fv: nth($from-value, $i);
+        $tv: nth($to-value, $i);
+
+        $bv: $fv;
+        $bvf: false;
+        $bvt: false;
+
+        @if (type-of($fv) == "number" and not unitless($fv) and unit($fv) != "%") {
+            $fv: if(unit($fv) != "px", ($fv / ($fv * 0 + 1) * 16) * 1px, $fv);
+            $bvf: $fv;
+        }
+        @if (type-of($tv) == "number" and not unitless($tv) and unit($tv) != "%") {
+            $tv: if(unit($tv) != "px", ($tv / ($tv * 0 + 1) * 16) * 1px, $tv);
+            $bvt: $tv;
+        }
+        @if ($bvf != false and $bvt != false) {
+            $bv: value-between($bvf, $bvt, $from-bp, $to-bp);
+        }
+
+        $from-values: append($from-values, $fv);
+        $between-values: append($between-values, $bv);
+        $to-values: append($to-values, $tv);
+    }
+
+    #{$property}: $from-values;
+
+    @media (min-width: em($from-bp)) {
+        #{$property}: $between-values;
+    }
+
+    @media (min-width: em($to-bp)) {
+        #{$property}: $to-values;
+    }
+}

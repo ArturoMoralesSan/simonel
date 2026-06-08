@@ -1,0 +1,51 @@
+<mjml>
+  <mj-head>
+    <mj-title>El registro fue exitoso</mj-title>
+    <mj-include path="./_styles.mjml" />
+    
+  </mj-head>
+  <mj-body css-class="background-body" width="600px">
+    <mj-include path="./_header.mjml" />
+    <mj-wrapper padding-top="0" padding-bottom="0px" css-class="body-section">
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column>
+            <mj-text font-size="12px">
+    
+                Hola <strong>{!! $user->name !!} {!! $user->last_name !!}</strong> <br>
+                ¡Gracias por registrarte en Atvantag3! Estamos emocionados de tenerte a bordo. <br>
+                Para poder acceder a tu cuenta, haz clic en el siguiente botón<br>               
+            </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px" padding-top="0">
+        <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+                <mj-button href="https://atvantag3.com/login" background-color="#21314b" color="#ffffff" font-size="12px">
+                    Acceder a la cuenta
+            </mj-button>
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-top="0" padding-left="15px" padding-right="15px">
+        <mj-column width="100%">
+         <mj-text font-size="12px"> 
+                Si no creaste esta cuenta, puedes ignorar este mensaje.<br>
+                Si tienes alguna pregunta, no dudes en contactarnos.
+                ¡Bienvenido a Atvantag3!<br>
+                Saludos,<br>
+                <strong>El equipo de Atvantag3</strong> <br>
+         </mj-text>
+        </mj-column>
+          <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+        </mj-column>
+
+        <mj-include path="./_footer.mjml" />
+      </mj-section>
+      
+    </mj-wrapper>
+    
+    
+  </mj-body>
+</mjml>

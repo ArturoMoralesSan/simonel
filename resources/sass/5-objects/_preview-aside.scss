@@ -1,0 +1,36 @@
+/*
+================================================================================
+Preview aside
+================================================================================
+
+An object that changes the order of preview boxes in dashboard panels.
+*/
+
+.preview-aside {
+    margin-bottom: $spacer * 3;
+    text-align: center;
+
+    @include media(md) {
+        margin-bottom: 0;
+        margin-left: auto;
+        order: 1;
+        width: 25%;
+    }
+}
+
+.preview-aside__box {
+    margin-bottom: $spacer * 1.5;
+    margin-left: auto;
+    margin-right: auto;
+
+    @include media(md) {
+        max-width: none;
+        width: 100%;
+    }
+}
+
+.preview-aside__btn {
+    @include media(md) {
+        width: 100%;
+    }
+}

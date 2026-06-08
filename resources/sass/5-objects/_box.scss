@@ -1,0 +1,22 @@
+/*
+================================================================================
+Box
+================================================================================
+
+The box object is just a container with some padding for breathing room.
+*/
+
+.box {
+    margin-bottom: $spacer;
+    padding: $spacer;
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+
+    &--xs  { padding: $spacer * 0.5; }
+    &--sm  { padding: $spacer * 0.75; }
+    &--lg  { padding: $spacer * 1.5; }
+    &--xl  { padding: $spacer * 2; }
+    &--2xl { padding: $spacer * 3; }
+}

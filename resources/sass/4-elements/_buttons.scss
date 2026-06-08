@@ -1,0 +1,16 @@
+/*
+================================================================================
+Buttons
+================================================================================
+*/
+
+button {
+    cursor: pointer;
+    display: inline-block;
+    font-size: rem($font-size);
+    vertical-align: middle;
+
+    &:disabled {
+        @include disabled;
+    }
+}

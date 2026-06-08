@@ -1,0 +1,89 @@
+// =============================================================================
+// Grid
+// =============================================================================
+
+
+// Return the styles for a flexbox column.
+// It calls the `grid-column` mixin, and makes it possible to pass the first
+// argument as a numeric fraction (without quotes), e.g.:
+//
+// .example {
+//     @include column(1/2);
+// }
+//
+// @param {string} $fraction [1/1] - Column width expressed as a fraction.
+// @param {number} $cycle - Specify which iteration of the generated class
+//     will be treated as the last element of each row and pushed to the right.
+//     The denominator of the passed function is used as default.
+//     Use a value of 0 to ignore.
+// @param {number} $gutter [$gutter] - Gutter in pixels, rems or percentage.
+//     The global $gutter is used as default.
+
+@mixin column($args...) {
+    @if (length($args) == 0) {
+        @include grid-column;
+    } @else {
+        $delimeter-position: str-index(inspect($args), ",");
+        $fraction: str-slice(inspect($args), 1, $delimeter-position - 1);
+
+        $parenthesis-position: str-index(inspect($fraction), "(");
+
+        @if ($parenthesis-position != null) {
+            $fraction: str-slice($fraction, $parenthesis-position + 1);
+        }
+
+        $new-args: set-nth($args, 1, $fraction);
+
+        @include grid-column($new-args...);
+    }
+}
+
+
+// Return the styles for a flexbox column.
+// Based on LostGrid system (http://lostgrid.org).
+//
+// @param {string} $fraction [1/1] - Column width expressed as a fraction.
+// @param {number} $cycle - Specify which iteration of the generated class
+//     will be treated as the last element of each row and pushed to the right.
+//     The denominator of the passed function is used as default.
+//     Use a value of 0 to ignore.
+// @param {number} $gutter [$gutter] - Gutter in pixels, rems or percentage.
+//     The global $gutter is used as default.
+
+@mixin grid-column($fraction: "1/1", $cycle: get-denominator($fraction), $gutter: $gutter) {
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    @if $fraction == "1/1" {
+        width: 100%;
+    } @else {
+        width: calc(99.9% * #{$fraction} - #{$gutter - (divide-fraction($fraction) * $gutter)});
+    }
+
+    &:nth-child(n) {
+        margin-left: 0;
+        margin-right: $gutter;
+    }
+
+    &:last-child {
+        margin-right: 0;
+    }
+
+    @if $cycle != 0 {
+        &:nth-child(#{$cycle}n) {
+            margin-left: auto;
+            margin-right: 0;
+        }
+    }
+}
+
+
+// Offset a column by the given distance.
+//
+// @param {string} $fraction - The distance to move, expressed as a fraction.
+// @param {number} $gutter [$gutter] - Space between columns in pixels, rems
+//     or percentage. The global $gutter is used as default.
+
+@mixin offset($fraction, $gutter: $gutter) {
+    margin-left: calc(99.9% * #{$fraction} - #{$gutter - (divide-fraction($fraction) * $gutter) + #{$gutter}});
+}

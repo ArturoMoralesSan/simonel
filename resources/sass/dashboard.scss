@@ -1,0 +1,19 @@
+$font-family-primary: "Lato", sans-serif;
+$font-family-headings: "Lato", sans-serif;
+
+$font-size: 15px;
+$font-size-h1: $font-size * 1.6;
+
+@import "main.scss";
+
+@import "5-objects/_preview-aside";
+
+@import "7-components/_dashboard-headings";
+@import "7-components/_dashboard-menu";
+@import "7-components/_dashboard-panel";
+@import "7-components/_gallery-panel";
+@import "7-components/_pagination";
+@import "7-components/_seach-form";
+@import "7-components/_statistics";
+@import "7-components/_tabs";
+

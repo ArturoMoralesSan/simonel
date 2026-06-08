@@ -1,0 +1,22 @@
+/*
+================================================================================
+Page
+================================================================================
+*/
+
+/*
+ * 1. Set the global font-size in ems.
+ */
+html {
+    font-family: $font-family-primary;
+    font-size: em($font-size); /* 1 */
+    font-weight: $font-weight;
+    line-height: $line-height;
+    min-height: 100%;
+}
+
+body {
+    background-color: #F5F6F8;
+    color: $color-text;
+    padding: 0;
+}

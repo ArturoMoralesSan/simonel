@@ -1,0 +1,34 @@
+// =============================================================================
+// Position
+// =============================================================================
+
+
+// Set an element position and coordinates.
+// Credit: http://bourbon.io/docs/#position
+//
+// @param {string} $position [relative]
+// @param {list} $coords
+
+@mixin position($position: relative, $coords: null null null null) {
+    @if type-of($position) == list {
+        $coords: $position;
+        $position: relative;
+    }
+
+    $coords: unpack-shorthand($coords);
+
+    $offsets: (
+        top:    nth($coords, 1),
+        right:  nth($coords, 2),
+        bottom: nth($coords, 3),
+        left:   nth($coords, 4)
+    );
+
+    position: $position;
+
+    @each $offset, $value in $offsets {
+        @if is-length($value) {
+            #{$offset}: $value;
+        }
+    }
+}

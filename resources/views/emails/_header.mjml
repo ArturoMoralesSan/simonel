@@ -1,0 +1,14 @@
+<mj-hero
+    css-class="background-body"
+    mode="fixed-height"
+    height="140px"
+    background-color="transparent"
+    padding="15px 0 0"
+>
+    <mj-image src="	https://atvantag3.com/img/advantage-logo.png"
+        alt="atvantage"
+        padding-bottom="20px"
+        padding-top="0"
+        width="150px"
+    />
+</mj-hero>

@@ -1,0 +1,47 @@
+.footer__container-direction {
+    background-color: #0A121E;
+    padding: 25px 0;
+}
+.footer_container-title {
+    color: #FFFFFF;
+}
+
+.footer_container-text {
+	color:#fdfdfd;
+	font-size: 15px;
+}
+
+.footer__container-logo {
+    background-color: $color-red;
+    padding: 30px 0;
+}
+.footer__logo{
+    display: block;
+    margin: 0 auto;
+    width: 250px;
+    /* margin-top: 0; */
+    height: 130px;
+}
+
+ .footer__svg {
+   color:#ffffff;
+   margin-right: 10px;
+ }
+
+ .footer__maps {
+ 	max-width: 470px;
+ 	width: 100%;
+ 	@include media(300, 960) {
+ 		display: block;
+    	margin: 0 auto;
+ 	}
+ }
+
+ .footer__col-text {
+ 	text-align: center;
+ 	margin-bottom: 10px;
+ 	@include media(960) {
+		text-align: left;
+		margin-bottom: 0;
+ 	}
+ }

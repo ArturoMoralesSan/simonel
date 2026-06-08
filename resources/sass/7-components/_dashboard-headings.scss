@@ -1,0 +1,24 @@
+/*
+================================================================================
+Dashboard heading
+================================================================================
+*/
+
+.dashboard-heading {
+    background-color: #fff;
+    border-bottom: 1px solid $color-border;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: $spacer * 3;
+    padding: 1.2em $gutter;
+}
+
+.dashboard-heading__caption {
+    color: $color-gray-darken-1;
+    font-size: 85%;
+    padding-top: 0.5em;
+}
+
+.dashboard-heading__title {
+    font-weight: 400;
+    margin-bottom: 0;
+}

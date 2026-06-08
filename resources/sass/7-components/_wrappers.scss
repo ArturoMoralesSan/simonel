@@ -1,0 +1,31 @@
+/*
+================================================================================
+Dashboard main
+================================================================================
+*/
+
+.db-main {
+    background-color: $color-gray-lighten-5;
+    height: calc(100vh - 60px);
+    overflow: auto;
+    transition: padding-left 200ms linear;
+    width: 100%;
+
+    @include media(1100) {
+        &--has-menu {
+            padding-left: 300px;
+        }
+    }
+}
+
+.text_reset-pass {
+    text-align: center;
+}
+.text_reset-pass a {
+    font-size: 12px;
+}
+
+.text_remember {
+    font-size: 12px;
+}
+

@@ -1,0 +1,74 @@
+/*
+================================================================================
+Checkbox
+================================================================================
+
+The custom checkbox component allows for a better cross browser positioning
+and the use of the `invalid` variant.
+
+Note that although IE11 ignores the basic styles, the component is still
+completely functional and accessible.
+*/
+
+
+// Size of the component.
+
+$checkbox-size: 13px;
+
+
+// Define the `border-radius` property for the component.
+
+$checkbox-radius: $radius-sm;
+
+
+// Color for when the component is checked.
+
+$checkbox-color: saturate($color-blue, 15%);
+
+
+// Icon to display when the component is checked.
+
+$checkbox-icon: icon-check(#fff, $checkbox-size, 3);
+
+
+/*
+ * Add the class directly to any checkbox input.
+ */
+.checkbox {
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid $color-gray;
+    border-radius: $checkbox-radius;
+    height: $checkbox-size;
+    @include position(relative, 0.05em null null null);
+    transition: background-color 150ms ease-out;
+    width: $checkbox-size;
+
+    &:checked {
+        background: $checkbox-color url($checkbox-icon) center center no-repeat;
+        border-color: $checkbox-color;
+    }
+
+    &:focus {
+        border-color: $color-blue;
+        box-shadow: 0 0 0 3px $color-blue-lighten-3;
+        outline: 0;
+    }
+
+    &:active {
+        box-shadow: 0 0 0 1px rgba(#000, 0.2) inset;
+        filter: brightness(0.95) saturate(2);
+    }
+}
+
+
+/* Validation
+============================================================================= */
+
+/*
+ * Styles for checkbox components that failed validation.
+ */
+.checkbox--invalid {
+    border-color: $color-danger;
+    box-shadow: 0 0 4px lighten($color-danger, 10%);
+}

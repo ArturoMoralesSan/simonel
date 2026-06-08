@@ -1,0 +1,88 @@
+<mjml>
+  <mj-head>
+    <mj-title>El registro fue exitoso</mj-title>
+      <mj-include path="./_styles.mjml" />
+  </mj-head>
+  <mj-body css-class="background-body" width="600px">
+    <mj-include path="./_header.mjml" />
+    <mj-wrapper padding-top="0" padding-bottom="0px" css-class="body-section">
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column>
+            <mj-text font-size="12px">
+              
+                Estimado/a {{ $sale->user->name }} {{ $sale->user->last_name}} <br>
+                Nos complace informarte que la cotización ha sido ordenada. Nuestro equipo se comunicará contigo cuando esté lista para entrega. <br>
+              
+            </mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px" padding-top="0">
+        <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+                <mj-text font-size="12px">
+                    
+                  <strong>Detalles de la Orden de Trabajo:</strong>
+                </mj-text>
+                <mj-table font-size="12px" color="#000" cellpadding="3" cellspacing="0" width="100%" >
+                            <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                                <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Número de Orden:</th>
+                                <td style="padding-bottom: 10px;">#{{ $sale->id }}</td>
+                            </tr>
+                            
+                </mj-table>
+                <mj-table font-size="12px" color="#000" cellpadding="3" cellspacing="0" width="100%" >
+                    @foreach($sale->products as $product)
+                        <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                            <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Descripción de la order realizada:</th>
+                            <td style="padding-bottom: 10px;">
+                                <strong>Nombre:</strong> {{ $product->pivot->product_name }}<br>
+                                <strong>producto:</strong> {{ $product->name }}<br>
+                                <strong>Categoría:</strong> {{ $product->type->name }}<br>
+                                <strong>Acabado:</strong> {{ $product->cut_name }}<br>
+                                <strong>Ancho:</strong> {{ $product->pivot->width }} cm <br>
+                                <strong>Alto:</strong> {{ $product->pivot->height }} cm <br>
+                                <strong>Total:</strong> ${{ $product->pivot->sale_price }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </mj-table>
+                <mj-table font-size="12px" color="#000" cellpadding="3" cellspacing="0" width="100%" >
+                    <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                        <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Subtotal:</th>
+                        <td style="padding-bottom: 10px;">${{ $sale->total_sale_price }}</td>
+                    </tr>
+                    <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                        <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">IVA:</th>
+                        <td style="padding-bottom: 10px;">${{ $sale->iva }}</td>
+                    </tr>
+                    <tr style="border:1px solid #ecedee;text-align:left;padding:15px 0;">
+                        <th style="text-align:left; padding-right: 20px; padding-bottom: 10px;">Total:</th>
+                        <td style="padding-bottom: 10px;">${{ $sale->total_with_iva }}</td>
+                    </tr>
+                            
+                </mj-table>
+                
+                
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column width="100%">
+         <mj-text font-size="12px"> 
+            Si tienes alguna pregunta, necesitas más información o algún ajuste adicional, no dudes en contactarnos.<br>
+
+            Agradecemos la confianza depositada en nuestros servicios.
+         </mj-text>
+        </mj-column>
+
+        <mj-column width="100%">
+            <mj-divider border-color="#DFE3E8" border-width="1px"></mj-divider>
+        </mj-column>
+          <mj-include path="./_footer.mjml" />
+
+      </mj-section>
+    </mj-wrapper>
+    
+  </mj-body>
+</mjml>

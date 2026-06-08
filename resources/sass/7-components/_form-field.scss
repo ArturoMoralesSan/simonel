@@ -1,0 +1,153 @@
+/*
+================================================================================
+Form field
+================================================================================
+
+The form field component provides styles for form inputs, selects
+and textareas. It contains modifiers for validation feedback.
+*/
+
+
+// Define the `border-radius` property for the form field component.
+// The global `$radius` value is used by default.
+
+$form-field-radius: $radius;
+
+
+// Define if the validation modifiers will display background icons.
+
+$form-field-validation-icons: true;
+
+
+// Background icon for valid fields.
+
+$form-field-icon-valid: icon-check();
+
+
+// Background icon for invalid fields.
+
+$form-field-icon-invalid: icon-solid-warning();
+
+
+.form-field {
+    border-radius: $form-field-radius;
+    padding: 0.6em;
+    position: relative;
+    transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+    width: 100%;
+}
+
+/*
+ * Use a background icon in select elements for cross-browser consistency.
+ *
+ * 1. Hide the native arrow button in IE.
+ */
+select.form-field {
+    appearance: none;
+    text-overflow: ellipsis;
+
+    &::-ms-expand {
+        display: none; /* 1 */
+    }
+
+    &:not([size]):not([multiple]) {
+        background-image: url(icon-caret());
+        background-position: right 0.5em center;
+        background-repeat: no-repeat;
+        padding-right: 2.2em;
+    }
+}
+
+
+/* Validation
+============================================================================= */
+
+.form-field--invalid,
+.form-field--valid {
+    background-position: right 0.5em center;
+    background-repeat: no-repeat;
+    padding-right: 2.2em;
+}
+
+/*
+ * Styles for fields that failed validation.
+ */
+.form-field--invalid {
+    border-color: $color-danger;
+    box-shadow: 0 0 5px lighten($color-danger, 25%);
+
+    @if $form-field-validation-icons {
+        background-image: url($form-field-icon-invalid);
+    }
+}
+
+@if $form-field-validation-icons {
+    /*
+     * Styles for fields that passed validation.
+     */
+    .form-field--valid {
+        background-image: url($form-field-icon-valid);
+    }
+
+    /*
+     * Icons are positioned on the top right in elements that span
+     * multiple lines, leaving room for the scrollbar.
+     *
+     * 1. Note that IE has a bug in select elements where padding
+     *    affects the scrollbar position.
+     */
+    .form-field--invalid[multiple],
+    .form-field--invalid[size],
+    .form-field--valid[multiple],
+    .form-field--valid[size],
+    textarea.form-field--invalid,
+    textarea.form-field--valid {
+        background-position: right 1.2em top 0.4em;
+        padding-right: 2.7em; /* 1 */
+    }
+
+    /*
+     * The `no-scrollbar` modifier can be used in textareas
+     * to position the icon when there is no scrollbar.
+     */
+    textarea.form-field--invalid.form-field--no-scrollbar,
+    textarea.form-field--valid.form-field--no-scrollbar {
+        background-position: right 0.5em top 0.4em;
+        padding-right: 2.2em;
+    }
+
+    /*
+     * Dropdowns already have a background icon (caret),
+     * so two backgrounds are necessary.
+     */
+    select:not([size]):not([multiple]) {
+        &.form-field--invalid,
+        &.form-field--valid {
+            background-position: right 0.5em center, right 2em center;
+            padding-right: 4em;
+        }
+
+        &.form-field--invalid {
+            background-image: url(icon-caret()), url($form-field-icon-invalid);
+        }
+
+        &.form-field--valid {
+            background-image: url(icon-caret()), url($form-field-icon-valid);
+        }
+    }
+}
+
+
+/* Focus state
+============================================================================= */
+
+/*
+ * The focus modifier is defined after validation classes
+ * so that it can override them without increasing specificity.
+ */
+.form-field:focus,
+.form-field--focus {
+    border-color: $color-blue-lighten-2;
+    box-shadow: 0 0 3px $color-blue-lighten-3;
+}
+

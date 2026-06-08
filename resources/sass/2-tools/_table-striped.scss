@@ -1,0 +1,12 @@
+// =============================================================================
+// Table striped
+// =============================================================================
+
+
+// Add zebra stripes to table body rows.
+
+@mixin table-striped {
+    tbody > :nth-child(even) {
+        background-color: $color-gray-lighten-5;
+    }
+}

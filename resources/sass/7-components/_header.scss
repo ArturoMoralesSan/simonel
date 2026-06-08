@@ -1,0 +1,240 @@
+/*
+================================================================================
+Header
+================================================================================
+*/
+
+.main-header {
+    color:#000;
+    min-width: 320px;
+    background-color: #fff;
+    position: relative;
+    box-shadow: 0px 1px 7px 0px #888888;
+
+    @include media($menu-breakpoint) {
+        text-align: center;
+        padding: 15px 0;
+        position: initial;
+    }
+}
+
+.header__container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    @include media($menu-breakpoint) {
+        justify-content: space-between;
+        z-index: 0;
+        position: initial;
+        background-color: transparent;
+    }
+
+    @media(max-width: 760px) {
+        justify-content: space-between;
+        padding: 15px 15px;
+    }
+}
+
+
+/* Logo
+============================================================================= */
+
+.main-header__logo-link {
+    display: inline-block;
+    order: 2;
+
+    @include media($menu-breakpoint) {
+
+        width: auto;
+        order: 1;
+    }
+}
+
+.main-header__logo-img {
+    width: 200px;
+    @include media($menu-breakpoint) {
+        width: 220px;
+    }
+}
+.main-header-text {
+    font-size: 20px;
+    color: #000;
+    line-height: 29px;
+    padding: 8px 0 0 0;
+    margin-bottom: 0;
+    font-weight: 300;
+    padding-right: 15px;
+    order: 1;
+    @include media($menu-breakpoint) {
+        font-size: 28px;
+        padding: 0;
+        text-align: center;
+        right: 0px;
+        padding-right: 0;
+        order: 2;
+
+    }
+}
+
+.main-header__logo-text {
+    height: 12.75px;
+    margin-left: 13px;
+    width: 152px;
+
+    @include media($menu-breakpoint) {
+        display: block;
+        height: 15px;
+        margin: 20px 0 0;
+        width: 179px;
+    }
+}
+
+.header__search-field {
+    width: calc(100% - 40px);
+    margin-right: -4px;
+    border-radius: 3px 0 0 3px;
+    background-color: #fff0;
+}
+
+.header__search-field input::placeholder {
+    color: #dc3545;
+    font-size: 1.3em;
+    line-height: 1.3em;
+    text-transform: uppercase;
+}
+
+.header__search-button {
+    margin-top: -3px;
+    border-radius: 0 3px 3px 0;
+    border-left: 0;
+    background-color: #ad0000;
+    border-color: #ad0000;
+    width: 40px;
+
+    &:focus,
+    &:hover,
+    &:active {
+        background-color: lighten(#ad0000, 10%);
+        border-color: lighten(#ad0000, 10%);
+    }
+}
+
+.header__search-button .svg-icon {
+    fill: #fff;
+}
+
+.form-container {
+    position: relative;
+}
+
+.header__container-form {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: 30px;
+    background: #dcdcdcfe;
+    width: 100%;
+    height: 100px;
+    padding-right: calc(3px + 3.75vw);
+    padding-left: calc(3px + 3.75vw);
+    z-index: 0;
+    transition: .4s ease-in-out;
+    max-width: 100%;
+
+    @include media($menu-breakpoint) {
+        position: absolute;
+        left: auto;
+        right: 0;
+        bottom: 50px;
+        margin-top: 0;
+        padding-top: 0;
+        background: transparent;
+        width: calc(100% - 300px);
+        height: auto;
+        transition: 0s;
+        max-width: 1170px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+}
+
+
+.search-expand {
+    transform: translateY(100%);
+}
+
+.search-hide {
+    transform: translateY(0);
+}
+
+
+.btn-expand-search {
+    display: block;
+    @include media($menu-breakpoint) {
+        display: none;
+    }
+}
+
+.img-user-login {
+     width: 17px;
+    filter: invert(1);
+    @include media($menu-breakpoint) {
+        filter: none;
+    }
+}
+
+.login-container {
+    display: none;
+    order:3;
+
+   @include media($menu-breakpoint) {
+        display: block;
+    }
+}
+
+.social-bar-container {
+    background-color: #2F7327;
+    padding: 5px;
+    display: block;
+    @include media(760) {
+        display: none;
+    }
+}
+.social-icon {
+    width: 20px;
+    filter: invert(1);
+     @include media(760) {
+         width: 36px;
+    }
+}
+
+.social-icon-detail {
+    width: 20px;
+     @include media(760) {
+         width: 36px;
+    }
+}
+
+.img-detail {
+    max-width: 100%;
+    @include media(300, 720) {
+        max-width: 400px;
+        display: block;
+        margin: 0 auto;
+    }
+}
+
+.img-detail__qr {
+    max-width: 100%;
+    width: 220px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    display: block;
+    margin: 0 auto;
+    @include media(300, 720) {
+        max-width: 400px;
+    }
+}
+
+

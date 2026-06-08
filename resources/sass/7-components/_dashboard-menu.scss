@@ -1,0 +1,314 @@
+/*
+================================================================================
+Dashboard menu
+================================================================================
+*/
+
+$db-icon-size: 18px;
+$db-tile-size: 40px;
+
+.dashboard-menu {
+    display: flex;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    @include position(absolute, 60px null null 0);
+    transform: translate(-300px, 0);
+    width: 100%;
+    z-index: 2;
+
+    &--enter { animation: db-menu-enter 200ms linear; }
+    &--leave { animation: db-menu-enter 200ms linear reverse; }
+
+    &--visible { transform: translate(0, 0); }
+
+    @include media(1100) {
+        width: auto;
+    }
+}
+
+.dashboard-menu__overlay {
+    height: 100%;
+    @include position(absolute, 0 null null 0);
+    width: 100%;
+
+    @include media(1100) {
+        display: none;
+    }
+}
+
+
+/* Sections
+============================================================================= */
+
+.dashboard-menu__col-sections {
+    background: $color-db-section;
+    box-shadow: 1px 0 3px 0 rgba(#000, 0.5);
+    display: block;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    overflow: auto;
+    position: relative;
+    width: 80px;
+    z-index: 2;
+}
+
+.dashboard-menu__section {
+    border-bottom: 1px solid #222;
+    border-top: 1px solid $color-db-submenu;
+    color: rgba(#fff, 0.6);
+    cursor: pointer;
+    display: block;
+    font-size: rem(9);
+    height: 80px;
+    margin: 0;
+    opacity: 0.5;
+    padding: 0 5px;
+    position: relative;
+    text-align: center;
+    transition: background-color 150ms ease-out, opacity 150ms ease-out;
+
+    &:hover,
+    &--active {
+        background-color: $color-db-primary;
+        opacity: 1;
+    }
+}
+
+.dashboard-menu__tile {
+    display: block;
+    height: $db-tile-size;
+    margin: 10px auto 0;
+    width: $db-tile-size;
+    filter: invert(1);
+}
+
+
+/* Submenus
+============================================================================= */
+
+.dashboard-menu__col-submenus {
+    background-color: $color-db-submenu;
+    width: 220px;
+    z-index: 1;
+}
+
+.dashboard-menu__submenu {
+    padding-bottom: 30px;
+}
+
+.dashboard-menu__link-group {
+    list-style: none;
+    margin-bottom: 10px;
+    margin-left: 0;
+
+    &:last-child {
+        padding-bottom: 15px;
+    }
+}
+
+.dashboard-menu__link-group-container {
+    height: calc(100vh - 110px);
+    overflow: auto;
+    padding-top: 15px;
+}
+
+.dashboard-menu__links-arrow {
+    background: url(icon-arrow($color-gray-lighten-5, 14)) no-repeat center center;
+    font-size: rem(18);
+    height: 20px;
+    @include position(absolute, 50% 0 null null);
+    transform: translate(0, -50%) rotate(90deg);
+    transition: transform 150ms ease-out;
+    width: 20px;
+
+    .dashboard-menu__links-title--active & {
+        transform: translate(0, -50%);
+    }
+}
+
+.dashboard-menu__links-icon {
+    display: inline-block;
+    height: $db-icon-size;
+    margin-right: 0.75em;
+    vertical-align: top;
+    width: $db-icon-size;
+    filter: invert(1);
+}
+
+.dashboard-menu__links-title {
+    color: $color-gray;
+    cursor: pointer;
+    display: block;
+    font-size: rem(13);
+    line-height: 1.4;
+    opacity: 0.8;
+    overflow: hidden;
+    padding: 0.6em 2em 0.6em 1em;
+    position: relative;
+    transition: opacity 150ms ease-out;
+    margin-bottom: 0;
+    &:active,
+    &:focus,
+    &:hover,
+    &--active {
+        background-color:  $color-db-primary;
+        color: #fff;
+        opacity: 1;
+    }
+
+    &--current,
+    &--current:active,
+    &--current:focus,
+    &--current:hover {
+        background-color: $color-db-primary;
+        color: #fff;
+        opacity: 1;
+    }
+}
+
+
+/* Links
+============================================================================= */
+
+.dashboard-menu__link-list {
+    list-style: none;
+    margin-left: 0;
+    overflow: hidden;
+    padding: 0;
+    background-color: #0F1A2D;
+}
+
+.dashboard-menu__link {
+    color: #9eadb5;
+    display: block;
+    font-size: rem(12);
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 0.75em 15px 0.75em 45px;
+    position: relative;
+    text-decoration: none;
+    transition: color 150ms ease-out, padding 150ms ease-out;
+
+    &::after {
+        @include triangle(left, #f7f7f7, 7px);
+        display: none;
+        @include position(absolute, 50% 0 null null);
+        transform: translate(0, -50%);
+    }
+
+    &::before {
+        border-left: 1px solid darken($color-db-submenu, 5%);
+        border-right: 1px solid lighten($color-db-submenu, 4%);
+        content: "";
+        display: block;
+        height: 100%;
+        @include position(absolute, 0 null null 30px);
+        width: 0;
+
+        li:first-child > & {
+            top: 0.4em;
+        }
+
+        li:last-child > & {
+            bottom: 0.4em;
+            top: auto;
+        }
+
+        li:first-child:last-child > & {
+            height: 0;
+        }
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: #fff;
+        padding: 0.75em 10px 0.75em 50px;
+        text-decoration: none;
+        
+    }
+
+    &--active {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+
+        &::after {
+            display: block;
+        }
+    }
+}
+
+
+/* Filter
+============================================================================= */
+
+.dashboard-menu__filter-container {
+    box-shadow: 0 3px 5px rgba(#000, 0.2);
+    height: 50px;
+    overflow: hidden;
+    padding: 10px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.dashboard-menu__filter {
+    background-color: #303E52;
+    border: 1px solid #313d4f;
+    border-radius: 3px;
+    color: #888;
+    display: block;
+    font-size: rem(14);
+    margin: 0 auto 10px;
+    padding: 0.5em 1.7em 0.4em 0.5em;
+    position: relative;
+    transition: background-color 150ms ease-out, border-color 150ms ease-out;
+    width: 90%;
+
+    &::placeholder {
+        color: #888;
+        font-size: rem(12);
+        font-style: italic;
+        font-weight: $font-weight-normal;
+    }
+
+    &:active,
+    &:focus {
+        background-color: #fff;
+        color: #333;
+
+        &::placeholder {
+            color: #333;
+        }
+    }
+}
+
+.dashboard-menu__filter-btn {
+    background-color: transparent;
+    border: 0;
+    color: #777;
+    font-size: rem(18);
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    @include position(absolute, 17px 18px null null);
+    transition: color 150ms ease-out;
+    z-index: 2;
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: $color-danger;
+        cursor: pointer;
+    }
+}
+
+
+/* Animations
+============================================================================= */
+
+@keyframes db-menu-enter {
+    0%   { transform: translate(-300px, 0); }
+    100% { transform: translate(0, 0); }
+}

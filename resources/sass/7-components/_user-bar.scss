@@ -1,0 +1,263 @@
+/*
+================================================================================
+User bar
+================================================================================
+*/
+
+.user-bar {
+    align-items: center;
+    background-color: #0B1421;
+    display: flex;
+    height: 60px;
+    justify-content: space-between;
+    position: relative;
+}
+
+.user-bar__dashboard-link {
+    color: $color-gray-lighten-1;
+    font-weight: 300;
+    padding: 0 20px;
+    transition: color 150ms ease-out;
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+}
+
+
+/* Button
+============================================================================= */
+
+.user-bar__btn {
+    background-color: transparent;
+    border: 0;
+    color: $color-gray-lighten-1;
+    font-size: rem(13);
+    margin: 0;
+    padding: 1em 1.5em;
+    transition: color 150ms ease-out;
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: #fff;
+    }
+}
+
+.user-bar__btn-icon {
+    $bar-height: 2px;
+
+    @include hamburger($color-gray-lighten-1, 20px, $bar-height, 4px);
+    margin-right: 7px;
+
+    > span {
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='146' height='30' viewBox='0 0 146 30' fill='%23ccc'><path d='M94.258 10H51.743C49.123 10 47 12.24 47 15c0 2.762 2.126 5 4.743 5h42.515C96.873 20 99 17.762 99 15c0-2.76-2.123-5-4.742-5zM15 0L0 15l15 15V20h22V10H15M146 15L131 0v10h-22v10h22v10'/></svg>") no-repeat 0 0;
+        background-size: auto #{$bar-height * 3};
+        height: #{$bar-height * 3};
+        top: -$bar-height;
+        width: 20px;
+
+        [aria-expanded="false"] > & {
+            background-position: 100% 0;
+        }
+    }
+}
+
+
+/* Profile
+============================================================================= */
+
+.user-bar__profile {
+    align-items: center;
+    display: flex;
+    height: 60px;
+    justify-content: right;
+    padding-right: 15px;
+    position: relative;
+
+    &::after {
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='496 497.5 8 5'><path fill='%23fff' d='M497.048 497.972c-.252-.295-.526-.295-.825 0-.297.25-.297.523 0 .818l3.366 3.272c.25.25.524.25.822 0l3.364-3.272c.298-.295.298-.568 0-.818-.274-.273-.56-.273-.858 0L500 500.63l-2.952-2.658z'/></svg>") no-repeat 0 0;
+        content: "";
+        display: inline-block;
+        height: 5px;
+        margin-left: 0.5em;
+        margin-top: 0.2em;
+        vertical-align: middle;
+        width: 8px;
+    }
+}
+
+.user-bar__avatar {
+    height: auto;
+    width: 100%;
+}
+
+.user-bar__avatar-container {
+    border-radius: 9999px;
+    box-shadow: inset 0 2px 2px rgba(#000, 0.4);
+    display: inline-block;
+    height: 40px;
+    overflow: hidden;
+    width: 40px;
+}
+
+.user-bar__user-name {
+    color: #fff;
+    display: none;
+    font-weight: 100;
+    margin-bottom: 0;
+    margin-left: 0.75em;
+
+    @include media(500) {
+        display: block;
+    }
+}
+
+
+/* Profile menu
+============================================================================= */
+
+.user-bar__profile-menu {
+    background-color: $color-gray-darken-4;
+    border-radius: 3px;
+    box-shadow: 0 5px 5px rgba(#000, 0.2);
+    list-style: none;
+    margin: 0;
+    max-width: 300px;
+    min-width: 200px;
+    @include position(absolute, 70px 10px null null);
+    z-index: 5;
+
+
+    &::before {
+        @include triangle(top, $color-gray-darken-4, 8px);
+        @include position(absolute, -7px 6px null null);
+        z-index: 2;
+
+        @include media(500) {
+            right: 40px;
+        }
+    }
+
+    &::after {
+        content: "";
+        display: block;
+        height: 10px;
+        @include position(absolute, -10px null null 0);
+        width: 100%;
+    }
+
+    &--hide { animation: hide-profile-menu 150ms ease-in forwards; }
+    &--show { animation: show-profile-menu 250ms ease-out forwards; }
+}
+
+.user-bar__profile-menu-item {
+    border-top: 1px solid $color-gray-darken-3;
+
+    &:first-child {
+        border-top: 0;
+    }
+}
+
+.user-bar__profile-menu-link {
+    border-radius: 3px;
+    color: #aaa;
+    display: block;
+    font-size: rem(13);
+    font-weight: 400;
+    min-width: 180px;
+    padding: 1em;
+    text-decoration: none;
+    transition: background-color 200ms ease-out, color 200ms ease-out;
+
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: darken($color-gray-darken-4, 5%);
+        color: #fff;
+        text-decoration: none;
+    }
+
+    &--logout {
+        background-color: #133;
+        font-size: rem(12);
+        position: relative;
+        text-transform: uppercase;
+
+        &:active,
+        &:focus,
+        &:hover {
+            background-color: #122;
+
+            & > .user-bar__logout-icon {
+                color: #b55;
+            }
+        }
+    }
+}
+
+/**
+ * 1. Icon position might change depending on used fonts.
+ */
+.user-bar__logout-icon {
+    line-height: 1;
+    margin-right: 0.4em;
+    stroke: $color-gray-darken-2;
+    @include position(relative, 0.1em null null null); /* 1 */
+    transition: stroke 150ms ease-out;
+    vertical-align: top;
+    width: rem(15);
+
+    :active > &,
+    :focus > &,
+    :hover > & {
+        stroke: #b55;
+    }
+
+    .dashboard & {
+        top: 0.1em; /* 1 */
+    }
+}
+
+
+/* Animations
+============================================================================= */
+
+@keyframes show-profile-menu {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+        transform-origin: right top;
+        visibility: visible;
+    }
+
+    70% {
+        opacity: 1;
+        transform: scale(1.075);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        transform-origin: right top;
+        visibility: visible;
+    }
+}
+
+@keyframes hide-profile-menu {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        transform-origin: right top;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+        transform-origin: right top;
+    }
+}

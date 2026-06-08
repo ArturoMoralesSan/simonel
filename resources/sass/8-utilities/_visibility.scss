@@ -1,0 +1,39 @@
+/*
+================================================================================
+Visibility
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("visibility") {
+    @include media($min-width) {
+
+        /*
+         * Hide visually and from screenreaders, but maintain layout.
+         */
+        #{set-affix("invisible", $affix)} {
+            visibility: hidden !important;
+        }
+
+        #{set-affix("visible", $affix)} {
+            visibility: visible !important;
+        }
+
+        /*
+         * Hide only visually, but have it available for screen readers:
+         * https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+         * Credit: https://github.com/h5bp/html5-boilerplate
+         *
+         * 1. The `focusable` modifier allows the element to be focusable
+         *    when navigated to via keyboard.
+         */
+        #{set-affix("visually-hidden", $affix)} {
+            @include visually-hidden;
+
+            &--focusable:focus,
+            &--focusable:active {
+                @include visually-hidden-focusable; /* 1 */
+            }
+        }
+
+    }
+}

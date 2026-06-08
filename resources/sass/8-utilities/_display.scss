@@ -1,0 +1,40 @@
+/*
+================================================================================
+Display
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("display") {
+    @include media($min-width) {
+
+        #{set-affix("d-block", $affix)}        { display: block !important; }
+        #{set-affix("d-inline", $affix)}       { display: inline !important; }
+        #{set-affix("d-inline-block", $affix)} { display: inline-block !important; }
+        #{set-affix("d-flex", $affix)}         { display: flex !important; }
+        #{set-affix("d-inline-flex", $affix)}  { display: inline-flex !important; }
+        #{set-affix("d-table", $affix)}        { display: table !important; }
+
+        #{set-affix("hidden", $affix)}         { display: none !important; }
+
+    }
+}
+
+
+/* Print
+============================================================================= */
+
+@media print {
+    /*
+     * Visible for printers.
+     */
+    .print\:d-block {
+        display: block !important;
+    }
+
+    /*
+     * Hidden from printers.
+     */
+    .print\:hidden {
+        display: none !important;
+    }
+}

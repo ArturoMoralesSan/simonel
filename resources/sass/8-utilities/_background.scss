@@ -1,0 +1,29 @@
+/*
+================================================================================
+Background colors
+================================================================================
+*/
+
+
+// The colors used to generate background utility classes.
+// By default, the `$utility-colors` defined in `1-settings/_utilities`
+// are used.
+//
+// The following class is generated for each one of these colors:
+//
+// .bg-{color}
+
+$utility-bg-colors: $utility-colors !default;
+
+
+@each $affix, $min-width in utility-breakpoints("bg-color") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-bg-colors {
+            #{set-affix("bg-" + $name, $affix)}  {
+                background-color: $value;
+            }
+        }
+
+    }
+}

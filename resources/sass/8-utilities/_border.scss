@@ -1,0 +1,147 @@
+/*
+================================================================================
+Border
+================================================================================
+*/
+
+
+// The widths used for generating border utility classes.
+//
+// The following classes are generated for each one of these values:
+//
+// .b-{width}  for border (all sides)
+// .bb-{width} for border-bottom
+// .bl-{width} for border-left
+// .br-{width} for border-right
+// .bt-{width} for border-top
+
+$utility-border-widths: (
+    "0":    0,
+    "1":    1px,
+    "2":    2px,
+    "3":    3px,
+    "4":    4px
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("border") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-border-widths {
+            #{set-affix("b-" + $name, $affix)}  {
+                border: $value solid $color-border !important;
+            }
+
+            #{set-affix("bb-" + $name, $affix)} {
+                border-bottom: $value solid $color-border !important;
+            }
+
+            #{set-affix("bl-" + $name, $affix)} {
+                border-left: $value solid $color-border !important;
+            }
+
+            #{set-affix("br-" + $name, $affix)} {
+                border-right: $value solid $color-border !important;
+            }
+
+            #{set-affix("bt-" + $name, $affix)} {
+                border-top: $value solid $color-border !important;
+            }
+        }
+
+    }
+}
+
+
+/*
+================================================================================
+Border color
+================================================================================
+*/
+
+
+// Colors used to generate border-color utility classes.
+// By default, the `$utility-colors` defined in `1-settings/_utilities`
+// are used.
+//
+// The following class is generated for each one of these colors:
+//
+// .border-{color}
+
+$utility-border-colors: $utility-colors !default;
+
+
+@each $affix, $min-width in utility-breakpoints("border-color") {
+    @include media($min-width) {
+
+        @each $color, $value in $utility-border-colors {
+            #{set-affix("border-" + $color, $affix)} {
+                border-color: $value !important;
+            }
+        }
+
+    }
+}
+
+
+/*
+================================================================================
+Border radius
+================================================================================
+*/
+
+
+// Sizes used for generating border-radius utility classes.
+//
+// The following classes are generated for each one of these values:
+//
+// .rounded-{size}        for all corners
+// .rounded-bottom-{size} for bottom left and bottom right corners
+// .rounded-left-{size}   for bottom left and top left corners
+// .rounded-right-{size}  for bottom right and top right corners
+// .rounded-top-{size}    for top left and top right corners
+//
+// Note that the class name for the default variant is generated without
+// the suffix (i.e: instead of `.rounded-top-default`, the name will be
+// `.rounded-top`).
+
+$utility-border-radiuses: (
+    default: $radius,
+    "full":  9999px,
+    "0":     0
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("border-radius") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-border-radiuses {
+            $name: if($name == "default", "", "-" + $name);
+
+            #{set-affix("rounded" + $name, $affix)} {
+                border-radius: $value !important;
+            }
+
+            #{set-affix("rounded-bottom" + $name, $affix)} {
+                border-bottom-left-radius: $value !important;
+                border-bottom-right-radius: $value !important;
+            }
+
+            #{set-affix("rounded-left" + $name, $affix)} {
+                border-bottom-left-radius: $value !important;
+                border-top-left-radius: $value !important;
+            }
+
+            #{set-affix("rounded-right" + $name, $affix)} {
+                border-bottom-right-radius: $value !important;
+                border-top-right-radius: $value !important;
+            }
+
+            #{set-affix("rounded-top" + $name, $affix)} {
+                border-top-left-radius: $value !important;
+                border-top-right-radius: $value !important;
+            }
+        }
+
+    }
+}

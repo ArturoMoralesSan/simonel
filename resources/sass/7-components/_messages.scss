@@ -1,0 +1,151 @@
+/*
+================================================================================
+Messages
+================================================================================
+
+A message displays information to users. It consists of a title
+and a section for the content.
+*/
+
+
+// Font size for the message component. Use pixels or rems.
+
+$message-font-size: 15px;
+
+
+// Define the `border-radius` property for the message component.
+// The global `$radius` value is used by default.
+
+$message-radius: $radius;
+
+
+// Horizontal padding.
+
+$message-padding-x: 1em;
+
+
+// Vertical padding.
+
+$message-padding-y: 0.75em;
+
+
+// Icon for the title of "info" type messages.
+
+$message-icon-info: icon-info(#fff, 23);
+
+
+// Icon for the title of "danger" type messages.
+
+$message-icon-danger: icon-error(#fff, 23);
+
+
+// Icon for the title of "success" type messages.
+
+$message-icon-success: icon-check(#fff);
+
+
+// Icon for the title of "warning" type messages.
+
+$message-icon-warning: icon-warning($color-warning-text, 23);
+
+
+/*
+ * The `.message` class should be applied to a container element.
+ */
+.message {
+    background-color: $color-gray-lighten-5;
+    border-radius: $message-radius;
+    font-size: rem($message-font-size);
+    margin-bottom: $spacer;
+
+    &--info {
+        background-color: $color-info-light;
+        color: $color-info-text;
+    }
+
+    &--danger {
+        background-color: $color-danger-light;
+        color: $color-danger-text;
+    }
+
+    &--success {
+        background-color: $color-success-light;
+        color: $color-success-text;
+    }
+
+    &--warning {
+        background-color: $color-warning-light;
+        color: $color-warning-text;
+    }
+}
+
+.message__body,
+.message__title {
+    padding: $message-padding-y $message-padding-x;
+}
+
+/*
+ * For simple messages, you can add the body class directly
+ * to a paragraph element. Alternatively, it can be applied
+ * to a div tag with any content you wish.
+ */
+.message__body {
+    border-radius: 0 0 $message-radius $message-radius;
+}
+
+/*
+ * The title class can be applied directly to a paragraph element.
+ */
+.message__title {
+    background-color: $color-gray-darken-4;
+    border-radius: $message-radius $message-radius 0 0;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 0;
+
+    .message--danger > &  { background-color: $color-danger; }
+    .message--info > &    { background-color: $color-info; }
+    .message--success > & { background-color: $color-success; }
+
+    .message--warning > & {
+        background-color: $color-warning;
+        color: $color-warning-text;
+    }
+}
+
+
+/* Bordered body
+============================================================================= */
+
+/*
+ * Add a thin border to the body element of the message component with
+ * this modifier class to get a better contrast in certain backgrounds.
+ */
+.message__body--bordered {
+    border-color: $color-border;
+    border-style: solid;
+    border-width: 0 1px 1px;
+
+    .message--info > &    { border-color: $color-info-border; }
+    .message--danger > &  { border-color: $color-danger-border; }
+    .message--success > & { border-color: $color-success-border; }
+    .message--warning > & { border-color: $color-warning-border; }
+}
+
+
+/* Title with icons
+============================================================================= */
+
+/*
+ * Add a status icon to the title element.
+ */
+.message__title--has-icon {
+    background-position: $message-padding-x 0.65em;
+    background-repeat: no-repeat;
+    padding-left: calc(#{$message-padding-x} + 35px);
+
+    .message--info &    { background-image: url($message-icon-info); }
+    .message--success & { background-image: url($message-icon-success); }
+    .message--warning & { background-image: url($message-icon-warning); }
+    .message--danger &  { background-image: url($message-icon-danger); }
+}

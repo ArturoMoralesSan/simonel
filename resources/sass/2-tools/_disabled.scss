@@ -1,0 +1,12 @@
+// =============================================================================
+// Disabled
+// =============================================================================
+
+
+// Styles for disabled buttons and form fields.
+
+@mixin disabled {
+    cursor: not-allowed;
+    filter: saturate(0.7);
+    opacity: 0.6;
+}

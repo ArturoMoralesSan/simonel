@@ -1,0 +1,62 @@
+
+.file-link--doc {
+    &::before {
+        background-repeat: no-repeat;
+        background-size: 100%;
+        content: "";
+        display: inline-block;
+        height: 24px;
+        margin-right: 0.5em;
+        @include position(relative, 0.25em null null null);
+        vertical-align: baseline;
+        width: 22px;
+        background-image: url("../img/icons/icon-doc.png");
+    }
+}
+
+    .file-link--pdf {
+    &::before {
+        background-repeat: no-repeat;
+        background-size: 100%;
+        content: "";
+        display: inline-block;
+        height: 24px;
+        margin-right: 0.5em;
+        @include position(relative, 0.25em null null null);
+        vertical-align: baseline;
+        width: 22px;
+        background-image: url("../img/icons/icon-pdf.png");
+    }
+}
+
+.file-link--img {
+    &::before {
+        background-repeat: no-repeat;
+        background-size: 100%;
+        content: "";
+        display: inline-block;
+        height: 24px;
+        margin-right: 0.5em;
+        @include position(relative, 0.25em null null null);
+        vertical-align: baseline;
+        width: 22px;
+        background-image: url("../img/icons/icon-img.png");
+        top: 0.6em;
+    }
+}
+
+.file-link--xls {
+    &::before {
+        background-repeat: no-repeat;
+        background-size: 100%;
+        content: "";
+        display: inline-block;
+        height: 24px;
+        margin-right: 0.5em;
+        @include position(relative, 0.25em null null null);
+        vertical-align: baseline;
+        width: 22px;
+         background-image: url("../img/icons/icon-xls.png");
+    }
+}
+

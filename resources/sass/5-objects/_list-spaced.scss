@@ -1,0 +1,22 @@
+/*
+================================================================================
+List spaced
+================================================================================
+
+An object specifically for lists that spaces out their items
+to provide more breathing room.
+*/
+
+dd, li {
+    .list-spaced > &:not(:last-child) {
+        margin-bottom: $spacer;
+    }
+
+    .list-spaced--sm > &:not(:last-child) {
+        margin-bottom: $spacer * 0.5;
+    }
+
+    .list-spaced--lg > &:not(:last-child) {
+        margin-bottom: $spacer * 1.5;
+    }
+}

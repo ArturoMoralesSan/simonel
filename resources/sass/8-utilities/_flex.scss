@@ -1,0 +1,62 @@
+/*
+================================================================================
+Flex
+================================================================================
+*/
+
+/*
+ * Credit:
+ * https://tailwindcss.com (flex utilities)
+ * https://github.com/suitcss/utils-flex (order utilities)
+ */
+@each $affix, $min-width in utility-breakpoints("flex") {
+    @include media($min-width) {
+
+        #{set-affix("flex-initial", $affix)} { flex: initial !important; }
+        #{set-affix("flex-auto", $affix)}    { flex: auto !important; }
+        #{set-affix("flex-none", $affix)}    { flex: none !important; }
+        #{set-affix("flex-1", $affix)}       { flex: 1 !important; }
+
+        // Align
+        #{set-affix("content-start", $affix)}   { align-content: flex-start !important; }
+        #{set-affix("content-center", $affix)}  { align-content: center !important; }
+        #{set-affix("content-end", $affix)}     { align-content: flex-end !important; }
+        #{set-affix("content-around", $affix)}  { align-content: space-around !important; }
+        #{set-affix("content-between", $affix)} { align-content: space-between !important; }
+        #{set-affix("content-stretch", $affix)} { align-content: stretch !important; }
+        #{set-affix("items-start", $affix)}     { align-items: flex-start !important; }
+        #{set-affix("items-center", $affix)}    { align-items: center !important; }
+        #{set-affix("items-end", $affix)}       { align-items: flex-end !important; }
+        #{set-affix("items-stretch", $affix)}   { align-items: stretch !important; }
+        #{set-affix("self-auto", $affix)}       { align-self: auto !important; }
+        #{set-affix("self-start", $affix)}      { align-self: flex-start !important; }
+        #{set-affix("self-center", $affix)}     { align-self: center !important; }
+        #{set-affix("self-end", $affix)}        { align-self: flex-end !important; }
+        #{set-affix("self-stretch", $affix)}    { align-self: stretch !important; }
+
+        // Direction
+        #{set-affix("flex-col", $affix)}         { flex-direction: column !important; }
+        #{set-affix("flex-col-reverse", $affix)} { flex-direction: column-reverse !important; }
+        #{set-affix("flex-row", $affix)}         { flex-direction: row !important; }
+        #{set-affix("flex-row-reverse", $affix)} { flex-direction: row-reverse !important; }
+
+        // Justify
+        #{set-affix("justify-start", $affix)}   { justify-content: flex-start !important; }
+        #{set-affix("justify-center", $affix)}  { justify-content: center !important; }
+        #{set-affix("justify-end", $affix)}     { justify-content: flex-end !important; }
+        #{set-affix("justify-around", $affix)}  { justify-content: space-around !important; }
+        #{set-affix("justify-between", $affix)} { justify-content: space-between !important; }
+        #{set-affix("justify-evenly", $affix)}  { justify-content: space-evenly !important; }
+
+        // Order
+        #{set-affix("order-first", $affix)} { order: -1 !important; }
+        #{set-affix("order-none", $affix)}  { order: 0 !important; }
+        #{set-affix("order-last", $affix)}  { order: 1 !important; }
+
+        // Wrap
+        #{set-affix("flex-nowrap", $affix)}       { flex-wrap: nowrap !important; }
+        #{set-affix("flex-wrap", $affix)}         { flex-wrap: wrap !important; }
+        #{set-affix("flex-wrap-reverse", $affix)} { flex-wrap: wrap-reverse !important; }
+
+    }
+}

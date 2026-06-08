@@ -1,0 +1,303 @@
+/*
+================================================================================
+Main menu
+================================================================================
+*/
+
+
+.main-menu {
+    font-size: rem(14);
+    z-index: 11;
+    @include media($menu-breakpoint) {
+        background-color: $color-gray-lighten-1;
+    }
+}
+
+.menu__container {
+    display: flex;
+    background: #cfd4d8;
+    height: 53px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    @include media($menu-breakpoint) {
+        flex-direction: column;
+        height:auto;
+        padding: 0;
+    }
+}
+
+/* Close button
+============================================================================= */
+
+.main-menu__close {
+    background-color: $color-gray-darken-5;
+    margin-bottom: 0;
+    text-align: right;
+
+    @include media($menu-breakpoint) {
+        display: none;
+    }
+}
+
+.main-menu__close-btn {
+    background-color: transparent;
+    border: 0;
+    color: #fff;
+    display: inline-block;
+    font-size: rem(12);
+    opacity: 0.7;
+    padding: 0.5em 1em 0.3em;
+    transition: opacity 150ms ease-out;
+
+    &:focus,
+    &:hover,
+    &:active {
+        opacity: 1;
+    }
+}
+
+.main-menu__close-icon {
+    font-size: rem(15);
+    @include position(-1px null null null);
+}
+
+
+/* Menu button
+============================================================================= */
+
+.main-menu__btn {
+   background-color: transparent;
+    border: 0;
+    color: #fff;
+    display: inline-block;
+    float: left;
+    margin-left: -2.3em;
+    padding: 0.5em;
+
+    &:focus {
+        outline: 1px dotted rgba(#fff, 0.7);
+    }
+
+    @include media(300, 500) {
+        margin-left: -1.7em;
+    }
+
+    @include media($menu-breakpoint) {
+        display: none;
+    }
+}
+
+.main-menu__btn-icon {
+    @include hamburger($color-gray-darken-5);
+
+}
+
+
+/* Logo
+============================================================================ */
+
+.main-menu__list-logo {
+    display: inline-block;
+    position: relative;
+}
+
+.main-menu__logo-img {
+    height: 68px;
+    width: 53px;
+}
+
+.main-menu__logo-text {
+    display: block;
+    height: 12px;
+    margin-top: 18px;
+    width: 143px;
+}
+
+
+/* List
+============================================================================= */
+
+.main-menu__list {
+    background-color: $color-gray-lighten-3;
+    box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.2);
+    height: 100%;
+    margin-left: auto;
+    min-width: 250px;
+    overflow-y: scroll;
+    @include position(fixed, 0 null null 0);
+    transform: translate(-100%, 0);
+    visibility: hidden;
+    width: 70vw;
+    z-index: 12;
+
+
+    &--closed {
+        animation: slide-out-left 200ms ease-out forwards;
+    }
+
+    &--open {
+        animation: slide-in-right 200ms ease-out forwards;
+    }
+
+    @include media($menu-breakpoint) {
+        background-color: transparent;
+        box-shadow: none;
+        display: block;
+        height: auto;
+        margin: 0 auto;
+        max-width: 1170px;
+        overflow-y: visible;
+        padding:12px 0;
+        position: relative;
+        text-align: center;
+        transform: none;
+        visibility: visible;
+        width: auto;
+        z-index: 1;
+    }
+}
+
+.main-menu__li {
+    border-bottom: 1px solid $color-gray-lighten-3;
+    display: block;
+
+    @include media($menu-breakpoint) {
+        border-bottom: 0;
+        display: inline-block;
+    }
+
+    &--logo {
+        background: #fff url("../img/bg.png") repeat-x 0 0;
+        background-size: 125px 325px;
+        padding: 20px 0;
+        text-align: center;
+
+        @include media-retina {
+            background-image: url("../img/bg@2.png");
+        }
+
+        @include media($menu-breakpoint) {
+            display: none;
+        }
+    }
+}
+
+
+.main-menu__link {
+    background-color: #fff;
+    color: $color-gray-darken-4;
+    display: block;
+    font-family: $font-family-headings;
+    font-size: rem(14);
+    padding: 1.1em 1.5em;
+    text-decoration: none;
+
+    &:focus,
+    &:hover,
+    &:active {
+        background-color: $color-gray-lighten-5;
+        color: $color-menu-text;
+        text-decoration: none;
+    }
+
+    @include media($menu-breakpoint) {
+        background-color: transparent;
+        color: $color-gray-darken-3;
+        padding: 0.25em 2em;
+        transition: color 150ms ease-out;
+
+        &--active {
+            color: $color-menu-text;
+        }
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: transparent;
+        }
+    }
+}
+
+.main-menu__li:last-child .main-menu__link {
+    padding-right: 0px;
+}
+
+
+/*
+================================================================================
+Link document
+================================================================================
+*/
+.link-document {
+  font-size: 0.9375rem;
+}
+
+.link-document::before {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  content: "";
+  display: inline-block;
+  height: 25px;
+  margin-right: 0.5em;
+  position: relative;
+  top: -0.15em;
+  vertical-align: middle;
+  width: 20px;
+}
+
+.link-document--pdf::before {
+  background-image: url("../img/icons/icon-pdf.png");
+}
+
+.main-menu__submenu-container {
+    position: relative;
+    cursor: pointer;
+    @include media(300, 759) {
+        background-color: #fff;
+        color: #343b41;
+        display: block;
+        font-family: Open Sans, sans-serif;
+        font-size: 0.875rem;
+        padding: 1.1em 1.5em;
+        text-decoration: none;
+    }
+}
+.main-menu__submenu {
+    position: absolute;
+    top: 37px;
+    background: #ffffff;
+    list-style: none;
+    margin-left: 0;
+    box-shadow: 0px 1px 2px 1px #e8e7e7;
+    width: 170px;
+
+    @include media(300, 759) {
+        position: absolute;
+        top: 54px;
+        left: 0;
+        background: #f3f3f3;
+        list-style: none;
+        margin-left: 0;
+        box-shadow: 0;
+        width: 100%;
+    }
+}
+
+.main-menu__submenu-li {
+    text-align: left;
+    padding: 5px;
+    border-bottom: 1px solid #e2e2e2;
+    @include media(300, 759) {
+        padding: 1.1em 1.5em;
+    }
+}
+.main-menu__submenu-link {
+    color: #505963;
+    text-decoration: none;
+}
+
+.main-menu__submenu-hidden {
+    display: none;
+}

@@ -1,0 +1,142 @@
+/*
+================================================================================
+Headings
+================================================================================
+*/
+
+h1, h2, h3, h4, h5, h6 {
+    color: $color-headings;
+    font-family: $font-family-headings;
+    font-weight: $font-weight;
+    line-height: $line-height-tight;
+}
+
+h1 {
+    font-size: rem($font-size-h1);
+    margin-bottom: 1em;
+}
+
+h2 {
+    font-size: rem($font-size-h2);
+}
+
+h3 {
+    font-size: rem($font-size-h3);
+}
+
+h4 {
+    font-size: rem($font-size-h4);
+}
+
+h5 {
+    font-size: rem($font-size-h5);
+}
+
+h6 {
+    font-size: rem($font-size-h6);
+}
+
+
+/*
+================================================================================
+Text
+================================================================================
+*/
+
+a {
+    color: $color-link;
+    text-decoration: none;
+
+    &:focus,
+    &:hover,
+    &:active {
+        color: $color-link-focus;
+        text-decoration: underline;
+    }
+}
+
+blockquote {
+    background-color: $color-gray-lighten-5;
+    border-left: 4px solid $color-gray-lighten-2;
+    margin-bottom: $spacer * 2;
+    padding: 2em 2em 2em 4em;
+    position: relative;
+    quotes: "\201C" "\201D";
+
+    &::before {
+        color: $color-gray-lighten-1;
+        content: open-quote;
+        display: block;
+        font: 3em/1 $font-family-primary;
+        @include position(absolute, 0.4em null null 0.4em);
+    }
+}
+
+figcaption {
+    color: $color-gray-darken-1;
+    font-size: rem($font-size-sm);
+    padding-top: $spacer * 0.25;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid $color-border;
+    display: block;
+    height: 1px;
+    margin: $spacer 0;
+    padding: 0;
+}
+
+
+/* Semantic inline elements
+============================================================================= */
+
+code, kbd, pre, samp, var {
+    font-family: $font-family-monospace;
+    font-size: 90%;
+}
+
+code, kbd, samp {
+    display: inline-block;
+    line-height: 1;
+    padding: 0.3em 0.3em 0.2em;
+    @include position(-1px null null null);
+}
+
+abbr[title] {
+    cursor: help;
+    text-decoration: underline dotted;
+}
+
+cite {
+    color: $color-gray-darken-1;
+}
+
+code {
+    background-color: $color-gray-lighten-4;
+}
+
+kbd {
+    border: 1px solid $color-gray-lighten-2;
+    border-radius: $radius;
+}
+
+mark {
+    background-color: #ffe86b;
+    color: $color-text;
+}
+
+small {
+    font-size: 80%;
+}
+
+strong {
+    font-weight: $font-weight-bold;
+}
+
+sub,
+sup {
+    font-size: 70%;
+    line-height: 0;
+    margin-left: 0.25em;
+}

@@ -1,0 +1,16 @@
+/*
+================================================================================
+Overflow
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("overflow") {
+    @include media($min-width) {
+
+        #{set-affix("overflow-auto", $affix)}   { overflow: auto !important; }
+        #{set-affix("overflow-hidden", $affix)} { overflow: hidden !important; }
+        #{set-affix("overflow-x-auto", $affix)} { overflow-x: auto !important; }
+        #{set-affix("overflow-y-auto", $affix)} { overflow-y: auto !important; }
+
+    }
+}

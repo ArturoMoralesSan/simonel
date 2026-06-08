@@ -1,0 +1,18 @@
+/*
+================================================================================
+Vertical alignment
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("vertical-alignment") {
+    @include media($min-width) {
+
+        #{set-affix("align-baseline", $affix)}    { vertical-align: baseline !important; }
+        #{set-affix("align-bottom", $affix)}      { vertical-align: bottom !important; }
+        #{set-affix("align-middle", $affix)}      { vertical-align: middle !important; }
+        #{set-affix("align-top", $affix)}         { vertical-align: top !important; }
+        #{set-affix("align-text-bottom", $affix)} { vertical-align: text-bottom !important; }
+        #{set-affix("align-text-top", $affix)}    { vertical-align: text-top !important; }
+
+    }
+}

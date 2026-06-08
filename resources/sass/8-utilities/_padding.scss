@@ -1,0 +1,55 @@
+/*
+================================================================================
+Padding
+================================================================================
+*/
+
+
+// The sizes used for generating padding utility classes.
+//
+// The following classes are generated for each one of these sizes:
+//
+// .p-{size}  for padding (all sides)
+// .pb-{size} for padding-bottom
+// .pl-{size} for padding-left
+// .pr-{size} for padding-right
+// .pt-{size} for padding-top
+// .px-{size} for both padding-left and padding-right
+// .py-{size} for both padding-bottom and padding-top
+//
+// Credit: https://tailwindcss.com
+
+$utility-paddings: (
+    "0": 0,
+    "1": $spacer * 0.25,
+    "2": $spacer * 0.5,
+    "3": $spacer * 0.75,
+    "4": $spacer,
+    "6": $spacer * 1.5,
+    "8": $spacer * 2
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("padding") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-paddings {
+            #{set-affix("p-" + $name, $affix)}  { padding: $value !important; }
+            #{set-affix("pb-" + $name, $affix)} { padding-bottom: $value !important; }
+            #{set-affix("pl-" + $name, $affix)} { padding-left: $value !important; }
+            #{set-affix("pr-" + $name, $affix)} { padding-right: $value !important; }
+            #{set-affix("pt-" + $name, $affix)} { padding-top: $value !important; }
+
+            #{set-affix("px-" + $name, $affix)} {
+                padding-left: $value !important;
+                padding-right: $value !important;
+            }
+
+            #{set-affix("py-" + $name, $affix)} {
+                padding-bottom: $value !important;
+                padding-top: $value !important;
+            }
+        }
+
+    }
+}

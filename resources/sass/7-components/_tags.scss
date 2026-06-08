@@ -1,0 +1,26 @@
+/*
+================================================================================
+Tags
+================================================================================
+*/
+
+.tag {
+    background-color: $color-gray-lighten-3;
+    border-radius: $radius;
+    color: $color-text;
+    padding: 0.3em 0.6em;
+
+    &--xs      { font-size: 0.65em; }
+    &--sm      { font-size: 0.8em; }
+    &--caption { font-size: 0.9em; }
+    &--subtitle { font-size: 1.1em; }
+}
+
+.svg-icon {
+    width: 15px;
+    margin-right: 5px;
+}
+
+.svg-icon-only {
+    width: 15px;
+}

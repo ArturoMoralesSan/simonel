@@ -1,0 +1,19 @@
+/*
+================================================================================
+Float
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("float") {
+    @include media($min-width) {
+
+        #{set-affix("clearfix", $affix)} {
+            @include clearfix;
+        }
+
+        #{set-affix("float-left", $affix)}  { float: left !important; }
+        #{set-affix("float-none", $affix)}  { float: none !important; }
+        #{set-affix("float-right", $affix)} { float: right !important; }
+
+    }
+}

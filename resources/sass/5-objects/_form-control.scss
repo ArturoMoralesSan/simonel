@@ -1,0 +1,17 @@
+/*
+================================================================================
+Form control
+================================================================================
+
+For grouping a form field and all its related elements (label,
+description or validation messages).
+*/
+
+.form-control {
+    margin-bottom: $spacer * 1.5;
+    position: relative;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}

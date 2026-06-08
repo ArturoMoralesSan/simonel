@@ -1,0 +1,45 @@
+// =============================================================================
+// Hamburger button
+// =============================================================================
+
+@mixin hamburger($color: #fff, $size: 24px, $bar-height: 2px, $gutter: 5px) {
+    background-color: transparent;
+    border: 0;
+    box-sizing: content-box;
+    display: inline-block;
+    height: $size;
+    margin-bottom: 0;
+    padding: 0;
+    @include position(-1px null null null);
+    vertical-align: middle;
+    width: $size;
+
+    &::after,
+    &::before,
+    > span {
+        background-color: $color;
+        border-radius: $bar-height / 2;
+        display: block;
+        height: $bar-height;
+        margin-top: #{floor(($size - $bar-height) / 2)};
+        @include position(absolute, null null null 0);
+        transition: all 150ms ease-out;
+        width: $size;
+    }
+
+    &::after,
+    &::before {
+        content: "";
+    }
+
+    &::before { top: -#{$gutter + $bar-height}; }
+    > span    { top: 0; }
+    &::after  { top: #{$gutter + $bar-height}; }
+
+    &--active {
+        &::before { transform: translate(0, ($gutter + $bar-height)) rotate(45deg); }
+        &::after  { transform: translate(0, -($gutter + $bar-height)) rotate(-45deg); }
+
+        > span { opacity: 0; }
+    }
+}

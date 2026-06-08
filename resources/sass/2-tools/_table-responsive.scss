@@ -1,0 +1,59 @@
+// =============================================================================
+// Table responsive
+// =============================================================================
+
+
+// Adapt a table to small screens by displaying its cells as blocks.
+//
+// Each cell in the body needs a `data-label` attribute with
+// the label/title, e.g.:
+//
+// <td data-label="Name:">John</td>
+//
+// Credit: https://css-tricks.com/responsive-data-tables/
+//
+// 1. Necessary for IE.
+//
+// @param {number} $padding-x [0.8em] - Horizontal padding for cells.
+// @param {number} $padding-y [0.6em] - Vertical padding for cells.
+
+@mixin table-responsive($padding-x: 0.8em, $padding-y: 0.6em) {
+    @include table-striped;
+
+    display: inline-block; // 1 //
+
+    tbody {
+        display: block; // 1 //
+    }
+
+    td, th {
+        display: flex;
+    }
+
+    td {
+        border-bottom: 1px solid rgba($color-border, 0.5);
+        padding: $padding-y $padding-x;
+
+        &::before {
+            content: attr(data-label);
+            flex-shrink: 0;
+            font-weight: $font-weight-bold;
+            margin-right: $padding-x;
+            width: calc(45% - #{$padding-x});
+        }
+
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    thead {
+        @include visually-hidden;
+    }
+
+    tr {
+        display: block;
+        padding-bottom: 0.5em;
+        padding-top: 0.5em;
+    }
+}

@@ -1,0 +1,57 @@
+/*
+================================================================================
+Margin
+================================================================================
+*/
+
+
+// The sizes used for generating margin utility classes.
+//
+// The following classes are generated for each one of these sizes:
+//
+// .m-{size}  for margin (all sides)
+// .mb-{size} for margin-bottom
+// .ml-{size} for margin-left
+// .mr-{size} for margin-right
+// .mt-{size} for margin-top
+// .mx-{size} for both margin-left and margin-right
+// .my-{size} for both margin-bottom and margin-top
+//
+// Credit: https://tailwindcss.com
+
+$utility-margins: (
+    "auto": auto,
+    "0":    0,
+    "1":    $spacer * 0.25,
+    "2":    $spacer * 0.5,
+    "4":    $spacer,
+    "6":    $spacer * 1.5,
+    "8":    $spacer * 2,
+    "12":   $spacer * 3,
+    "16":   $spacer * 4
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("margin") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-margins {
+            #{set-affix("m-" + $name, $affix)}  { margin: $value !important; }
+            #{set-affix("mb-" + $name, $affix)} { margin-bottom: $value !important; }
+            #{set-affix("ml-" + $name, $affix)} { margin-left: $value !important; }
+            #{set-affix("mr-" + $name, $affix)} { margin-right: $value !important; }
+            #{set-affix("mt-" + $name, $affix)} { margin-top: $value !important; }
+
+            #{set-affix("mx-" + $name, $affix)} {
+                margin-left: $value !important;
+                margin-right: $value !important;
+            }
+
+            #{set-affix("my-" + $name, $affix)} {
+                margin-bottom: $value !important;
+                margin-top: $value !important;
+            }
+        }
+
+    }
+}

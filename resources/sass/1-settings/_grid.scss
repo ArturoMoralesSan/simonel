@@ -1,0 +1,38 @@
+// =============================================================================
+// Grid
+// =============================================================================
+
+
+// The space between grid columns. It can be any value in pixels, rems
+// or percentage. You could use a value like `$spacer * 2` if you
+// wished to be more consistent with your space system.
+//
+// A recommended value is provided by default.
+
+$gutter: 30px !default;
+
+
+// The sizes registered here will be used for generating grid columns and
+// offset classes. Values must be fractions. Add or remove as you need.
+
+$grid-columns: (
+    "1/12",     // 8.33%
+    "1/10",     // 10%
+    "1/6",      // 16.66%
+    "1/5",      // 20%
+    "1/4",      // 25%
+    "3/10",     // 30%
+    "1/3",      // 33.33%
+    "2/5",      // 40%
+    "5/12",     // 41.66%
+    "1/2",      // 50%
+    "7/12",     // 58.33%
+    "3/5",      // 60%
+    "2/3",      // 66.66%
+    "7/10",     // 70%
+    "3/4",      // 75%
+    "4/5",      // 80%
+    "5/6",      // 83.33%
+    "9/10",     // 90%
+    "11/12"     // 91.66%
+) !default;

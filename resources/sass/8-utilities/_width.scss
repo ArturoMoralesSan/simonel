@@ -1,0 +1,52 @@
+/*
+================================================================================
+Width
+================================================================================
+*/
+
+
+// The sizes used for generating width utility classes.
+// Values for `auto` and `full` width are included by default, along with
+// fractions with denominators of 10 and 12 to match the ones used in the
+// grid system.
+//
+// The following class is generated for each one of the values:
+//
+// .w-{size}
+
+$utility-widths: (
+    "auto":  auto,
+    "1/12":  percentage(1/12),  // 8.33%
+    "1/10":  percentage(1/10),  // 10%
+    "1/6":   percentage(1/6),   // 16.66%
+    "1/5":   percentage(1/5),   // 20%
+    "1/4":   percentage(1/4),   // 25%
+    "3/10":  percentage(3/10),  // 30%
+    "1/3":   percentage(1/3),   // 33.33%
+    "2/5":   percentage(2/5),   // 40%
+    "5/12":  percentage(5/12),  // 41.66%
+    "1/2":   percentage(1/2),   // 50%
+    "7/12":  percentage(7/12),  // 58.33%
+    "3/5":   percentage(3/5),   // 60%
+    "2/3":   percentage(2/3),   // 66.66%
+    "7/10":  percentage(7/10),  // 70%
+    "3/4":   percentage(3/4),   // 75%
+    "4/5":   percentage(4/5),   // 80%
+    "5/6":   percentage(5/6),   // 83.33%
+    "9/10":  percentage(9/10),  // 90%
+    "11/12": percentage(11/12), // 91.66%
+    "full":  100%,
+) !default;
+
+
+@each $affix, $min-width in utility-breakpoints("width") {
+    @include media($min-width) {
+
+        @each $name, $value in $utility-widths {
+            #{set-affix(#{"w-" + fraction-to-class-name($name)}, $affix)} {
+                width: $value !important;
+            }
+        }
+
+    }
+}

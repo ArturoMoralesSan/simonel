@@ -1,0 +1,87 @@
+/*
+================================================================================
+Headings
+================================================================================
+*/
+
+/*
+ * Classes that match the styles defined for h1-h6 tags.
+ * For situations where you may need to use a heading for semantics and/or
+ * accessibility, but want it to look like another for visual hierarchy.
+ */
+.h1 { @extend h1; }
+.h2 { @extend h2; }
+.h3 { @extend h3; }
+.h4 { @extend h4; }
+.h5 { @extend h5; }
+.h6 { @extend h6; }
+
+
+/*
+================================================================================
+Descriptions
+================================================================================
+*/
+
+/*
+ * Small paragraphs for providing helpful text.
+ */
+.description,
+.error,
+.success {
+    font-size: rem(12);
+    list-style: none;
+    margin-left: 0;
+    margin-top: 0.5em;
+}
+
+.description {
+    color: $color-gray;
+
+    label > & {
+        margin-left: 0.3em;
+    }
+}
+
+/*
+ * The `.error` class is used in paragraphs and lists to show
+ * validation error messages.
+ */
+.error {
+    color: $color-danger;
+}
+
+.success {
+    color: $color-success;
+}
+
+
+/*
+================================================================================
+Lead
+================================================================================
+*/
+
+/*
+ * A class that makes text more noticeable. Useful for the opening
+ * paragraph of an article or page.
+ */
+.lead {
+    color: $color-gray-darken-1;
+    font-size: rem($font-size-xl);
+    font-weight: $font-weight-light;
+}
+
+
+/*
+================================================================================
+Muted
+================================================================================
+*/
+
+/*
+ * Reduce the importance of text by lowering its opacity.
+ */
+.muted {
+    opacity: 0.55;
+}

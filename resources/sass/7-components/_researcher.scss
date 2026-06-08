@@ -1,0 +1,129 @@
+.researcher__container {
+    @include column(1/1);
+    
+    @include media(400) {
+        @include column(1/2);
+    }
+    @include media(760) {
+        @include column(1/3);
+    }
+
+    @include media(920) {
+        @include column(1/4);
+    }
+}
+.researcher__title {
+    color: #B11830;
+    font-weight: 600;
+}
+
+.researcher__subtitle {
+    font-weight:600;
+}
+.researcher__link {
+    position: relative;
+    text-decoration: none !important;
+}
+
+.researcher__sni {
+    position: absolute;
+    background: #B11830;
+    border-radius: 17px;
+    font-size: 10px;
+    width: 32px;
+    height: 32px;
+    color: #fff;
+    top: 7px;
+    left: 7px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.researcher__image {
+    @include media(300,960) {
+        max-width: 400px;
+        display: block;
+        margin: 0 auto;
+    }
+
+}
+
+.researcher__name {
+    color: #3A4148;
+    font-weight: 600;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.researcher___adcription {
+    font-size: 11px;
+    text-align: center;
+    color: #5F6B78;
+    margin-top: 2px;
+}
+
+.researcher-group__container {
+    align-items: center;
+}
+
+.researcher-group__filter {
+    border: 1px solid #5F6B78;
+    margin-left: 15px;
+    padding: 3px 15px;
+    border-radius: 22px;
+    color: #5F6B78;
+    font-size: 14px;
+    &:focus, 
+    &:hover, 
+    &:active {
+        border: 1px solid #3399CC;
+        color: #fff;
+        background: #3399CC;
+        text-decoration: none;
+    }
+    &--active {
+        border: 1px solid #3399CC;
+        color: #fff;
+        background: #3399CC;
+    }
+}
+
+.researcher-group__publications {
+    margin-top: 20px;
+}
+
+.researcher-details__col {
+    order:2;
+    @include media(lg) {
+        order:1;
+    }
+}
+
+.researcher-image__col {
+    order:1;
+    margin-bottom: 20px;
+    @include media(lg) {
+        order:2;
+        margin-bottom: 0;
+    }
+}
+
+.researcher-data {
+    text-align:center;
+    margin-top: 7px;
+    @include media(lg) {
+        text-align:left;
+    }
+}
+
+.researcher__row {
+    padding-top: 2.5rem;
+}
+
+.field-researcher__name {
+    color: #909090;
+    font-size: 13px;
+}

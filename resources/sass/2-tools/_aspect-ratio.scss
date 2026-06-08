@@ -1,0 +1,27 @@
+// =============================================================================
+// Aspect ratio
+// =============================================================================
+
+// Mantain a proportional height in relation to width.
+//
+// Based on:
+// https://foundation.zurb.com/sites/docs/responsive-embed.html
+// https://github.com/suitcss/components-flex-embed/
+//
+// @param {number (unitless)} $width
+// @param {number (unitless)} $height
+
+@mixin aspect-ratio($width, $height) {
+    height: 0;
+    overflow: hidden;
+    padding-bottom: calc(100% * #{$height / $width});
+    position: relative;
+    width: 100%;
+
+    > * {
+        display: block;
+        height: 100%;
+        @include position(absolute, 0 null null 0);
+        width: 100%;
+    }
+}

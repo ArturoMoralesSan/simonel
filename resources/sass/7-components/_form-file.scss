@@ -1,0 +1,102 @@
+/*
+================================================================================
+File
+================================================================================
+
+Component that makes a native file input look more consistent with the
+visual style of the framework. It works by hiding the file input inside
+a wrapper and positioning it over a text input.
+
+The structure looks like this:
+
+.form-file (wrapper)
+    .form-file__upload (file input)
+    .form-file__text (text input)
+    .form-file__btn (focusable button)
+
+Requires javascript for full functionality.
+*/
+
+
+// Viewport width from which the styles for wide screens will be applied.
+
+$form-file-breakpoint: 420;
+
+
+// Button text is replaced by this icon on small screens.
+// By default, a "browse" icon is used.
+
+$form-file-icon: escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='#{$color-text}' stroke-width='2' stroke-miterlimit='10' stroke-linecap='round'><path stroke-linejoin='round' d='M13.019 19.019H5.023a2.004 2.004 0 0 1-2.002-2.006V6.024c0-1.107.896-2.005 2.002-2.005H11l2 2h6.019c1.105 0 2.002.898 2.002 2.005v2.893'/><circle cx='16' cy='14' r='3'/><path d='M18.5 16.5L21 19'/></svg>");
+
+
+/*
+ * 1. Prevents the contents of the component from appearing above
+ *    other elements on the page.
+ */
+.form-file {
+    display: flex;
+    position: relative;
+    z-index: 0; /* 1 */
+}
+
+/*
+ * 1. Hide the text without affecting width, keeping it accessible
+ *    to screen readers.
+ * 2. The button is positioned over the native file input, so that the hover
+ *    effect works properly.
+ */
+.form-file__btn {
+    background-image: url($form-file-icon);
+    background-position: center center;
+    background-repeat: no-repeat;
+    color: transparent; /* 1 */
+    font-size: 1px; /* 1 */
+    margin-left: 5px;
+    min-width: 40px;
+    padding-bottom: 0;
+    padding-top: 0;
+    z-index: 2; /* 2 */
+
+    &:focus,
+    &:hover,
+    &:active {
+        color: transparent;
+    }
+
+    @include media($form-file-breakpoint) {
+        background-image: none;
+        color: $color-text;
+        font-size: rem($font-size * 0.95);
+        min-width: auto;
+        width: auto;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $color-text;
+        }
+    }
+}
+
+/*
+ * Style the text field and make both inputs have the same height.
+ */
+.form-file__text,
+.form-file__upload {
+    @extend .form-field;
+}
+
+.form-file__text {
+    @include truncate;
+}
+
+/*
+ * 1. Prevent scrolling on small screens.
+ */
+.form-file__upload {
+    cursor: pointer;
+    opacity: 0;
+    overflow: hidden; /* 1 */
+    @include position(absolute, 0 null null 0);
+    z-index: 1;
+}

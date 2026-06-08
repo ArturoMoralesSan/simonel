@@ -1,0 +1,26 @@
+/*
+================================================================================
+Validation icons
+================================================================================
+
+Success and warning background icons.
+*/
+
+.has-check,
+.has-warning,
+.has-error {
+    background-position: right top;
+    background-repeat: no-repeat;
+}
+
+.has-check {
+    background-image: url(icon-check());
+}
+
+.has-warning {
+    background-image: url(icon-solid-warning());
+}
+
+.has-error {
+	background-image: url(icon-error());
+}

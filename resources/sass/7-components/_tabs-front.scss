@@ -1,0 +1,97 @@
+/*
+===============================================================================
+Tabs
+===============================================================================
+*/
+
+.tabs {
+    margin-bottom: $spacer * 2;
+}
+
+.tabs__menu {
+    margin-bottom: $spacer * 3;
+    margin-left: 0;
+
+    &--desktop-view {
+        border-bottom: 1px solid $color-gray-lighten-1;
+    }
+
+    .tabs--sm & {
+        font-size: 90%;
+    }
+}
+
+.tabs__li {
+    background-color: $color-gray-lighten-4;
+    border: 1px solid $color-gray-lighten-4;
+    border-radius: $radius;
+    color: $color-text;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 0.5em;
+    padding: 0.75em 1em;
+    @include position(relative, 1px null null null);
+    transition: background-color 150ms ease-out, border-color 150ms ease-out;
+
+    &:focus,
+    &:hover,
+    &:active {
+        border-color: $color-primary;
+    }
+
+    .tabs--sm & {
+        padding: 0.8em;
+    }
+
+    .tabs__menu--desktop-view & {
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-bottom: 0;
+        border-radius: $radius $radius 0 0;
+        display: inline-block;
+        margin-bottom: 0;
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: $color-gray-lighten-4;
+            border-color: transparent;
+            color: $color-link-focus;
+        }
+    }
+
+    &[aria-selected="true"] {
+        background-color: $color-primary;
+        border-color: transparent;
+        color: #fff;
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: $color-primary;
+            cursor: auto;
+        }
+
+        .tabs__menu--desktop-view & {
+            background-color: transparent;
+            border-bottom: 2px solid #3399CC;
+            //border-color:;
+            color: #202428;
+
+            &:focus,
+            &:hover,
+            &:active {
+                background-color: transparent;
+
+            }
+        }
+    }
+
+    .tabs__menu--sm & {
+        padding: 0.5em 0.75em;
+    }
+}
+
+.tabs__select {
+    margin-bottom: $spacer * 3;
+}

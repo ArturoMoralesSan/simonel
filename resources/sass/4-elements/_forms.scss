@@ -1,0 +1,46 @@
+/*
+================================================================================
+Forms
+================================================================================
+*/
+
+input,
+select,
+textarea {
+    background-color: #fff;
+    border: 1px solid $color-border-input;
+    color: $color-text;
+
+    &:disabled {
+        @include disabled;
+    }
+}
+
+/*
+ * Set a gray background for disabled controls.
+ */
+input:disabled:not([type="submit"]),
+select:disabled,
+textarea:disabled {
+    background-color: $color-gray-lighten-4;
+}
+
+label,
+legend {
+    display: inline-block;
+    margin-bottom: 0.25em;
+    max-width: 100%;
+}
+
+option {
+    @include truncate;
+    padding-bottom: 0.1em;
+    padding-top: 0.1em;
+}
+
+[type="checkbox"],
+[type="radio"] {
+    cursor: pointer;
+    margin-right: 0.25em;
+    vertical-align: baseline;
+}

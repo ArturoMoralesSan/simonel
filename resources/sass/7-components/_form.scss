@@ -1,0 +1,110 @@
+.login-form {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-image {
+    margin-bottom: 25px;
+    width: 185px;
+}
+
+.form-boxed {
+    background-color: #FCFCFC;
+    border: 1px solid #e0e3e6;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    max-width: 350px;
+    padding: 1.5rem;
+    border-radius: 12px;
+    
+}
+
+.form-boxed > hr {
+    border-top: 3px solid #436eb3;
+    padding-bottom: 10px;
+    width: 158px;
+    margin: 0 auto;
+    
+}
+
+.divider-form-login {
+    align-items: center;
+    display: flex;
+    margin-top: 15px;
+    &:before, &:after {
+        background-color: #dfdfdf;
+        content: "";
+        flex: 1 1;
+        margin: 5px;
+        padding: 0.2px;
+    }
+}
+.divider-form-login-span {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.file-icon {
+    margin-right: 3px;
+    width: 25px;
+}
+
+.message__item{
+    line-height: 2.4;
+    margin: 0px;
+}
+
+.form-group {
+    border: 1px solid #e2e1e1fe;
+    padding: 35px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.form-group__title {
+    text-align: center;
+    top: -23px;
+    left: 25px;
+    position: absolute;
+    background: #ffff;
+    padding: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.search-form__dashboard {
+    display: flex;
+    width: 35%;
+}
+.search-form-width {
+    width: 100%;
+}
+.form-check {
+    display: flex;
+}
+
+
+
+.permissions-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    padding: 15px;
+}
+
+.permission-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}

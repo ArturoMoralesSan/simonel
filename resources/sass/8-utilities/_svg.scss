@@ -1,0 +1,29 @@
+/*
+================================================================================
+SVG
+================================================================================
+*/
+
+@each $affix, $min-width in utility-breakpoints("svg") {
+    @include media($min-width) {
+
+        /*
+         * Combine with a text-color utility to set the fill color of an SVG.
+         *
+         * Credit: https://tailwindcss.com
+         */
+        #{set-affix("fill-current", $affix)} {
+            fill: currentColor !important;
+        }
+
+        /*
+         * Combine with a text-color utility to set the stroke color of an SVG.
+         *
+         * Credit: https://tailwindcss.com
+         */
+        #{set-affix("stroke-current", $affix)} {
+            stroke: currentColor !important;
+        }
+
+    }
+}

@@ -1,0 +1,15 @@
+// =============================================================================
+// Radius
+// =============================================================================
+
+
+// Define the border-radius values to have available in your project.
+
+$radius-sm: 3px !default;
+$radius-md: 6px !default;
+$radius-lg: 9px !default;
+
+
+// The default value will be used for components and form controls.
+
+$radius: $radius-sm !default;

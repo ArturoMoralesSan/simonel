@@ -1,0 +1,390 @@
+/*
+================================================================================
+Tables
+================================================================================
+
+A component for styling every table of your project.
+Given that tables have many elements, Sonata uses nested selectors instead
+of a pure BEM approach to avoid unnecessary CSS classes.
+*/
+
+
+// Font size for the tables. Use pixels or rems.
+// The global font size is used by default.
+
+$table-font-size: $font-size;
+
+
+// Define the background colors for the header variants.
+// This will generate a class like `.table--header-{variant}` for each key
+// registered in this map. Set the background color as value.
+//
+// If you want a specific color for the text, you can define a list
+// containing both background and text colors. For example:
+//
+// $table-header-variants: (
+//     "blue": ($color-blue, #fff)
+// )
+//
+// Where `$color-blue` would be the background, and `#fff` the text color.
+
+$table-header-variants: (
+    "primary": $color-primary,
+    "light":   $color-gray-lighten-4,
+    "dark":    $color-gray-darken-5
+);
+
+
+// Horizontal padding for cells.
+
+$table-padding-x: 0.8em;
+
+
+// Vertical padding for cells.
+
+$table-padding-y: 0.6em;
+
+
+.table {
+    background-color: #fff;
+    font-size: rem($table-font-size);
+    margin-bottom: $spacer * 2;
+    max-width: 100%;
+    width: 100%;
+
+    caption {
+        font-size: rem($table-font-size * 0.9);
+        padding: ($table-padding-y / 2) $table-padding-x;
+    }
+
+    td, th {
+        padding: $table-padding-y $table-padding-x;
+        vertical-align: top;
+    }
+
+    th {
+        font-weight: $font-weight-bold;
+    }
+
+    tr {
+        border-bottom: 1px solid $color-border;
+    }
+
+    tfoot {
+        font-weight: $font-weight-bold;
+    }
+
+    thead th {
+        vertical-align: bottom;
+    }
+
+    thead tr {
+        border-bottom: 2px solid $color-gray-darken-3;
+    }
+}
+
+/*
+ * Make the table fill the entire width of its container.
+ */
+.table--full-width {
+    width: 100%;
+}
+
+/*
+ * Highlight rows when the cursor is over them.
+ */
+.table--hoverable {
+    tbody tr {
+        transition: background-color 150ms ease-out;
+
+        &:hover {
+            background-color: $color-blue-lighten-5;
+        }
+    }
+}
+
+/*
+ * Add zebra stripes to body rows.
+ */
+.table--striped {
+    @include table-striped;
+}
+
+
+/* Header color variants
+============================================================================= */
+
+// Styles to apply to all header variants.
+
+%table-header-variant {
+    thead tr {
+        border-bottom: 0;
+    }
+
+    thead th {
+        font-weight: $font-weight-semibold;
+    }
+}
+
+@each $variant, $color in $table-header-variants {
+    .table--header-#{$variant} {
+        @extend %table-header-variant;
+
+        thead {
+            @if type-of($color) == list {
+                background-color: nth($color, 1);
+                color: nth($color, 2);
+            } @else {
+                background-color: $color;
+                color: contrast-color($color);
+            }
+        }
+    }
+}
+
+
+/* Border variants
+============================================================================= */
+
+/*
+ * Add borders to all cells.
+ */
+.table--bordered {
+    td, th {
+        border: 1px solid $color-border;
+    }
+
+    tr,
+    thead tr {
+        border: 0;
+    }
+}
+
+/*
+ * Remove borders from body rows.
+ */
+.table--borderless {
+    tbody tr {
+        border: 0;
+    }
+}
+
+
+/* Size variants
+============================================================================= */
+
+.table--xs {
+    td, th {
+        padding: ($table-padding-y * 0.3) ($table-padding-x * 0.4);
+    }
+}
+
+.table--sm {
+    td, th {
+        padding: ($table-padding-y * 0.6) ($table-padding-x * 0.8);
+    }
+}
+
+.table--lg {
+    td, th {
+        padding: ($table-padding-y * 1.4) ($table-padding-x * 1.2);
+    }
+}
+
+.table--xl {
+    td, th {
+        padding: ($table-padding-y * 1.8) ($table-padding-x * 1.4);
+    }
+}
+
+
+/* Responsive variants
+============================================================================= */
+
+/*
+ * By using the `.{breakpoint}:table--responsive` classes, the table cells
+ * will be displayed as blocks in a two-column layout in small screens,
+ * and change to the original table layout when the viewport width
+ * matches the desired breakpoint.
+ *
+ * Each cell in the body needs a `data-label` attribute with
+ * the label/title, e.g.:
+ *
+ * <td data-label="Name:">John</td>
+ *
+ * Credit: https://css-tricks.com/responsive-data-tables/
+ */
+@each $affix, $max-width in $breakpoints {
+    @include media-until($max-width) {
+
+        #{set-affix("table--responsive", $affix)} {
+            @include table-responsive($table-padding-x, $table-padding-y);
+        }
+
+    }
+}
+
+.icon-link-more::before {
+    background-size: 100%;
+    content: "";
+    display: inline-block;
+    height: 8px;
+    margin-left: 2px;
+    vertical-align: middle;
+    width: 5px;
+}
+
+.icon-link-more::before {
+  background-image: url("../img/icons/icon-link-more.png");
+}
+
+.table--programs {
+
+    .thead-subtitle {
+        background-color: transparent !important;
+
+        & tr th{
+            color: #383838;
+            font-weight: 700;
+        }
+
+        & tr {
+            border-bottom: 2px solid #505963;
+        }
+
+
+    }
+
+    & .td {
+        text-align: center;
+    }
+
+    & .has {
+        font-size: 90%;
+    }
+
+    @media screen and (max-width: 780px){
+
+        .thead-subtitle {
+            display: none;
+        }
+
+        & td {
+            color: #505963 !important;
+            display: block;
+            padding: .25em .75em;
+        }
+
+        & tr td:first-child {
+            padding-top: 1.25em;
+        }
+
+        & tr td:last-child {
+            padding-bottom: 1.25em;
+        }
+
+
+        & .td {
+            font-size: 90%;
+            text-align: left;
+
+        }
+
+
+        & .td::before {
+            color: #505963 !important;
+            content: attr(data-heading);
+            margin-right: .25em;
+        }
+    }
+}
+.table-resource__actions {
+    display: flex;
+    align-items: center;
+}
+
+.table-resource__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.15;
+    margin: 0;
+}
+
+
+
+/* Bloque principal */
+.order-table {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+/* Encabezado de la tabla */
+.order-table__header {
+    margin-bottom: 16px;
+}
+
+.order-table__title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Cuerpo de la tabla */
+.order-table__body {
+    margin-top: 16px;
+}
+
+/* Estilos de la tabla */
+.order-table__details {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-table__row {
+    border-bottom: 1px solid #eee;
+}
+
+.order-table__cell {
+    padding: 12px;
+    color: #666;
+}
+
+.order-table__cell--heading {
+    font-weight: 600;
+    color: #333;
+    text-align: left;
+}
+
+.order-table__row:hover {
+    background-color: #f9f9f9;
+}
+
+/* Detalles adicionales como lista */
+.order-table__details-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.order-table__details-list li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.order-table__details-list li strong {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .order-table__details {
+        font-size: 13px;
+    }
+    .order-table__cell {
+        padding: 10px;
+    }
+}

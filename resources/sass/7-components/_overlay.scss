@@ -1,0 +1,21 @@
+/*
+================================================================================
+Overlay
+================================================================================
+*/
+
+.overlay {
+    background-color: rgba(#000, 0.6);
+    height: 100vh;
+    opacity: 0;
+    @include position(fixed, 0 null null 0);
+    transition: opacity 200ms ease-out, visibility 200ms ease-out;
+    visibility: hidden;
+    width: 100vw;
+    z-index: 10;
+
+    &--active {
+        opacity: 1;
+        visibility: visible;
+    }
+}

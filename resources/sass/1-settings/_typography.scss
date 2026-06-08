@@ -1,0 +1,87 @@
+// =============================================================================
+// Font family
+// =============================================================================
+//
+// Define any font families that you will be using in your application.
+// Feel free to add variables as needed.
+
+
+// The primary font family is used for body text.
+
+$font-family-primary: Open Sans, sans-serif !default;
+
+
+// This font family is used for headings (h1, h2...) by default.
+
+$font-family-headings: Open Sans, sans-serif !default;
+
+
+// Monospace font family is used for some semantic
+// text elements (code, kbd, pre, samp and var).
+
+$font-family-monospace: monospace !default;
+
+
+// =============================================================================
+// Font size
+// =============================================================================
+
+
+// Define the default size for your text size here. Use pixels.
+
+$font-size: 16px !default;
+
+$font-size-sm: $font-size * 0.8 !default;
+$font-size-lg: $font-size * 1.12 !default;
+$font-size-xl: $font-size * 1.25 !default;
+
+
+// Heading sizes. We provide some sensible defaults based on a slightly
+// altered version of the major third scale, but most likely you'll want
+// to change them to match your design.
+
+$font-size-h1: $font-size * 2.44 !default;
+$font-size-h2: $font-size * 1.95 !default;
+$font-size-h3: $font-size * 1.56 !default;
+$font-size-h4: $font-size * 1.25 !default;
+$font-size-h5: $font-size !default;
+$font-size-h6: $font-size * 0.85 !default;
+
+
+// =============================================================================
+// Font weight
+// =============================================================================
+//
+// Depending on the font family you choose for the body text, you may want
+// to change these values and decide on a default weight.
+
+
+$font-weight-light:    300 !default;
+$font-weight-normal:   400 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold:     700 !default;
+
+
+// Default.
+
+$font-weight: $font-weight-normal !default;
+
+
+// =============================================================================
+// Line height
+// =============================================================================
+
+
+// The line height for the body text.
+
+$line-height: 1.6 !default;
+
+
+// A tight line height value used for headings and utility classes.
+
+$line-height-tight: 1.2 !default;
+
+
+// A more relaxed value. Used for utility classes.
+
+$line-height-loose: 2 !default;

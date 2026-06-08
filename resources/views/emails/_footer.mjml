@@ -1,0 +1,15 @@
+
+        <mj-column>
+            <mj-text
+                align="center"
+                font-size="9px"
+                line-height="20px"
+                padding-top="0"
+            >
+                <strong>Atvantage</strong><br>
+                página web: <a  css-class="footer-link" href="https://atvantag3.com">atvantag3.com</a>
+                <br>
+                Correo electrónico: <a css-class="footer-link" href="mailto:contacto@atvantag3.com">contacto@atvantag3.com</a>
+            </mj-text>
+        </mj-column>    
+

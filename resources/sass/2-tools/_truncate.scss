@@ -1,0 +1,25 @@
+// =============================================================================
+// Text truncate
+// =============================================================================
+
+
+// Truncate long text with an ellipsis.
+//
+// @param {boolean} $important [false] - Use the `!important` rule.
+
+@mixin truncate($important: false) {
+    overflow: hidden if($important, !important, null);
+    text-overflow: ellipsis if($important, !important, null);
+    white-space: nowrap if($important, !important, null);
+}
+
+
+// Reset the properties of the `truncate` mixin to default values.
+//
+// @param {boolean} $important [false] - Use the `!important` rule.
+
+@mixin truncate-none($important: false) {
+    overflow: visible if($important, !important, null);
+    text-overflow: clip if($important, !important, null);
+    white-space: normal if($important, !important, null);
+}

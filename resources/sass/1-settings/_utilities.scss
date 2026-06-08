@@ -1,0 +1,85 @@
+// =============================================================================
+// Responsive classes
+// =============================================================================
+
+$menu-breakpoint: 760px;
+
+// Define which responsive utility classes (like `.md:mt-0`) will be generated.
+// Non-responsive utility classes (like `.mt-0`) will still be created
+// regardless of these settings.
+
+$responsive-utilities: (
+    "bg-color":           false,
+    "border":             true,
+    "border-color":       false,
+    "border-radius":      false,
+    "display":            true,
+    "flex":               true,
+    "float":              true,
+    "leading":            false,
+    "margin":             true,
+    "overflow":           false,
+    "padding":            true,
+    "position":           true,
+    "shadow":             false,
+    "svg":                false,
+    "table-layout":       false,
+    "text-alignment":     false,
+    "text-color":         true,
+    "text-ellipsis":      true,
+    "text-size":          false,
+    "vertical-alignment": false,
+    "visibility":         false,
+    "width":              true
+) !default;
+
+
+// =============================================================================
+// Colors
+// =============================================================================
+
+
+// A map of colors available for utility classes.
+// See `1-settings/_colors.scss` for more information on their values.
+
+$utility-colors: (
+    "transparent":    transparent,
+    "primary":        $color-primary,
+    "black":          #000,
+    "white":          #fff,
+    "link":           $color-link,
+    "gray":           $color-gray,
+    "gray-lighten-1": $color-gray-lighten-1,
+    "gray-lighten-2": $color-gray-lighten-2,
+    "gray-lighten-3": $color-gray-lighten-3,
+    "gray-lighten-4": $color-gray-lighten-4,
+    "gray-lighten-5": $color-gray-lighten-5,
+    "gray-darken-1":  $color-gray-darken-1,
+    "gray-darken-2":  $color-gray-darken-2,
+    "gray-darken-3":  $color-gray-darken-3,
+    "gray-darken-4":  $color-gray-darken-4,
+    "gray-darken-5":  $color-gray-darken-5,
+    "blue":           $color-blue,
+    "blue-lighten-1": $color-blue-lighten-1,
+    "blue-lighten-2": $color-blue-lighten-2,
+    "blue-lighten-3": $color-blue-lighten-3,
+    "blue-lighten-4": $color-blue-lighten-4,
+    "blue-lighten-5": $color-blue-lighten-5,
+    "blue-darken-1":  $color-blue-darken-1,
+    "blue-darken-2":  $color-blue-darken-2,
+    "blue-darken-3":  $color-blue-darken-3,
+    "blue-darken-4":  $color-blue-darken-4,
+    "blue-darken-5":  $color-blue-darken-5,
+    "info":           $color-info,
+    "info-light":     $color-info-light,
+    "info-text":      $color-info-text,
+    "success":        $color-success,
+    "success-light":  $color-success-light,
+    "success-text":   $color-success-text,
+    "danger":         $color-danger,
+    "danger-light":   $color-danger-light,
+    "danger-text":    $color-danger-text,
+    "warning":        $color-warning,
+    "warning-light":  $color-warning-light,
+    "warning-text":   $color-warning-text
+);

@@ -1,0 +1,105 @@
+/*
+================================================================================
+Row
+================================================================================
+
+The row object is a flex container for grid columns.
+*/
+
+
+// A `.row` class is generated along with the responsive variant
+// for each one of the registered breakpoints.
+
+@each $affix, $min-width in breakpoints() {
+    @include media($min-width) {
+
+        #{set-affix("row", $affix)} {
+            display: flex;
+            flex-flow: row wrap;
+        }
+
+    }
+}
+
+
+/*
+================================================================================
+Columns
+================================================================================
+
+Grid columns are built on flexbox and must be used inside a `.row` object
+or another flex container to display properly. Widths are set in percentages.
+
+The grid system is based on LostGrid (http://lostgrid.org).
+*/
+
+
+// Sonata generates a `.col` class for full-width columns, and a class
+// (like `.col-1/4`) for each value registered in the `$grid-columns` map.
+//
+// A `.col-auto` class is also created for equal width columns in a single row.
+//
+// All of these classes are generated with their responsive variants.
+
+@each $affix, $min-width in breakpoints() {
+    @include media($min-width) {
+
+        #{set-affix("col", $affix)} {
+            @include column;
+        }
+
+        @each $fraction in $grid-columns {
+            #{set-affix(#{"col-" + fraction-to-class-name($fraction)}, $affix)} {
+                @include column($fraction, 0);
+            }
+        }
+
+        #{set-affix("col-auto", $affix)} {
+            flex: 1;
+            width: auto;
+
+            &:nth-child(n) {
+                margin-left: 0;
+                margin-right: $gutter;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+       }
+    }
+}
+
+
+/*
+================================================================================
+Offset
+================================================================================
+
+The offset object allows you to move grid columns to the right.
+*/
+
+
+// A class (like `.offset-1/4`) is created for each one of the fractions
+// registered in the `$grid-columns` map, along with an `.offset-0` class
+// to use as a reset. All of these classes are generated with their
+// responsive variants.
+//
+// The `:root` selector is used to increase the specificity
+// and override the margin.
+
+@each $affix, $min-width in breakpoints() {
+    @include media($min-width) {
+
+        :root #{set-affix("offset-0", $affix)} {
+            margin-left: 0;
+        }
+
+        @each $fraction in $grid-columns {
+            :root #{set-affix(#{"offset-" + fraction-to-class-name($fraction)}, $affix)} {
+                @include offset($fraction);
+            }
+        }
+
+    }
+}

@@ -1,0 +1,21 @@
+// =============================================================================
+// Breakpoints
+// =============================================================================
+
+
+// Register responsive breakpoints for your application here. These will
+// be used to generate classes for the grid system and responsive utilities.
+// Sonata provides you with some sensible defaults.
+//
+// You can remove or add as many as you want, but try to include only
+// those that you will be using, especially if you generate responsive
+// utility classes (which Sonata does by default) as this could increase
+// the compiled file size significantly.
+//
+// Use pixel based widths.
+
+$breakpoints: (
+    sm: 600,
+    md: 720,
+    lg: 960
+) !default;

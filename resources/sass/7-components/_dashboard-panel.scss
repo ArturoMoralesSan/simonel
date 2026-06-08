@@ -1,0 +1,39 @@
+/*
+================================================================================
+Dashboard panel
+================================================================================
+*/
+
+.db-panel {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: $gutter;
+    overflow: auto;
+    padding: $gutter;
+    position: relative;
+    border-radius: 12px;
+}
+
+
+/* Heading
+============================================================================= */
+
+.db-panel__title {
+    border-bottom: 1px solid #ccc;
+    color: $color-db-panel-title;
+    font-size: rem(14);
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    margin: -1em -30px  ($spacer * 2.5) #{-$gutter};
+    padding: 1em $gutter 1.6em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.db-panel__title-link {
+    display: inline-block;
+    font-weight: 400;
+    margin-left: 0.3em;
+    text-transform: none;
+}
+

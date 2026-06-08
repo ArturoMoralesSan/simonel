@@ -1,0 +1,528 @@
+// =============================================================================
+// Color
+// =============================================================================
+
+
+// Return the option that provides more contrast for the given base color.
+//
+// @param {color} $base
+// @param {color} $dark-option [$color-text]
+// @param {color} $light-option [#fff]
+// @return {color}
+
+@function contrast-color($base, $dark-option: $color-text, $light-option: #fff) {
+    @if contrast-ratio($dark-option, $base) > contrast-ratio($light-option, $base) {
+        @return $dark-option;
+    }
+
+    @return $light-option;
+}
+
+
+// Return the contrast ratio between two given colors, ranging
+// from 1 (no contrast) to 21 (maximum contrast).
+//
+// Credit: algorithm from
+// https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+//
+// @param {color} $color-1
+// @param {color} $color-2
+// @return {number}
+
+@function contrast-ratio($color-1, $color-2) {
+    $luminance-1: luminance($color-1) + 0.05;
+    $luminance-2: luminance($color-2) + 0.05;
+
+    @return max($luminance-1, $luminance-2) / min($luminance-1, $luminance-2);
+}
+
+
+// Return the relative luminance of the given color, ranging from 0 (black)
+// to 1 (white).
+//
+// Credit: algorithm from
+// http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+//
+// @param {color} $color
+// @return {number}
+
+@function luminance($color) {
+    $rgb: red($color), green($color), blue($color);
+
+    @for $i from 1 through 3 {
+        $value: nth($rgb, $i) / 255;
+        $new-color: if($value <= 0.03928, $value / 12.92, pow(($value + 0.055)/1.055, 2.4));
+
+        $rgb: set-nth($rgb, $i, $new-color);
+    }
+
+    @return 0.2126 * nth($rgb, 1) + 0.7152 * nth($rgb, 2) + 0.0722 * nth($rgb, 3);
+}
+
+
+// =============================================================================
+// Fractions
+// =============================================================================
+
+
+// Return the result of dividing the given fraction.
+//
+// @param {string} $fraction - String representation of a fraction
+// @return {number}
+
+@function divide-fraction($fraction) {
+    $list: fraction-to-list($fraction);
+
+    @return nth($list, 1) / nth($list, 2);
+}
+
+
+// Convert the given fraction for use in a class name.
+// Example: `1/12` => `1\/12` or `1-12`.
+//
+// @param {string} $fraction - String representation of a fraction
+// @return {string}
+
+@function fraction-to-class-name($fraction) {
+    @if $fractions-in-class-names {
+        @return str-replace($fraction, "/", "\\/");
+    }
+
+    @return str-replace($fraction, "/", "-");
+}
+
+
+// Create a list of numbers from the given fraction.
+// Example: `1/12` => 1, 12.
+//
+// @param {string} $fraction - String representation of a fraction
+// @return {list}
+
+@function fraction-to-list($fraction) {
+    $fraction: quote($fraction);
+    $bar-index: str-index($fraction, "/");
+    $numerator: str-slice($fraction, 1, $bar-index - 1);
+    $denominator: str-slice($fraction, $bar-index + 1);
+
+    @return str-to-number($numerator), str-to-number($denominator);
+}
+
+
+// Return the denominator from a fraction.
+//
+// @param {string} $fraction - String representation of a fraction
+// @return {number}
+
+@function get-denominator($fraction) {
+    $list: fraction-to-list($fraction);
+
+    @return nth($list, 2);
+}
+
+
+// =============================================================================
+// Icons
+// =============================================================================
+//
+// Functions that return a data URI of SVG icons to use as background.
+
+
+// Return a caret icon.
+//
+// @param {color} $color [$color-gray-darken-3]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @return string
+
+@function icon-caret($color: $color-gray-darken-3, $size: 24) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 0 24 24'><path fill='#{$color}' d='M12 16l-6-6h12z'/></svg>");
+}
+
+
+// Return a check icon.
+//
+// @param {color} $color [$color-success]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @param {number (unitless)} $stroke-width [2]
+// @return string
+
+@function icon-check($color: $color-success, $size: 24, $stroke-width: 2) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 0 24 24' fill='none' stroke='#{$color}' stroke-width='#{$stroke-width}' stroke-miterlimit='10'><path d='M5.5 12.5L10 17 20 7'/></svg>");
+}
+
+
+// Return an "x" icon.
+//
+// @param {color} $color [$color-danger]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @return string
+
+@function icon-error($color: $color-danger, $size: 24) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 0 24 24' fill='none' stroke='#{$color}' stroke-width='2' stroke-miterlimit='10'><circle cx='12' cy='12' r='9'/><path d='M8 8l8 8m0-8l-8 8'/></svg>");
+}
+
+
+// Return an "information" icon.
+//
+// @param {color} $color [$color-info]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @return string
+
+@function icon-info($color: $color-info, $size: 24) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 0 24 24' fill='#{$color}'><circle fill='none' stroke='#{$color}' stroke-width='2' stroke-miterlimit='10' cx='12' cy='12' r='9'/><circle cx='12' cy='16' r='1.25'/><path d='M13 13.5h-2L10.5 6h3z'/></svg>");
+}
+
+
+// Return a warning icon with a solid background.
+//
+// @param {color} $color [lighten($color-warning, 10%)]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @return string
+
+@function icon-solid-warning($color: lighten($color-warning, 10%), $size: 24) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 1 24 24' fill='#{$color}'><path d='M20.58 16.51l-6.5-11.25c-.51-.87-1.26-1.38-2.08-1.38s-1.57.5-2.08 1.38l-6.5 11.25c-.5.88-.56 1.79-.15 2.49.41.71 1.22 1.11 2.23 1.11h13c1.01 0 1.83-.41 2.23-1.11.41-.7.35-1.61-.15-2.49zM12 18.15c-.64 0-1.15-.51-1.15-1.15s.51-1.15 1.15-1.15 1.15.51 1.15 1.15-.51 1.15-1.15 1.15zm1-3.65h-2l-.3-6h2.5l-.2 6z'/></svg>");
+}
+
+
+// Return an outlined warning icon.
+//
+// @param {color} $color [lighten($color-warning, 10%)]
+// @param {number (unitless)} $size [24] - Size in pixels
+// @return string
+
+@function icon-warning($color: lighten($color-warning, 10%), $size: 24) {
+    @return escape-svg("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='#{$size}' height='#{$size}' viewBox='0 0 24 24' fill='#{$color}'><path fill='none' stroke='#{$color}' stroke-width='2' stroke-miterlimit='10' d='M4.98 19.79c-1.54 0-2.18-1.09-1.4-2.43L10.6 5.21c.77-1.34 2.03-1.34 2.81 0l7.02 12.15c.77 1.34.14 2.43-1.4 2.43H4.98z'/><circle cx='12' cy='16.5' r='1'/><path d='M12.7 14.5h-1.4l-.3-6h2z'/></svg>");
+}
+
+
+// =============================================================================
+// Math
+// =============================================================================
+
+
+// Return the base number raised to the power of given exponent.
+//
+// Credit: https://css-tricks.com/snippets/sass/power-function/
+//
+// @author Hugo Giraudel
+// @param {number} $base
+// @param {number} $exponent - Must be an integer
+// @return {number}
+
+@function pow($base, $exponent) {
+    $value: 1;
+
+    @if $exponent > 0 {
+        @for $i from 1 through $exponent {
+            $value: $value * $base;
+        }
+    } @else if $exponent < 0 {
+        @for $i from 1 through -$exponent {
+            $value: $value / $base;
+        }
+    }
+
+    @return $value;
+}
+
+
+// =============================================================================
+// Mixin utilities
+// =============================================================================
+
+
+// Transform a list that can range from 1 to 4 values to be 4 values.
+// Credit: https://github.com/thoughtbot/bourbon
+//
+// @param {list | number} $shorthand
+// @return {list}
+
+@function unpack-shorthand($shorthand) {
+    @if length($shorthand) == 1 {
+        @return nth($shorthand, 1) nth($shorthand, 1) nth($shorthand, 1) nth($shorthand, 1);
+    } @else if length($shorthand) == 2 {
+        @return nth($shorthand, 1) nth($shorthand, 2) nth($shorthand, 1) nth($shorthand, 2);
+    } @else if length($shorthand) == 3 {
+        @return nth($shorthand, 1) nth($shorthand, 2) nth($shorthand, 3) nth($shorthand, 2);
+    } @else {
+        @return $shorthand;
+    }
+}
+
+
+// =============================================================================
+// Responsive
+// =============================================================================
+
+
+// Return the value of a registered breakpoint.
+//
+// @param {string} $name - Name of the breakpoint as its registered in
+//     `$breakpoints` map.
+// @param {string} $units [em] - Units in which the value is to be returned.
+//     Options: `em`, `px` and `unitless`.
+// @return {number}
+
+@function bp($name, $units: em) {
+    @if not map-has-key($breakpoints, $name) {
+        @error "The breakpoint \"#{$name}\" is not registered."
+    }
+
+    $value: map-get($breakpoints, $name);
+
+    @if $units == unitless {
+        @return strip-units($value);
+    }
+
+    @if $units == px {
+        @return strip-units($value) * 1px;
+    }
+
+    @if $units == em {
+        @return em($value);
+    }
+
+    @error "The unit \"#{$units}\" is not supported in \"bp()\" function.";
+}
+
+
+// Return a map of the registered breakpoints to build responsive classes.
+//
+// @return {map}
+
+@function breakpoints() {
+    @return join((null: 0), $breakpoints);
+}
+
+
+// Add the given prefix or suffix to the class name.
+// You can customize the way the class name is generated in
+// `1-settings/_class-names`.
+//
+// @param {string} $class-name
+// @param {string} $affix [null]
+// @return {string}
+
+@function set-affix($class-name, $affix: null) {
+    @if str-index($class-name, ".") == 1 {
+        $class-name: str-slice($class-name, 2);
+    }
+
+    @if not $affix {
+        @return "." + $class-name;
+    }
+
+    @if $use-responsive-suffix {
+        @return "." + $class-name + $responsive-separator + $affix;
+    }
+
+    @return "." + $affix + $responsive-separator + $class-name;
+}
+
+
+// Return a map of the registered breakpoints to build responsive utility
+// classes. The types that can generate responsive classes can be defined
+// in the `$responsive-utilities` map in `1-settings/utilities`.
+//
+// @param {string} $type
+// @return {map}
+
+@function utility-breakpoints($type) {
+    @if map-get($responsive-utilities, $type) {
+        @return breakpoints();
+    }
+
+    @return (null: 0);
+}
+
+
+// Output a CSS calc function that constrains a value from
+// A to B over viewport-width A to viewport-width B.
+// Requires a media query to cap the value at B.
+//
+// Credit: https://css-tricks.com/between-the-lines/
+//
+// @author David Bachmann
+// @param {number} $from - Minimum value
+// @param {number} $to - Maximum value
+// @param {number} $from-width - Minimum viewport width in pixels
+// @param {number} $to-width - Maximum viewport width in pixels
+
+@function value-between($from, $to, $from-width, $to-width) {
+    $slope: strip-units($to - $from) / strip-units($to-width - $from-width);
+    $base: $from - $slope * strip-units($from-width);
+
+    @return calc(#{$base} + #{100vw * $slope});
+}
+
+
+// =============================================================================
+// Strings
+// =============================================================================
+
+
+// Escape the given SVG data URI for use as background image.
+//
+// @param {string} $data
+// @return {string}
+
+@function escape-svg($data) {
+    $data: str-replace($data, "<", "%3C");
+    $data: str-replace($data, ">", "%3E");
+
+    @return str-replace($data, "#", "%23");
+}
+
+
+// Replace `$search` with `$replace` in `$string`.
+//
+// Credit: https://hugogiraudel.com/2014/01/13/sass-string-replacement-function/
+//
+// @author Hugo Giraudel
+// @param {string} $string - Initial string
+// @param {string} $search - Substring to replace
+// @param {string} $replace [""] - New value
+// @return {string} - Updated string
+
+@function str-replace($string, $search, $replace: "") {
+    $index: str-index($string, $search);
+
+    @if not $index {
+        @return $string;
+    }
+
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+}
+
+
+// Convert a string representation of an integer to a number.
+//
+// Credit: https://hugogiraudel.com/2014/01/15/sass-string-to-number/
+//
+// @author Hugo Giraudel
+// @param {string} $string
+// @return {number}
+
+@function str-to-number($string) {
+    $strings: "0" "1" "2" "3" "4" "5" "6" "7" "8" "9";
+    $numbers:  0   1   2   3   4   5   6   7   8   9;
+    $result: 0;
+
+    @for $i from 1 through str-length($string) {
+        $character: str-slice($string, $i, $i);
+        $index: index($strings, $character);
+
+        @if not $index {
+            @return false;
+        }
+
+        $number: nth($numbers, $index);
+        $result: $result * 10 + $number;
+    }
+
+    @return $result;
+}
+
+
+// =============================================================================
+// Unit conversion
+// =============================================================================
+
+
+// Pixels to em conversion.
+//
+// @param {number} $value
+// @param {number (unitless)} $base [16]
+// @return {number}
+
+@function em($value, $base: 16) {
+    @if (type-of($value) != number) {
+        @error "The value '#{$value}' must be a number.";
+    }
+
+    @if unit($value) == "em" {
+        @return $value;
+    }
+
+    @if (unit($value) != px and not unitless($value)) {
+        @error "The value '#{$value}' must be in pixels.";
+    }
+
+    @return strip-units($value) / $base * 1em;
+}
+
+
+// Em to pixels conversion.
+//
+// @param {number} $value
+// @return {number}
+
+@function px($value) {
+    @if (type-of($value) != number) {
+        @error "The value '#{$value}' must be a number.";
+    }
+
+    @if unit($value) == "px" {
+        @return $value;
+    }
+
+    @if (unit($value) != em and not unitless($value)) {
+        @error "The value '#{$value}' must be in ems.";
+    }
+
+    @return strip-units($value) * 16px;
+}
+
+
+// Pixels to rem conversion.
+//
+// @param {number} $value
+// @return {number}
+
+@function rem($value) {
+    @if (type-of($value) != number) {
+        @error "The value '#{$value}' must be a number.";
+    }
+
+    @if unit($value) == "rem" {
+        @return $value;
+    }
+
+    @if (unit($value) != px and not unitless($value)) {
+        @error "The value '#{$value}' must be in pixels.";
+    }
+
+    @return strip-units($value) / strip-units($font-size) * 1rem;
+}
+
+
+// Return a unitless number.
+//
+// @param {number} $value
+// @return {number (unitless)}
+
+@function strip-units($value) {
+    @if (type-of($value) != number) {
+        @error "The value '#{$value}' must be a number.";
+    }
+
+    @return $value / ($value * 0 + 1);
+}
+
+
+// =============================================================================
+// Validation
+// =============================================================================
+
+
+// Check if the given value is a valid CSS length.
+//
+// Credit: https://github.com/thoughtbot/bourbon
+//
+// @param {string} $value.
+// @return {boolean}
+
+@function is-length($value) {
+    @return type-of($value) != "null" and (str-slice($value + "", 1, 4) == "calc"
+        or index(auto inherit initial 0, $value)
+        or (type-of($value) == "number" and not(unitless($value))));
+}

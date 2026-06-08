@@ -1,0 +1,154 @@
+// =============================================================================
+// Brand
+// =============================================================================
+//
+// The main colors of your application.
+// Feel free to register as many as you need.
+
+
+// Change this value to match your brand color.
+
+$color-primary: #436eb3 !default;
+$color-light-blue:     #436eb3;
+$color-blue-gray:      #f0f7fa;
+$color-menu-text: #436eb3;
+$color-red: #436eb3;
+
+
+// =============================================================================
+// Color palettes
+// =============================================================================
+//
+// Gray and blue palettes are provided by default, but feel free
+// to add as many colors or palettes as you need.
+
+
+// Gray (with a tint of blue).
+//
+// The gray palette is used for control backgrounds and borders accross
+// the framework, so be careful when changing these values as they may
+// impact several classes.
+
+$color-gray:           #adb5bd !default;
+$color-gray-lighten-1: lighten($color-gray, 12%) !default;
+$color-gray-lighten-2: lighten($color-gray, 18%) !default;
+$color-gray-lighten-3: lighten($color-gray, 22%) !default;
+$color-gray-lighten-4: lighten($color-gray, 24%) !default;
+$color-gray-lighten-5: lighten($color-gray, 27%) !default;
+$color-gray-darken-1:  darken($color-gray, 10%) !default;
+$color-gray-darken-2:  darken($color-gray, 22%) !default;
+$color-gray-darken-3:  darken($color-gray, 36%) !default;
+$color-gray-darken-4:  darken($color-gray, 48%) !default;
+$color-gray-darken-5:  darken($color-gray, 57%) !default;
+
+
+// Blue.
+//
+// The blue palette is used in links and controls across the framework,
+// so be careful when changing these values as they may impact several
+// classes. Creating a new palette instead is recommended.
+
+$color-blue:           #39c !default;
+$color-blue-lighten-1: lighten($color-blue, 10%) !default;
+$color-blue-lighten-2: lighten($color-blue, 20%) !default;
+$color-blue-lighten-3: lighten($color-blue, 30%) !default;
+$color-blue-lighten-4: lighten($color-blue, 40%) !default;
+$color-blue-lighten-5: lighten($color-blue, 45%) !default;
+$color-blue-darken-1:  darken($color-blue, 5%) !default;
+$color-blue-darken-2:  darken($color-blue, 10%) !default;
+$color-blue-darken-3:  darken($color-blue, 20%) !default;
+$color-blue-darken-4:  darken($color-blue, 30%) !default;
+$color-blue-darken-5:  darken($color-blue, 35%) !default;
+
+
+// =============================================================================
+// Dashboard
+// =============================================================================
+
+
+$color-db-green:       #53832D !default;
+$color-db-orange:      #e75a5d !default;
+$color-db-primary:     #9f1211 !default;
+
+
+// Submenu.
+
+$color-db-submenu:     #0F1A2D;
+$color-db-section:     #0B1421;
+
+
+// Text.
+
+$color-db-panel-title: lighten($color-db-submenu, 20%) !default;
+
+
+// =============================================================================
+// Borders
+// =============================================================================
+
+
+// A default global color for borders.
+// This is used for tables, border utility classes and components.
+
+$color-border: $color-gray-lighten-2;
+
+
+// Default color for input and textarea borders.
+
+$color-border-input: $color-gray-lighten-1;
+
+
+// =============================================================================
+// Text
+// =============================================================================
+
+
+// Color for the body text.
+
+$color-text: $color-gray-darken-3 !default;
+
+
+// Color for your heading tags (h1, h2...).
+
+$color-headings: $color-gray-darken-4 !default;
+
+
+// The default color for links.
+
+$color-link: $color-blue !default;
+$color-link-over:      darken($color-link, 15%);
+
+
+// Color for focused and active links.
+
+$color-link-focus: $color-blue-darken-2 !default;
+
+
+// =============================================================================
+// States
+// =============================================================================
+//
+// State colors are used in support classes, form validation
+// and in some components (like buttons and alerts).
+
+
+$color-info:           $color-blue-darken-1 !default;
+$color-info-light:     $color-blue-lighten-4 !default;
+$color-info-text:      $color-blue-darken-3 !default;
+$color-info-border:    darken($color-info-light, 10%) !default;
+
+$color-success:        #20c372 !default;
+$color-success-light:  lighten($color-success, 40%) !default;
+$color-success-text:   darken($color-success, 20%) !default;
+$color-success-border: lighten($color-success, 20%) !default;
+
+$color-danger:         #BF3535 !default;
+$color-danger-light:   lighten($color-danger, 37%) !default;
+$color-danger-text:    darken($color-danger, 15%) !default;
+$color-danger-border:  lighten($color-danger, 30%) !default;
+
+$color-warning:        #ffc31a !default;
+$color-warning-light:  lighten($color-warning, 34%) !default;
+$color-warning-text:   darken($color-warning, 34%) !default;
+$color-warning-border: lighten($color-warning, 18%) !default;
+
