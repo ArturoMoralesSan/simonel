@@ -23,7 +23,7 @@
         </p>
 
         <add-products-form
-            :templates="{{ $templates }}"
+            :products="{{ $products }}"
             :users="{{ json_encode($users) }}"
             action="{{ url('admin/ventas/crear') }}"
             

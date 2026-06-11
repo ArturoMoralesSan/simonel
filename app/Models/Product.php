@@ -48,13 +48,19 @@ class Product extends Model
         return $this->hasMany(Inventory::class);
     }
 
-    public function templates()
-    {
-        return $this->hasMany(ProductTemplate::class);
-    }
-
     public function lots()
     {
         return $this->hasMany(ProductLot::class);
     }
+
+    public function saleProducts()
+    {
+        return $this->hasMany(SaleProduct::class, 'product_id');
+    }
+
+    public function recipes()
+    {
+        return $this->hasMany(ProductRecipe::class, 'product_id');
+    }
 }
+

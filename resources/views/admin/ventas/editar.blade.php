@@ -22,7 +22,7 @@
             <a href="{{ url('admin/ventas/') }}">Ver todas las ventas</a>
         </p>
         <add-products-form
-            :templates="{{ $templates }}"
+            :products="{{ $products }}"
             :users="{{ json_encode($users) }}"
             action="{{ url('admin/ventas/crear') }}"
             :sale="{{ json_encode($sale) }}"

@@ -78,7 +78,7 @@
                                     <search-select-field
                                         :name="'inventory' + index + '_product_id'"
                                         v-model="fields['inventory' + index + '_product_id']"
-                                        :options="templatesOptions"
+                                        :options="pendingProducts"
                                     />
                                     <field-errors :name="'inventory' + index + '_product_id'"></field-errors>
                                 </div>
@@ -290,6 +290,7 @@ export default {
             inventory: {},
             movementsEntradas: {},
             movementsSalidas: {},
+            pendingProducts: {},
             fields: {
                 product_count: 1,
                 type: 'resumen',
@@ -380,6 +381,9 @@ export default {
             this.inventory = Array.isArray(response.data.inventory) ? [...response.data.inventory] : [];
             this.movementsEntradas = Array.isArray(response.data.movementsEntradas) ? [...response.data.movementsEntradas] : [];
             this.movementsSalidas = Array.isArray(response.data.movementsSalidas) ? [...response.data.movementsSalidas] : [];
+
+            // Productos comprados y pendientes de surtir
+            this.pendingProducts = response.data.pendingProducts || {};
         },
 
         quitarProducto(index) {

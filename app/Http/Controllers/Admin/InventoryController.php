@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\InventoryMovement;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use App\Models\SaleProduct;
 
 class InventoryController extends Controller
 {
@@ -37,10 +38,30 @@ class InventoryController extends Controller
         $movementsEntradas = $movements->where('type', 'entrada')->values();
         $movementsSalidas = $movements->where('type', 'salida')->values();
 
+
+        $pendingProducts = SaleProduct::selectRaw("
+            sale_products.id,product_id,
+            CONCAT(
+                products.name,
+                ' (Venta #',
+                sales.id,
+                ' - ',
+                sale_products.quantity,
+                ' kg)'
+            ) as name
+        ")
+        ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
+        ->join('products', 'products.id', '=', 'sale_products.product_id')
+        ->where('sales.user_id', $clientId)
+        ->where('sales.status', 'paid')
+        ->orderBy('products.name')
+        ->pluck('name', 'product_id');
+
         return response()->json([
             'inventory' => $inventory,
             'movementsEntradas' => $movementsEntradas,
             'movementsSalidas' => $movementsSalidas,
+            'pendingProducts' => $pendingProducts
         ]);
     }
 
@@ -214,8 +235,6 @@ class InventoryController extends Controller
         $users = Customer::selectRaw("CONCAT(trade_name, ' (', business_name,')') as full_name, user_id")
             ->pluck('full_name', 'user_id');
         $products = Product::orderBy('name', 'ASC')->get();
-
-
         return view('admin.inventario.crear', compact('users', 'labels', 'products'));
     }
 

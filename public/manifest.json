@@ -1,10 +1,10 @@
 {
-    "name": "Atvantag3",
-    "short_name": "Atvantag3",
+    "name": "Simonel",
+    "short_name": "Simonel",
     "start_url": "/",
     "display": "standalone",
-    "theme_color": "#436eb3",
-    "background_color": "#436eb3",
+    "theme_color": "#de2523",
+    "background_color": "#f0f0f0",
     "icons": [
         {
             "src": "/img/icons/icon-192x192.png",

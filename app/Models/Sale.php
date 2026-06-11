@@ -59,11 +59,14 @@ class Sale extends Model
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
 
-    public function templates()
+    public function products()
     {
-        return $this->belongsToMany(ProductTemplate::class, 'sale_products')
-            ->withPivot(['product_name','quantity','base_price','subtotal', 'discount', 'iva', 'total_with_iva'])
-            ->withTimestamps();
+        return $this->hasMany(SaleProduct::class, 'sale_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function payments()

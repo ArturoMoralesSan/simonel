@@ -235,7 +235,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   "extends": _main_components_forms_base_BaseForm_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
   props: {
-    templates: {
+    products: {
       type: Array,
       required: true
     },
@@ -269,42 +269,41 @@ __webpack_require__.r(__webpack_exports__);
       this.fields.sale_id = this.sale.id;
       this.fields.client_id = this.sale.user_id;
       this.fields.comment = this.sale.comment;
-      if (this.sale.templates.length) {
-        this.fields.products = this.sale.templates.map(function (p) {
+      if (this.sale.products && this.sale.products.length) {
+        this.fields.products = this.sale.products.map(function (p) {
           return {
-            template_id: Number(p.id),
-            custom_name: p.pivot.product_name,
-            quantity: p.pivot.quantity || 1,
-            unit_price: p.pivot.base_price || 0,
-            discount: p.pivot.discount || 0,
-            iva: p.pivot.iva || 16
+            product_id: Number(p.product_id),
+            quantity: p.quantity || 1,
+            unit_price: p.base_price || 0,
+            discount: p.discount || 0,
+            iva: p.iva || 16,
+            subtotal: p.subtotal || 0
           };
         });
       }
     }
   },
   computed: {
-    templatesOptions: function templatesOptions() {
-      return this.templates.reduce(function (obj, t) {
-        obj[t.id] = t.product_name || t.name;
+    productsOptions: function productsOptions() {
+      return this.products.reduce(function (obj, p) {
+        obj[p.id] = p.name;
         return obj;
       }, {});
     },
     subtotalGeneral: function subtotalGeneral() {
-      this.fields.gross_amount = this.fields.products.reduce(function (sum, p) {
+      var total = this.fields.products.reduce(function (sum, p) {
         return sum + p.quantity * p.unit_price;
       }, 0);
-      return this.fields.products.reduce(function (sum, p) {
-        return sum + p.quantity * p.unit_price;
-      }, 0);
+      this.fields.gross_amount = total;
+      return total;
     },
     totalDescuentos: function totalDescuentos() {
-      var _this = this;
-      return this.fields.products.reduce(function (sum, p) {
+      var total = this.fields.products.reduce(function (sum, p) {
         var discount = p.quantity * p.unit_price * (p.discount / 100);
-        _this.fields.discounts = sum + discount;
         return sum + discount;
       }, 0);
+      this.fields.discounts = total;
+      return total;
     },
     totalIva: function totalIva() {
       return this.fields.products.reduce(function (sum, p) {
@@ -320,12 +319,12 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     addRow: function addRow() {
       this.fields.products.push({
-        template_id: null,
-        custom_name: null,
+        product_id: null,
         quantity: 1,
         unit_price: 0,
         discount: 0,
-        iva: 16
+        iva: 16,
+        subtotal: 0
       });
       this.errors.push({});
     },
@@ -333,18 +332,16 @@ __webpack_require__.r(__webpack_exports__);
       this.fields.products.splice(index, 1);
       this.errors.splice(index, 1);
     },
-    onTemplateSelected: function onTemplateSelected(index, templateId) {
+    onProductSelected: function onProductSelected(index, productId) {
       var product = this.fields.products[index];
-      product.template_id = templateId;
-      var template = this.templates.find(function (t) {
-        return t.id == templateId;
+      product.product_id = productId;
+      var selectedProduct = this.products.find(function (p) {
+        return p.id == productId;
       });
-      if (template) {
-        product.unit_price = parseFloat(template.sale_price) || 0;
-        product.custom_name = template.product_name || template.name;
+      if (selectedProduct) {
+        product.unit_price = parseFloat(selectedProduct.costo_venta) || 0;
       } else {
         product.unit_price = 0;
-        product.custom_name = '';
       }
       this.updateSubtotal(index);
     },
@@ -361,8 +358,8 @@ __webpack_require__.r(__webpack_exports__);
       var valid = true;
       this.errors = this.fields.products.map(function (p) {
         var rowErrors = {};
-        if (!p.template_id) {
-          rowErrors.template_id = 'Debe seleccionar un producto';
+        if (!p.product_id) {
+          rowErrors.product_id = 'Debe seleccionar un producto';
           valid = false;
         }
         if (p.quantity <= 0) {
@@ -1267,6 +1264,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       inventory: {},
       movementsEntradas: {},
       movementsSalidas: {},
+      pendingProducts: {},
       fields: {
         product_count: 1,
         type: 'resumen'
@@ -1382,7 +1380,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               _this2.inventory = Array.isArray(response.data.inventory) ? _toConsumableArray(response.data.inventory) : [];
               _this2.movementsEntradas = Array.isArray(response.data.movementsEntradas) ? _toConsumableArray(response.data.movementsEntradas) : [];
               _this2.movementsSalidas = Array.isArray(response.data.movementsSalidas) ? _toConsumableArray(response.data.movementsSalidas) : [];
-            case 11:
+
+              // Productos comprados y pendientes de surtir
+              _this2.pendingProducts = response.data.pendingProducts || {};
+            case 12:
             case "end":
               return _context.stop();
           }
@@ -5346,7 +5347,7 @@ var render = function render() {
     on: {
       click: _vm.addRow
     }
-  }, [_vm._v("\n      + Añadir producto\n    ")]), _vm._v(" "), _c("table", {
+  }, [_vm._v("\n        + Añadir producto\n        ")]), _vm._v(" "), _c("table", {
     staticClass: "table size-caption mx-auto md:table--responsive"
   }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.fields.products, function (product, index) {
     var _vm$errors$index, _vm$errors$index2, _vm$errors$index3;
@@ -5354,34 +5355,20 @@ var render = function render() {
       key: index
     }, [_c("td", [_c("search-select-field", {
       attrs: {
-        value: product.template_id,
-        options: _vm.templatesOptions,
-        name: "products[".concat(index, "][template_id]"),
+        value: product.id,
+        options: _vm.productsOptions,
+        name: "products[".concat(index, "][product_id]"),
         placeholder: "Selecciona un producto",
-        initial: _vm.sale ? product.template_id : ""
+        initial: _vm.sale ? product.product_id : ""
       },
       on: {
         input: function input($event) {
-          return _vm.onTemplateSelected(index, $event);
+          return _vm.onProductSelected(index, $event);
         }
       }
-    }), _vm._v(" "), (_vm$errors$index = _vm.errors[index]) !== null && _vm$errors$index !== void 0 && _vm$errors$index.template_id ? _c("small", {
+    }), _vm._v(" "), (_vm$errors$index = _vm.errors[index]) !== null && _vm$errors$index !== void 0 && _vm$errors$index.product_id ? _c("small", {
       staticClass: "text-red-600"
-    }, [_vm._v("\n              " + _vm._s(_vm.errors[index].template_id) + "\n            ")]) : _vm._e(), _vm._v(" "), _c("text-field", {
-      staticClass: "form-field mt-1",
-      attrs: {
-        type: "text",
-        name: "products[".concat(index, "][custom_name]"),
-        placeholder: "Nombre personalizado"
-      },
-      model: {
-        value: product.custom_name,
-        callback: function callback($$v) {
-          _vm.$set(product, "custom_name", $$v);
-        },
-        expression: "product.custom_name"
-      }
-    })], 1), _vm._v(" "), _c("td", [_c("text-field", {
+    }, [_vm._v("\n                    " + _vm._s(_vm.errors[index].product_id) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
       staticClass: "form-field",
       "class": {
         "is-invalid": (_vm$errors$index2 = _vm.errors[index]) === null || _vm$errors$index2 === void 0 ? void 0 : _vm$errors$index2.quantity
@@ -5405,7 +5392,7 @@ var render = function render() {
       }
     }), _vm._v(" "), (_vm$errors$index3 = _vm.errors[index]) !== null && _vm$errors$index3 !== void 0 && _vm$errors$index3.quantity ? _c("small", {
       staticClass: "text-red-600"
-    }, [_vm._v("\n              " + _vm._s(_vm.errors[index].quantity) + "\n            ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
+    }, [_vm._v("\n                    " + _vm._s(_vm.errors[index].quantity) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
       staticClass: "form-field",
       attrs: {
         type: "number",
@@ -5466,7 +5453,7 @@ var render = function render() {
         },
         expression: "product.iva"
       }
-    })], 1), _vm._v(" "), _c("td", [_vm._v("\n            $" + _vm._s(_vm.calculateSubtotal(product).toFixed(4)) + "\n          ")]), _vm._v(" "), _c("td", [_c("button", {
+    })], 1), _vm._v(" "), _c("td", [_vm._v("\n                    $" + _vm._s(_vm.calculateSubtotal(product).toFixed(4)) + "\n                ")]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn--danger btn--sm",
       attrs: {
         type: "button"
@@ -5476,7 +5463,7 @@ var render = function render() {
           return _vm.removeRow(index);
         }
       }
-    }, [_vm._v("\n              Quitar\n            ")])])]);
+    }, [_vm._v("\n                        Quitar\n                    ")])])]);
   }), 0), _vm._v(" "), _vm.fields.products.length ? _c("tfoot", [_c("tr", [_c("td", {
     staticClass: "text-right font-bold",
     attrs: {
@@ -5514,7 +5501,7 @@ var render = function render() {
     attrs: {
       colspan: "2"
     }
-  }, [_vm._v("\n            $" + _vm._s(_vm.totalGeneral.toFixed(4)) + "\n          ")])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                        $" + _vm._s(_vm.totalGeneral.toFixed(4)) + "\n                    ")])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
     staticClass: "form-control"
   }, [_c("label", {
     attrs: {
@@ -5534,7 +5521,7 @@ var render = function render() {
       },
       expression: "fields.comment"
     }
-  }, [_vm._v(_vm._s(_vm.sale ? _vm.sale.comment : "") + "\n    ")]), _vm._v(" "), _c("field-errors", {
+  }, [_vm._v(_vm._s(_vm.sale ? _vm.sale.comment : "") + "\n        ")]), _vm._v(" "), _c("field-errors", {
     attrs: {
       name: "comment"
     }
@@ -5542,7 +5529,7 @@ var render = function render() {
     staticClass: "text-center pt-4"
   }, [_c("form-button", {
     staticClass: "btn--primary btn--wide"
-  }, [_vm._v("\n      Enviar\n    ")])], 1)]);
+  }, [_vm._v("\n            Enviar\n        ")])], 1)]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -6591,7 +6578,7 @@ var render = function render() {
     }, [_c("label", [_vm._v("Producto")]), _vm._v(" "), _c("search-select-field", {
       attrs: {
         name: "inventory" + index + "_product_id",
-        options: _vm.templatesOptions
+        options: _vm.pendingProducts
       },
       model: {
         value: _vm.fields["inventory" + index + "_product_id"],
@@ -15432,7 +15419,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.is-invalid[data-v-1c5594a4] {\r\n  border-color: red;\n}\n.text-red-600[data-v-1c5594a4] {\r\n  color: #dc2626;\r\n  font-size: 0.75rem;\n}\n.table input[data-v-1c5594a4] {\r\n  width: 100%;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.is-invalid[data-v-1c5594a4] {\n    border-color: red;\n}\n.text-red-600[data-v-1c5594a4] {\n    color: #dc2626;\n    font-size: 0.75rem;\n}\n.table input[data-v-1c5594a4] {\n    width: 100%;\n}\n", ""]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
