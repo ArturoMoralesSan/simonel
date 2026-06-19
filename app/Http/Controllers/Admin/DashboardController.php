@@ -18,8 +18,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (Auth::user()->isSuperAdmin())
-        {
+        if (Auth::user()->isSuperAdmin()) {
+
             $dateNow     = Carbon::now();
             $dateFormat  = $dateNow->format('Y-m-d');
             $date        = $dateNow->locale('es');
@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Ventas
+            | VENTAS
             |--------------------------------------------------------------------------
             */
 
@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Ventas por día
+            | VENTAS POR DÍA
             |--------------------------------------------------------------------------
             */
 
@@ -61,47 +61,46 @@ class DashboardController extends Controller
                 ->orderBy('finish_date')
                 ->get()
                 ->groupBy(function ($val) {
-
-                    $dateParse = Carbon::parse($val->finish_date);
-                    $date      = $dateParse->locale('es');
-
-                    return $date->day . ' ' . $date->monthName;
+                    $dateParse = Carbon::parse($val->finish_date)->locale('es');
+                    return $dateParse->day . ' ' . $dateParse->monthName;
                 })
                 ->map(function ($sale) {
-
                     return $sale->sum('total_with_iva');
-
                 });
-
-
-            $productsCount = Product::select(
-                'products.id',
-                'products.name'
-            )
-            ->leftJoin('sale_products', 'sale_products.product_id', '=', 'products.id')
-            ->leftJoin('sales', 'sales.id', '=', 'sale_products.sale_id')
-            ->where(function ($q) use ($start_date, $end_date) {
-                $q->where('sales.is_paid', true)
-                ->whereBetween('sales.finish_date', [$start_date, $end_date]);
-            })
-            ->selectRaw('COALESCE(SUM(sale_products.quantity),0) as sales_count')
-            ->groupBy('products.id', 'products.name')
-            ->orderByDesc('sales_count')
-            ->take(10)
-            ->get();
 
             /*
             |--------------------------------------------------------------------------
-            | Utilidad estimada
+            | PRODUCTOS MÁS VENDIDOS (CANTIDAD)
+            |--------------------------------------------------------------------------
+            */
+
+            $productsCount = Product::select(
+                    'products.id',
+                    'manufactured_products.name'
+                )
+                ->leftJoin('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+                ->leftJoin('sale_products', 'sale_products.product_id', '=', 'products.id')
+                ->leftJoin('sales', 'sales.id', '=', 'sale_products.sale_id')
+                ->where(function ($q) use ($start_date, $end_date) {
+                    $q->where('sales.is_paid', true)
+                    ->whereBetween('sales.finish_date', [$start_date, $end_date]);
+                })
+                ->selectRaw('COALESCE(SUM(sale_products.quantity),0) as sales_count')
+                ->groupBy('products.id', 'manufactured_products.name')
+                ->orderByDesc('sales_count')
+                ->take(10)
+                ->get();
+
+            /*
+            |--------------------------------------------------------------------------
+            | UTILIDAD ESTIMADA
             |--------------------------------------------------------------------------
             */
 
             $profit = SaleProduct::selectRaw("
                     SUM(
-                        (
-                            sale_products.base_price -
-                            COALESCE(products.costo_total,0)
-                        ) * sale_products.quantity
+                        (sale_products.base_price - COALESCE(products.costo_total,0))
+                        * sale_products.quantity
                     ) as total_profit
                 ")
                 ->join('products', 'products.id', '=', 'sale_products.product_id')
@@ -112,43 +111,45 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Productos más vendidos (kg)
+            | TOP PRODUCTOS (KG)
             |--------------------------------------------------------------------------
             */
 
             $topProducts = SaleProduct::selectRaw("
                     products.id,
-                    products.name,
+                    manufactured_products.name,
                     SUM(sale_products.quantity) as total_kg
                 ")
                 ->join('products', 'products.id', '=', 'sale_products.product_id')
+                ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
                 ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
                 ->where('sales.is_paid', true)
                 ->whereBetween('sales.finish_date', [$start_date, $end_date])
-                ->groupBy('products.id', 'products.name')
+                ->groupBy('products.id', 'manufactured_products.name')
                 ->orderByDesc('total_kg')
                 ->take(10)
                 ->get();
 
             /*
             |--------------------------------------------------------------------------
-            | Inventario por producto
+            | INVENTARIO POR PRODUCTO
             |--------------------------------------------------------------------------
             */
 
             $inventoryProducts = ProductLot::selectRaw("
                     products.id,
-                    products.name,
+                    manufactured_products.name,
                     SUM(product_lots.available_quantity) as stock
                 ")
                 ->join('products', 'products.id', '=', 'product_lots.product_id')
-                ->groupBy('products.id', 'products.name')
+                ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+                ->groupBy('products.id', 'manufactured_products.name')
                 ->orderByDesc('stock')
                 ->get();
 
             /*
             |--------------------------------------------------------------------------
-            | Valor total inventario
+            | VALOR TOTAL INVENTARIO
             |--------------------------------------------------------------------------
             */
 
@@ -156,11 +157,11 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Lotes bajos
+            | LOTES BAJOS
             |--------------------------------------------------------------------------
             */
 
-            $lowLots = ProductLot::with('product')
+            $lowLots = ProductLot::with('product.manufactured')
                 ->where('available_quantity', '<=', 10)
                 ->where('available_quantity', '>', 0)
                 ->orderBy('available_quantity')
@@ -169,13 +170,13 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Pendientes de surtir
+            | PENDIENTES DE SURTIR
             |--------------------------------------------------------------------------
             */
 
             $pendingAssortment = Sale::with([
                     'user',
-                    'products.product'
+                    'products.product.manufactured'
                 ])
                 ->where('status', 'paid')
                 ->orderBy('created_at')
@@ -183,31 +184,24 @@ class DashboardController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Clientes con más ventas
+            | CLIENTES CON MÁS VENTAS
             |--------------------------------------------------------------------------
             */
 
             $customerCount = User::whereHas('sales', function ($q) use ($start_date, $end_date) {
-
-                    $q->where('is_paid', true);
-                    $q->whereBetween('finish_date', [$start_date, $end_date]);
-
+                    $q->where('is_paid', true)
+                    ->whereBetween('finish_date', [$start_date, $end_date]);
                 })
                 ->withCount([
-                    'sales',
                     'sales as sales_count' => function ($query) use ($start_date, $end_date) {
-
-                        $query->where('is_paid', true);
-                        $query->whereBetween('finish_date', [$start_date, $end_date]);
-
+                        $query->where('is_paid', true)
+                            ->whereBetween('finish_date', [$start_date, $end_date]);
                     }
                 ])
                 ->withSum([
                     'sales as total_sale_price' => function ($query) use ($start_date, $end_date) {
-
-                        $query->where('is_paid', true);
-                        $query->whereBetween('finish_date', [$start_date, $end_date]);
-
+                        $query->where('is_paid', true)
+                            ->whereBetween('finish_date', [$start_date, $end_date]);
                     }
                 ], 'total_with_iva')
                 ->get()
@@ -215,17 +209,16 @@ class DashboardController extends Controller
 
                     $customer->average_ticket =
                         $customer->sales_count > 0
-                        ? ($customer->total_sale_price / $customer->sales_count)
-                        : 0;
+                            ? ($customer->total_sale_price / $customer->sales_count)
+                            : 0;
 
                     return $customer;
-
                 })
                 ->sortByDesc('total_sale_price');
 
             /*
             |--------------------------------------------------------------------------
-            | Inventario clientes
+            | INVENTARIO CLIENTES
             |--------------------------------------------------------------------------
             */
 
@@ -235,11 +228,7 @@ class DashboardController extends Controller
                     SUM(inventories.quantity) as total_quantity
                 ")
                 ->join('users', 'users.id', '=', 'inventories.user_id')
-                ->groupBy(
-                    'users.id',
-                    'users.name',
-                    'users.last_name'
-                )
+                ->groupBy('users.id', 'users.name', 'users.last_name')
                 ->orderByDesc('total_quantity')
                 ->get();
 
@@ -250,20 +239,15 @@ class DashboardController extends Controller
                 'salesCount',
                 'salesNowCount',
                 'days',
-
                 'profit',
-
                 'topProducts',
-
+                'productsCount',
                 'inventoryProducts',
                 'inventoryValue',
                 'lowLots',
-
                 'pendingAssortment',
-
                 'customerCount',
-                'customerInventory',
-                'productsCount'
+                'customerInventory'
             ));
         }
 
