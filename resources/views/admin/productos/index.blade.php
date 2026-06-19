@@ -46,8 +46,6 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Categoría</th>
                                 <th>Costo</th>
                                 <th>Costo de presentación</th>
                                 <th>Costo indirecto</th>
@@ -62,18 +60,12 @@
                         <tbody>
                             <tr v-for="productItem in resourceList" class="table-resource__row" :key="productItem.id">
                                 <td data-label="Nombre:">
-                                    @{{ productItem.name }}
-                                </td>
-                                <td data-label="Descripción:">
-                                    @{{ productItem.description }}
-                                </td>
-                                <td data-label="Tipo de impresión :">
-                                    @{{ productItem.type.name }}
+                                    @{{ productItem.manufactured.name }}
                                 </td>
                                 <td data-label="Costo:">
                                     $@{{ productItem.vinil_cost }} 
                                 </td>
-                                <td data-label="Costo de empaquetado:">
+                                <td data-label="Costo de presentacion:">
                                     $@{{ productItem.impresion_cost }} <span class="description">@{{ productItem.cut.name }}(@{{ productItem.cut.measure }})</span> 
                                 </td>
                                 <td data-label="Costo indirecto:">

@@ -14,8 +14,8 @@ class ProductRecipe extends Model
         return $this->hasMany(ProductRecipeItem::class);
     }
 
-    public function product()
+    public function manufactured()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
     }
 }

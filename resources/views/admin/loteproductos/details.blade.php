@@ -18,7 +18,7 @@
 
             <div class="md:col-1/2">
                 <strong>Producto</strong>
-                <p>{{ $lot->product->name }}</p>
+                <p>{{ $lot->product->manufactured->name }}</p>
             </div>
 
             <div class="md:col-1/2">

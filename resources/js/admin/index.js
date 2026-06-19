@@ -2,6 +2,7 @@ import '../boot.js';
 import ProductRegistrationForm from '../main/components/forms/product-registration-form/ProductRegistrationForm.vue';
 import ProductRegistrationForms from '../main/components/forms/product-registration-forms/ProductRegistrationForms.vue';
 import ProductRecipeForm from '../main/components/forms/product-recipes/ProductRecipeForm.vue';
+import MaterialPurchaseForm from '../main/components/forms/material-purchase/MaterialPurchaseForm.vue';
 import ProductionOrderForm from '../main/components/forms/production-orders/ProductionOrderForm.vue';
 import AddFileButton from './components/AddFileButton.vue';
 import CloneButton from './components/CloneButton.vue';
@@ -83,7 +84,9 @@ import AddProductsForm from './components/AddProductsForm.vue';
     Vue.component('inventory-form', InventoryForm);
     Vue.component('inventory-product-form', InventoryProductForm);
     Vue.component('product-recipe-form', ProductRecipeForm);
+    Vue.component('material-purchase-form', MaterialPurchaseForm);
     Vue.component('product-order-form', ProductionOrderForm);
+    
 
 
 

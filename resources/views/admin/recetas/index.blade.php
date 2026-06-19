@@ -44,7 +44,6 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Producto</th>
-                                <th>Versión</th>
                                 <th>Rendimiento</th>
                                 <th>Ingredientes</th>
                                 <th>Notas</th>
@@ -61,11 +60,7 @@
                             >
 
                                 <td data-label="Producto:">
-                                    @{{ recipe.product.name }}
-                                </td>
-
-                                <td data-label="Versión:">
-                                    @{{ recipe.version }}
+                                    @{{ recipe.manufactured.name }}
                                 </td>
 
                                 <td data-label="Rendimiento:">

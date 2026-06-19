@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\ManufacturedProduct;
 use App\Models\RawMaterial;
 use App\Models\ProductRecipe;
 use App\Models\ProductRecipeItem;
@@ -18,7 +18,7 @@ class RecipeController extends Controller
     {
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
 
-        $recipes = ProductRecipe::with(['product','items.rawMaterial'])
+        $recipes = ProductRecipe::with(['manufactured','items.rawMaterial'])
         ->orderBy('id', 'DESC')
         ->paginate(20);
         
@@ -37,7 +37,7 @@ class RecipeController extends Controller
     {
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
     
-        $products = Product::orderBy('name', 'ASC')->pluck('name','id');
+        $products = ManufacturedProduct::orderBy('name', 'ASC')->pluck('name','id');
         $rawmaterials  = RawMaterial::pluck('name','id');
 
         return view('admin.recetas.crear', compact('products','rawmaterials'));   
@@ -49,7 +49,7 @@ class RecipeController extends Controller
 
 
         $recipe = ProductRecipe::with([
-            'product',
+            'manufactured',
             'items.rawMaterial'
         ])->findOrFail($id);
 
@@ -88,8 +88,7 @@ class RecipeController extends Controller
 
         }
 
-        $product_recipe->product_id = $request->product_id;
-        $product_recipe->version = $request->version;
+        $product_recipe->manufactured_product_id = $request->product_id;
         $product_recipe->yield_quantity = $request->yield_quantity;
         $product_recipe->notes = $request->notes;
         $product_recipe->active = 1;
@@ -125,7 +124,7 @@ class RecipeController extends Controller
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
 
         $recipe = ProductRecipe::with(['items.rawMaterial'])->findOrFail($id);
-        $products = Product::orderBy('name', 'ASC')->pluck('name', 'id');
+        $products = ManufacturedProduct::orderBy('name', 'ASC')->pluck('name', 'id');
         $rawmaterials = RawMaterial::orderBy('name', 'ASC')->pluck('name', 'id');
 
         return view('admin.recetas.editar', compact('recipe','products','rawmaterials'));   

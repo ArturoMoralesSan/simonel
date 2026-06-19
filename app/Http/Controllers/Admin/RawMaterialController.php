@@ -44,7 +44,6 @@ class RawMaterialController extends Controller
         
         $material = new RawMaterial;
         $material->name = $request->name;
-        $material->sku = $request->sku;
         $material->raw_material_type = $request->material_types;
         $material->minimum_stock = $request->stock;
         $material->unit = $request->unit;
@@ -87,7 +86,6 @@ class RawMaterialController extends Controller
 
         $material = RawMaterial::find($id);
         $material->name = $request->name;
-        $material->sku = $request->sku;
         $material->raw_material_type = $request->material_types;
         $material->minimum_stock = $request->stock;
         $material->unit = $request->unit;

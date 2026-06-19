@@ -18,9 +18,8 @@ class ProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', new NotUppercase, new NotLowercase, 'max:100'],
-            'description' => ['required', new NotUppercase, new NotLowercase, 'max:100'],
-            'type_id' => ['required', 'max:20'],
+            
+            'manufactured_product_id' => ['required', 'max:20'],
             'cut_id' => ['required', 'max:20'],
             'vinil_cost' => 'required_unless:type_id,3,|max:10',
             'impresion_cost' => 'required_unless:type_id,3,|max:10',

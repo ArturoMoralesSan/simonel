@@ -126,7 +126,6 @@
                 <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>Receta</th>
                         <th>Cantidad</th>
                         <th>Tipo</th>
                         <th>Costo estimado</th>
@@ -140,11 +139,7 @@
                         <tr>
 
                             <td>
-                                {{ $product->product->name ?? '-' }}
-                            </td>
-
-                            <td>
-                                {{ $product->recipe->version ?? '-' }}
+                                {{ $product->manufactured->name ?? '-' }}
                             </td>
 
                             <td>

@@ -236,7 +236,7 @@
 
                 return this.products.reduce((obj, p) => {
 
-                obj[p.id] = p.name;
+                obj[p.id] = p.manufactured.name;
 
                 return obj;
 

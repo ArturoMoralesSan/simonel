@@ -28,6 +28,9 @@ use App\Http\Controllers\Admin\LotController;
 use App\Http\Controllers\Admin\RecipeController;
 use App\Http\Controllers\Admin\ProductionOrderController;
 use App\Http\Controllers\Admin\ProductLotController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\PurchaseController;
+use App\Http\Controllers\Admin\ManufacturedProductController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -104,6 +107,22 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('roles/{id}/actualizar', [RoleController::class, 'update']);
     Route::delete('roles/eliminar/{id}', [RoleController::class, 'delete']);
 
+    //proveedores
+    Route::get('proveedores', [SupplierController::class, 'index']);
+    Route::view('agregar-proveedores', 'admin.proveedores.crear');
+    Route::post('proveedores/crear', [SupplierController::class, 'save']);
+    Route::get('proveedores/{id}/editar', [SupplierController::class, 'edit']);
+    Route::put('proveedores/{id}/actualizar', [SupplierController::class, 'update']);
+    Route::delete('proveedores/eliminar/{id}', [SupplierController::class, 'delete']);
+
+    Route::get('compras', [PurchaseController::class, 'index']);
+    Route::get('compras/{id}/detalle', [PurchaseController::class, 'details']);
+    Route::get('agregar-compras', [PurchaseController::class, 'create']);
+    Route::post('compras/crear', [PurchaseController::class, 'save']);
+    Route::get('compras/{id}/editar', [PurchaseController::class, 'edit']);
+    Route::put('compras/{id}/actualizar', [PurchaseController::class, 'update']);
+    Route::delete('compras/eliminar/{id}', [PurchaseController::class, 'delete']);
+
     //Categorias
     Route::get('categorias', [TypeController::class, 'index']);
     Route::view('agregar-categoria', 'admin.categorias.crear');
@@ -127,6 +146,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('almacenes/{id}/editar', [WarehouseController::class, 'edit']);
     Route::put('almacenes/{id}/actualizar', [WarehouseController::class, 'update']);
     Route::delete('almacenes/eliminar/{id}', [WarehouseController::class, 'delete']);
+
+    //catalogo de productos
+    Route::get('catalogo', [ManufacturedProductController::class, 'index']);
+    Route::get('agregar-catalogo', [ManufacturedProductController::class, 'create']);
+    Route::post('catalogo/crear', [ManufacturedProductController::class, 'save']);
+    Route::get('catalogo/{id}/editar', [ManufacturedProductController::class, 'edit']);
+    Route::put('catalogo/{id}/actualizar', [ManufacturedProductController::class, 'update']);
+    Route::delete('catalogo/eliminar/{id}', [ManufacturedProductController::class, 'delete']);
+
 
     //Lotes
     Route::get('lotes', [LotController::class, 'index']);

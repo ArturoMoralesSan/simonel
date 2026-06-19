@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Type;
 use App\Models\Cut;
+use App\Models\ManufacturedProduct;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ class ProductController extends Controller
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
         $search = \Request('search');
 
-        $query = Product::with('type', 'cut')->orderBy('created_at', 'desc');
+        $query = Product::with('manufactured','type', 'cut')->orderBy('created_at', 'desc');
         if ($search) {
             $query->where('name', 'LIKE', '%' . $search . '%')->orderBy('created_at', 'desc');
         }
@@ -35,6 +36,7 @@ class ProductController extends Controller
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
         $types = Type::pluck('name','id');
+        $manufactured = ManufacturedProduct::pluck('name','id');
         $presentationsOptions = Cut::selectRaw("id, CONCAT(name, ' (', measure, ')') as name")->pluck('name', 'id');
         $presentations = Cut::selectRaw("
             id,
@@ -42,8 +44,9 @@ class ProductController extends Controller
             cost
         ")->get();
 
-$presentationOptions = $presentations->pluck('name', 'id');
-        return view('admin.productos.crear', compact('types', 'presentations', 'presentationsOptions'));   
+        $presentationOptions = $presentations->pluck('name', 'id');
+        
+        return view('admin.productos.crear', compact('types', 'presentations', 'presentationsOptions','manufactured'));   
     }
 
     public function save(ProductRequest $request)
@@ -51,10 +54,9 @@ $presentationOptions = $presentations->pluck('name', 'id');
         abort_unless(Gate::allows('view.products') || Gate::allows('edit.products'), 403);
         
         $product = new Product;
-        $product->name           = $request->name;
-        $product->type_id        = $request->type_id;
+        $product->manufactured_product_id = $request->manufactured_product_id;
+        //$product->type_id        = $request->type_id;
         $product->cut_id         = $request->cut_id;
-        $product->description    = $request->description;
         $product->vinil_cost     = $request->vinil_cost;
         $product->impresion_cost = $request->impresion_cost;
         $product->indirect_cost  = $request->indirect_cost;
@@ -81,7 +83,7 @@ $presentationOptions = $presentations->pluck('name', 'id');
 
 
         // Obtener la nueva venta con los productos ya clonados para enviarlos al frontend
-        $newProduct->load('type', 'cut');
+        $newProduct->load('manufactured','type', 'cut');
 
         return response()->json([
             'success' => true,
@@ -93,13 +95,14 @@ $presentationOptions = $presentations->pluck('name', 'id');
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('edit.products'), 403);
         $product = Product::find($id);
+        $manufactured = ManufacturedProduct::pluck('name','id');
         $types = Type::pluck('name','id');
         $presentationsOptions = Cut::selectRaw("id, CONCAT(name, ' (', measure, ')') as name")->pluck('name', 'id');
         $presentations = Cut::selectRaw("
             id,
             CONCAT(name, ' (', measure, ')') as name,
             cost
-        ")->get();        return view('admin.productos.editar', compact('product', 'types', 'presentations', 'presentationsOptions'));
+        ")->get();        return view('admin.productos.editar', compact('manufactured','product', 'types', 'presentations', 'presentationsOptions'));
     }
 
 
@@ -108,10 +111,9 @@ $presentationOptions = $presentations->pluck('name', 'id');
         abort_unless(Gate::allows('view.products') || Gate::allows('edit.products'), 403);
 
         $product = Product::find($id);
-        $product->name           = $request->name;
-        $product->type_id        = $request->type_id;
+        $product->manufactured_product_id = $request->manufactured_product_id;
+        //$product->type_id        = $request->type_id;
         $product->cut_id         = $request->cut_id;
-        $product->description    = $request->description;
         $product->vinil_cost     = $request->vinil_cost;
         $product->impresion_cost = $request->impresion_cost;
         $product->indirect_cost  = $request->indirect_cost;

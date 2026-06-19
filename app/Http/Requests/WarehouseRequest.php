@@ -20,7 +20,6 @@ class WarehouseRequest extends FormRequest
         return [
             'name' => ['required', new NotUppercase, new NotLowercase, 'max:180'],
             'warehouse_type' => ['required', 'max:180'],
-            'temperature'     => ['required', 'max:5'],
         ];
     }
 }

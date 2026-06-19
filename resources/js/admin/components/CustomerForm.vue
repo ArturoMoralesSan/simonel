@@ -44,10 +44,18 @@
                 </div>
                 <div class="md:col-1/2">
                     <div class="form-control">
-                        <label for="contact">Contacto</label>
-                        <text-field name="contact" v-model="fields.contact" maxlength="80" :initial="user.contact || ''">
-                        </text-field>
-                        <field-errors name="contact"></field-errors>
+                        <label for="customer_type">Tipo de cliente</label>
+                        <select-field
+                            name="customer_type"
+                            v-model="fields.customer_type"
+                            :options="{
+                                mayorista: 'Mayorista',
+                                minorista: 'Minorista'
+                            }"
+                            :initial="user.customer_type || 'minorista'"
+                        >
+                        </select-field>
+                        <field-errors name="customer_type"></field-errors>
                     </div>
                 </div>
             </div>

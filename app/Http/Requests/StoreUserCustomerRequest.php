@@ -19,7 +19,6 @@ class StoreUserCustomerRequest extends FormRequest
                 'rfc'            => 'nullable|string|max:13|min:12',
                 'trade_name'     => 'nullable|string|max:255',
                 'tax_regime'     => 'nullable|string|max:255',
-                'contact'        => 'nullable|string|max:255',
                 'phone'          => 'nullable|string|max:20',
                 'street'         => 'nullable|string|max:255',
                 'ext_number'     => 'nullable|string|max:20',

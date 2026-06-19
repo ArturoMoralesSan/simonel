@@ -24,11 +24,11 @@ class InventoryController extends Controller
             return response()->json(['error' => 'Client ID requerido'], 400);
         }
 
-        $inventory = Inventory::with('product')
+        $inventory = Inventory::with('product.manufactured')
             ->where('user_id', $clientId)
             ->get();
 
-        $movements = InventoryMovement::with('inventory.product')
+        $movements = InventoryMovement::with('inventory.product.manufactured')
             ->whereHas('inventory', function ($q) use ($clientId) {
                 $q->where('user_id', $clientId);
             })
@@ -38,30 +38,34 @@ class InventoryController extends Controller
         $movementsEntradas = $movements->where('type', 'entrada')->values();
         $movementsSalidas = $movements->where('type', 'salida')->values();
 
-
         $pendingProducts = SaleProduct::selectRaw("
-            sale_products.id,product_id,
-            CONCAT(
-                products.name,
-                ' (Venta #',
-                sales.id,
-                ' - ',
-                sale_products.quantity,
-                ' kg)'
-            ) as name
-        ")
-        ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
-        ->join('products', 'products.id', '=', 'sale_products.product_id')
-        ->where('sales.user_id', $clientId)
-        ->where('sales.status', 'paid')
-        ->orderBy('products.name')
-        ->pluck('name', 'product_id');
+                sale_products.id,
+                sale_products.product_id,
+                CONCAT(
+                    manufactured_products.name,
+                    ' (Venta #',
+                    sales.id,
+                    ' - ',
+                    sale_products.quantity,
+                    ' kg)'
+                ) as name
+            ")
+            ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
+            ->join('products', 'products.id', '=', 'sale_products.product_id')
+            ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+            ->where('sales.user_id', $clientId)
+            ->where('sales.status', 'paid')
+            ->orderBy('manufactured_products.name')
+            ->pluck('name', 'product_id');
+
+        $customer = User::with('customer')->findOrFail($clientId);
 
         return response()->json([
             'inventory' => $inventory,
             'movementsEntradas' => $movementsEntradas,
             'movementsSalidas' => $movementsSalidas,
-            'pendingProducts' => $pendingProducts
+            'pendingProducts' => $pendingProducts,
+            'customer_type' => $customer->customer->customer_type,
         ]);
     }
 
@@ -225,17 +229,32 @@ class InventoryController extends Controller
 
     public function create()
     {
-        abort_unless(Gate::allows('view.inventories') || Gate::allows('edit.inventories'), 403);
-            $labels = [
-                'entradas' => 'Entradas',
-                'salidas'  => 'Salidas',
-                'Resumen' => 'Resumen',
-            ];
+        abort_unless(
+            Gate::allows('view.inventories') || Gate::allows('edit.inventories'),
+            403
+        );
 
-        $users = Customer::selectRaw("CONCAT(trade_name, ' (', business_name,')') as full_name, user_id")
-            ->pluck('full_name', 'user_id');
-        $products = Product::orderBy('name', 'ASC')->get();
-        return view('admin.inventario.crear', compact('users', 'labels', 'products'));
+        $labels = [
+            'entradas' => 'Entradas',
+            'salidas'  => 'Salidas',
+            'Resumen'  => 'Resumen',
+        ];
+
+        $users = Customer::selectRaw("
+            CONCAT(trade_name, ' (', business_name,')') as full_name,
+            user_id
+        ")->pluck('full_name', 'user_id');
+
+        $products = Product::with('manufactured')
+            ->get()
+            ->sortBy(fn($p) => optional($p->manufactured)->name)
+            ->values();
+
+        return view('admin.inventario.crear', compact(
+            'users',
+            'labels',
+            'products'
+        ));
     }
 
     public function save(InventoryRequest $request)

@@ -26,13 +26,13 @@
                         </thead>
                         <tbody>
                             <tr v-for="productItem in inventory" class="table-resource__row" :key="productItem.id">
-                                <td>{{ productItem.product.name }}</td>
+                                <td>{{ productItem.product.manufactured.name }}</td>
                                 <td>{{ productItem.quantity }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </section>
-                <div class="tabs mb-4">
+                <div v-if="esMayorista" class="tabs mb-4">
                 <a
                     :class="['btn tab-btn', { active: fields.type === 'entrada' }]"
                     @click="fields.type = 'entrada'"
@@ -53,9 +53,9 @@
                 </a>
                 </div>
 
-                <section v-if="fields.type === 'entrada' || fields.type === 'salida'" class="db-panel">
+                <section v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida'" class="db-panel">
                     <h3 class="db-panel__title">
-                        Agregar {{ fields.type }}
+                        {{ esMayorista ? 'Agregar ' + fields.type : 'Agregar inventario' }}
                     </h3>
                     <div v-for="index in fields.product_count" :key="'entrada-'+index" class="mb-4 product-row">
                         <button type="button" class="btn btn--danger btn--sm mt-4 btn-delete " v-if="index >= 2"  @click="quitarProducto(index)">
@@ -78,7 +78,7 @@
                                     <search-select-field
                                         :name="'inventory' + index + '_product_id'"
                                         v-model="fields['inventory' + index + '_product_id']"
-                                        :options="pendingProducts"
+                                        :options="productsOptions"
                                     />
                                     <field-errors :name="'inventory' + index + '_product_id'"></field-errors>
                                 </div>
@@ -99,15 +99,21 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn--sm btn--primary mb-2" type="button" @click="fields.product_count++">Agregar productos a {{ fields.type == 'entrada' ? 'camara de refrigeración' : 'piso' }}</button>
+                    <button class="btn btn--sm btn--primary mb-2" type="button" @click="fields.product_count++">
+                        {{
+                            esMayorista
+                                ? `Agregar productos a ${fields.type == 'entrada' ? 'camara de refrigeración' : 'piso'}`
+                                : 'Agregar producto'
+                        }}
+                    </button>
                 </section>
-                <div v-if="fields.type === 'entrada' || fields.type === 'salida'" class="text-center p-8">
+                <div v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida'" class="text-center p-8">
                     <form-button class="btn--primary btn--wide">
                         Guardar
                     </form-button>
                 </div>
 
-                <div class="tab-content mt-3">
+                <div v-if="esMayorista" class="tab-content mt-3">
                     <div v-show="fields.type==='entrada'">
                         <section class="db-panel">
                             <h3 class="db-panel__title">
@@ -124,7 +130,7 @@
                                 <tbody>
                                     <tr v-for="productItem in movementsEntradas" class="table-resource__row" :key="productItem.id">
                                         <td>{{ formatearFecha(productItem.date) }}</td>
-                                        <td>{{ productItem.inventory.product.name }}</td>
+                                        <td>{{ productItem.inventory.product.manufactured.name }}</td>
                                         <td>{{ productItem.quantity }}</td>
                                         <td>
                                             <button
@@ -159,7 +165,7 @@
                                 <tbody>
                                     <tr v-for="productItem in movementsSalidas" class="table-resource__row" :key="productItem.id">
                                         <td>{{ formatearFecha(productItem.date) }}</td>
-                                        <td>{{ productItem.inventory.product.name }}</td>
+                                        <td>{{ productItem.inventory.product.manufactured.name }}</td>
                                         <td>{{ productItem.quantity }}</td>
                                         <td>
                                             <button
@@ -287,7 +293,9 @@ export default {
     data() {
         return {
             clienteNombre: '',
+            clienteTipo: 'mayorista',
             inventory: {},
+            inventoryOptions: {},
             movementsEntradas: {},
             movementsSalidas: {},
             pendingProducts: {},
@@ -300,32 +308,45 @@ export default {
         };
     },
     computed: {
-        templatesOptions() {
-            return this.products.reduce((obj, t) => {
-                obj[t.id] = t.product_name || t.name;
-                return obj;
-            }, {});
+        esMayorista() {
+            return this.clienteTipo === 'mayorista';
+        },
+        productsOptions() {
+
+            if (!this.esMayorista) {
+                return this.pendingProducts;
+            }
+
+            if (this.fields.type === 'entrada') {
+                return this.pendingProducts;
+            }
+
+            if (this.fields.type === 'salida') {
+                return this.inventoryOptions;
+            }
+
+            return {};
         },
         resumen() {
             const resumen = {};
 
             // obtener todos los nombres de productos
-            const productos = Object.values(this.inventory).map(i => i.product.name);
+            const productos = Object.values(this.inventory).map(i => i.product.manufactured.name);
 
             productos.forEach(p => {
-                const inv = Object.values(this.inventory).find(i => i.product.name === p);
+                const inv = Object.values(this.inventory).find(i => i.product.manufactured.name === p);
                 const stock = inv ? Number(inv.quantity || 0) : 0;
 
                 // entradas
                 const entradas = Object.values(this.movementsEntradas || {}).reduce((acc, m) =>{ 
-                    return m.inventory.product.name === p
+                    return m.inventory.product.manufactured.name === p
                         ? acc + Number(m.quantity || 0)
                         : acc;
                 }, 0);
 
                 // salidas
                 const salidasArray = Object.values(this.movementsSalidas || {}).filter(
-                    m => m.inventory.product.name === p
+                    m => m.inventory.product.manufactured.name === p
                 );
                 const salidas = salidasArray.reduce((acc, m) => acc + Number(m.quantity || 0), 0);
 
@@ -373,12 +394,32 @@ export default {
                 full_name: nombre
             }));
 
+
             const client = clientsArray.find(c => c.id === Number(clientId));
+            
             if (!client) return;
 
             this.clienteNombre = client.full_name;
             const response = await window.axios.get(`/api/inventory-clients?client=${clientId}`);
+
+            this.clienteTipo = response.data.customer_type || 'mayorista';
+            if (this.clienteTipo === 'minorista') {
+                this.fields.type = 'entrada';
+            } else {
+                this.fields.type = 'resumen';
+            }
+
             this.inventory = Array.isArray(response.data.inventory) ? [...response.data.inventory] : [];
+            this.inventoryOptions = {};
+
+            this.inventory.forEach(item => {
+
+                this.inventoryOptions[item.product_id] =
+                    item.product.manufactured.name +
+                    ' (' +
+                    item.quantity +
+                    ' disponibles)';
+            });
             this.movementsEntradas = Array.isArray(response.data.movementsEntradas) ? [...response.data.movementsEntradas] : [];
             this.movementsSalidas = Array.isArray(response.data.movementsSalidas) ? [...response.data.movementsSalidas] : [];
 

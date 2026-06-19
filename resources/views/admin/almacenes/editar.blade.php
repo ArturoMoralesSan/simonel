@@ -36,14 +36,14 @@
                         </h3>
 
                         <div class="md:row">
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="name">Nombre</label>
                                     <text-field name="name" v-model="fields.name" maxlength="100" initial="{{ $warehouse->name }}"></text-field>
                                     <field-errors name="name"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="warehouse_type">Tipo de almacen</label>
@@ -54,16 +54,6 @@
                                     <field-errors name="warehouse_type"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
-                                {{-- nombres --}}
-                                <div class="form-control">
-                                    <label for="temperature">Temperatura</label>
-                                    <text-field name="temperature" v-model="fields.temperature" maxlength="80" initial="{{ $warehouse->temperature }}"></text-field>
-                                    <field-errors name="temperature"></field-errors>
-
-                                </div>
-                            </div>
-
                         </div>
                     </section>
                     <div class="text-center">

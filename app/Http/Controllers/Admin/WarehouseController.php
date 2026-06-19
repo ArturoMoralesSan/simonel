@@ -41,7 +41,6 @@ class WarehouseController extends Controller
         $warehouse = new Warehouse;
         $warehouse->name = $request->name;
         $warehouse->warehouse_type = $request->warehouse_type;
-        $warehouse->temperature = $request->temperature;
         $warehouse->active = 1;
         $warehouse->save();
 
@@ -77,7 +76,6 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::find($id);
         $warehouse->name = $request->name;
         $warehouse->warehouse_type = $request->warehouse_type;
-        $warehouse->temperature = $request->temperature;
         $warehouse->save();
 
         alert('Se ha actualizado un elemento.');

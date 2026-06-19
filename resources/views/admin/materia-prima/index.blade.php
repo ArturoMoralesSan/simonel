@@ -34,21 +34,17 @@
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
-                                <th>SKU</th>
                                 <th>materia prima</th>
                                 <th>Tipo de materia</th>
                                 <th>Unidad</th>
                                 <th>Días de expiración</th>
-                                <th>Costo</th>
+                                <th>Costo unitario</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             <tr v-for="cutItem in resourceList" class="table-resource__row" :key="cutItem.id">
-                                <td data-label="SKU:">
-                                    @{{ cutItem.sku }}
-                                </td>
                                 <td data-label="Nombre:">
                                     @{{ cutItem.name }}
                                 </td>

@@ -36,7 +36,6 @@
                             <tr class="table-resource__headings">
                                 <th>Almacen</th>
                                 <th>Tipo de almacen</th>
-                                <th>Temperatura</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -50,11 +49,6 @@
                                 <td data-label="Tipo de almacen:">
                                     @{{ warehouseItem.warehouse_type }}
                                 </td>
-
-                                <td data-label="Temperatura:">
-                                    @{{ warehouseItem.temperature }}
-                                </td>
-
                                 <td class="table-resource__actions" data-label="Acciones:">
                                     <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/almacenes/' + warehouseItem.id + '/editar' ">
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">

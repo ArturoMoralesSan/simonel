@@ -61,7 +61,7 @@
                                 </td>
 
                                 <td data-label="Proveedor:">
-                                    @{{ lotItem.supplier_lot }}
+                                     @{{ lotItem.supplier ? lotItem.supplier.business_name : 'Sin proveedor' }}
                                 </td>
                                 <td data-label="Fecha de entrada:">
                                     @{{ lotItem.formated_entry_date }}

@@ -23,4 +23,9 @@ class ProductionOrderProduct extends Model
     {
         return $this->belongsTo(ProductRecipe::class, 'product_recipe_id');
     }
+
+    public function manufactured()
+    {
+        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
+    }
 }

@@ -16,7 +16,6 @@ class MaterialRequest extends FormRequest
     {
         return [
             'name' => ['required', new NotUppercase, new NotLowercase, 'max:100'],
-            'sku' => ['required', 'max:100'],
             'material_types' => ['required','max:20'],
             'unit' => ['required', 'max:100'],
             'cost' => ['required','max:10'],

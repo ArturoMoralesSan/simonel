@@ -18,4 +18,9 @@ class Warehouse extends Model
     {
         return $this->hasMany(ProductLot::class);
     }
+
+    public function purchaseItems()
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
 }

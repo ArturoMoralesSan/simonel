@@ -16,7 +16,7 @@ class ProductLotController extends Controller
         abort_unless(Gate::allows('view.productlot') || Gate::allows('create.productlot'), 403);
 
         $search = request('search');
-        $query = ProductLot::with(['product', 'order', 'warehouse'])->orderBy('created_at', 'desc');
+        $query = ProductLot::with(['product.manufactured', 'order', 'warehouse'])->orderBy('created_at', 'desc');
 
         if ($search) {
             $query->where('name', 'LIKE', "%$search%");
@@ -31,14 +31,14 @@ class ProductLotController extends Controller
 
     public function details($id)
     {
-        $lot = ProductLot::with(['product', 'order'])->findOrFail($id);
+        $lot = ProductLot::with(['product.manufactured', 'order'])->findOrFail($id);
 
         return view('admin.loteproductos.details',compact('lot'));
     }
 
     public function label($id)
     {
-        $lot = ProductLot::with(['product', 'order'])->findOrFail($id);
+        $lot = ProductLot::with(['product.manufactured', 'order'])->findOrFail($id);
 
         return view('admin.loteproductos.etiqueta', compact('lot'));
     }

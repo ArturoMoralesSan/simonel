@@ -36,7 +36,7 @@
                         </h3>
 
                         <div class="md:row">
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="raw_material_id">Materia prima</label>
@@ -47,7 +47,7 @@
                                     <field-errors name="raw_material_id"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="warehouse_id">Almacen</label>
                                     <select-field class="form-select" name="warehouse_id" v-model="fields.warehouse_id"
@@ -57,23 +57,16 @@
                                     <field-errors name="warehouse_id"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
-                                {{-- nombres --}}
-                                <div class="form-control">
-                                    <label for="lot_number">Número de lote</label>
-                                    <text-field name="lot_number" v-model="fields.lot_number" maxlength="80" initial="{{ $lot->lot_number }}"></text-field>
-                                    <field-errors name="lot_number"></field-errors>
-                                </div>
-                            </div>
-
                         </div>
                         <div class="md:row mt-4">
                             <div class="md:col-1/3">
                                 {{-- nombres --}}
                                 <div class="form-control">
-                                    <label for="supplier_lot">Proveedor</label>
-                                    <text-field name="supplier_lot" v-model="fields.supplier_lot" maxlength="80" initial="{{ $lot->supplier_lot }}"></text-field>
-                                    <field-errors name="supplier_lot"></field-errors>
+                                    <label for="supplier_id">Proveedor</label>
+                                    <select-field class="form-select" name="supplier_id" v-model="fields.supplier_id"
+                                        :options="{{ $suppliers }}" initial="{{ $lot->supplier_id }}">
+                                    </select-field>
+                                    <field-errors name="supplier_id"></field-errors>
 
                                 </div>
                             </div>
@@ -97,29 +90,20 @@
                             </div>
                         </div>
                         <div class="md:row mt-4">
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="available_quantity">Cantidad inicial</label>
                                     <text-field name="available_quantity" v-model="fields.available_quantity" maxlength="20" initial="{{ $lot->available_quantity }}"></text-field>
                                     <field-errors name="available_quantity"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="cost">Costo <span class="description"> $</span></label>
+                                    <label for="cost">Costo total <span class="description"> $</span></label>
                                     <text-field name="cost" type="number" v-model="fields.cost" maxlength="5" initial="{{ $lot->cost }}"></text-field>
                                     <field-errors name="cost"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="status">Estado</label>
-                                    <select-field class="form-select" name="status" v-model="fields.status"
-                                        :options="{{ $status }}" initial="{{ $lot->status }}">
-                                    </select-field>
-                                                                        
-                                    <field-errors name="status"></field-errors>
-                                </div>
                         </div>
                     </section>
                     <div class="text-center">

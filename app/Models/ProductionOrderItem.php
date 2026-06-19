@@ -9,6 +9,14 @@ class ProductionOrderItem extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'production_order_id',
+        'raw_material_id',
+        'quantity',
+        'unit',
+        'estimated_cost',
+    ];
+
     public function ProductionOrder()
     {
         return $this->belongsTo(ProductionOrder::class);

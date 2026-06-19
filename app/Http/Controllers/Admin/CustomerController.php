@@ -56,7 +56,7 @@ class CustomerController extends Controller
         $customer->rfc           = $request->rfc;
         $customer->trade_name    = $request->trade_name;
         $customer->tax_regime    = $request->tax_regime;
-        $customer->contact       = $request->contact;
+        $customer->customer_type = $request->customer_type;
         $customer->phone         = $request->phone;
         $customer->email         = $request->email;
         $customer->street          = $request->street;

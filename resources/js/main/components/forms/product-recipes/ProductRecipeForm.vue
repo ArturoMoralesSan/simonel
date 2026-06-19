@@ -8,7 +8,7 @@
                         name="product_id" 
                         v-model="fields.product_id" 
                         :options="products"
-                         :initial="recipesData.product_id ? recipesData.product_id.toString() : ''"
+                         :initial="recipesData.manufactured_product_id ? recipesData.manufactured_product_id.toString() : ''"
                     >
                     </select-field>
                     <field-errors name="product_id"></field-errors>
@@ -17,7 +17,7 @@
             
         </div>
         <div class="row mb-4">
-            <div class="col-1/3">
+            <div class="col-1/2">
                 <div class="form-control">
                     <label for="yield_quantity">Cantidad a producir</label>
                     <text-field 
@@ -30,7 +30,7 @@
                     <field-errors name="yield_quantity"></field-errors>
                 </div>
             </div>
-            <div class="col-1/3">
+            <div class="col-1/2">
                 <div class="form-control">
                     <label for="unit">Unidad</label>
                     <text-field 
@@ -43,19 +43,7 @@
                     <field-errors name="unit"></field-errors>
                 </div>
             </div>
-            <div class="col-1/3">
-                <div class="form-control">
-                    <label for="version">Versión</label>
-                    <text-field 
-                        class="" 
-                        name="version" 
-                        v-model="fields.version" 
-                        maxlength="20" 
-                        :initial="recipesData.version ? recipesData.version.toString() : ''"
-                    ></text-field>
-                    <field-errors name="version"></field-errors>
-                </div>
-            </div>
+            
         </div>
         
         <div class="mb-4">

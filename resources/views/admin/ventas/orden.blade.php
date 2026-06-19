@@ -181,7 +181,7 @@
                         <tr>
 
                             <td>
-                                {{ $saleProduct->product->name ?? 'Producto eliminado' }}
+                                {{ optional($saleProduct->product->manufactured)->name ?? 'Producto eliminado' }}                            
                             </td>
 
                             <td>

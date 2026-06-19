@@ -10,8 +10,7 @@ class ProductRecipeRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'product_id' => 'required|exists:products,id',
-            'version' => 'required|integer|min:1',
+            'product_id' => 'required|exists:manufactured_products,id',
             'yield_quantity' => 'required|numeric|min:0.001',
             'notes' => 'nullable|string',
             'unit' => 'required|string',

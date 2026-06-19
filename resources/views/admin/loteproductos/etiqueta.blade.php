@@ -96,7 +96,7 @@
     </div>
 
     <div class="product">
-        {{ $lot->product->name }}
+        {{ $lot->product->manufactured->name }}
     </div>
 
     <div class="field">

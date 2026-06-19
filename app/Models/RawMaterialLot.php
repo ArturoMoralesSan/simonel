@@ -10,6 +10,21 @@ class RawMaterialLot extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'raw_material_id',
+        'warehouse_id',
+        'lot_number',
+        'supplier_id',
+        'supplier_lot',
+        'purchase_id',
+        'entry_date',
+        'expiration_date',
+        'initial_quantity',
+        'available_quantity',
+        'cost',
+        'status',
+    ];
+
     protected $appends = [
         'formated_entry_date',
         'formated_expiration_date'
@@ -35,5 +50,14 @@ class RawMaterialLot extends Model
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);
+    }
+    public function purchase()
+    {
+        return $this->belongsTo(Purchase::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

@@ -108,7 +108,12 @@ class SaleController extends Controller
             return redirect('admin/ventas');
         }
 
-        $sale = Sale::with(['products.product.type', 'user','payments'])->findOrFail($id);
+        $sale = Sale::with([
+            'products.product.manufactured',
+            'products.product.type',
+            'user',
+            'payments'
+        ])->findOrFail($id);
 
         $status = collect([
             'quoted'   => 'Cotizada',
@@ -331,7 +336,11 @@ class SaleController extends Controller
                 ->pluck('full_name','user_id');
         }
 
-        $products = Product::with(['type'])->orderBy('name')->get();
+        $products = Product::select('products.*')
+        ->leftJoin('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+        ->with(['manufactured', 'type'])
+        ->orderBy('manufactured_products.name')
+        ->get();
 
         return view('admin.ventas.crear',compact('users','products'));
     }
@@ -449,8 +458,12 @@ class SaleController extends Controller
                 ->pluck('full_name', 'user_id');
         }
 
-        $products = Product::orderBy('name')->get();
-
+        $products = Product::select('products.*')
+        ->leftJoin('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+        ->orderBy('manufactured_products.name')
+        ->with('manufactured')
+        ->get();
+        
         return view('admin.ventas.editar', compact('sale', 'users', 'products')
         );
     }
