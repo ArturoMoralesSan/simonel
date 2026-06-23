@@ -54,7 +54,7 @@
         </form-search>
         
         
-        <tabs-component :tabs="{{ json_encode($statusLabels) }}" initial="quoted">
+        <tabs-component :tabs="{{ json_encode($statusLabels) }}" initial="accepted">
             @foreach ($statusLabels as $status => $label)
                 <template #panel-{{ $status }}>
                     <section class="db-panel">
@@ -77,7 +77,7 @@
                                         <th>Hora</th>
                                         <th>Cliente</th>
                                         <th>Subtotal</th>
-                                        <th>IVA</th>
+                                        <th>Descuento</th>
                                         <th>Total</th>
                                         @if(auth()->user()->isSuperAdmin() || auth()->user()->isEmployee())
                                         <th>Orden</th>
@@ -102,10 +102,10 @@
                                             @{{ salesItem.user.name }} @{{ salesItem.user.last_name }}
                                         </td>
                                         <td data-label="Subtotal:">
-                                            $@{{ salesItem.total_sale_price }}
+                                            $@{{ salesItem.gross_amount }}
                                         </td>
-                                        <td data-label="IVA:">
-                                            $@{{ salesItem.iva }}
+                                        <td data-label="Descuento:">
+                                            $@{{ salesItem.discount }}
                                         </td>
                                         <td data-label="Total:">
                                             $@{{ salesItem.total_with_iva }}

@@ -276,7 +276,7 @@ __webpack_require__.r(__webpack_exports__);
             quantity: p.quantity || 1,
             unit_price: p.base_price || 0,
             discount: p.discount || 0,
-            iva: p.iva || 16,
+            // iva: p.iva || 16,
             subtotal: p.subtotal || 0
           };
         });
@@ -305,15 +305,18 @@ __webpack_require__.r(__webpack_exports__);
       this.fields.discounts = total;
       return total;
     },
-    totalIva: function totalIva() {
-      return this.fields.products.reduce(function (sum, p) {
-        var base = p.quantity * p.unit_price;
-        var discount = base * (p.discount / 100);
-        return sum + (base - discount) * (p.iva / 100);
-      }, 0);
-    },
+    /* totalIva() {
+          return this.fields.products.reduce((sum, p) => {
+              const base =
+            p.quantity * p.unit_price;
+              const discount =
+            base * (p.discount / 100);
+              return sum +
+            ((base - discount) * (p.iva / 100));
+          }, 0);
+    }, */
     totalGeneral: function totalGeneral() {
-      return this.subtotalGeneral - this.totalDescuentos + this.totalIva;
+      return this.subtotalGeneral - this.totalDescuentos; //+  this.totalIva
     }
   },
   methods: {
@@ -323,7 +326,7 @@ __webpack_require__.r(__webpack_exports__);
         quantity: 1,
         unit_price: 0,
         discount: 0,
-        iva: 16,
+        //iva: 16,
         subtotal: 0
       });
       this.errors.push({});
@@ -5685,27 +5688,6 @@ var render = function render() {
         },
         expression: "product.discount"
       }
-    })], 1), _vm._v(" "), _c("td", [_c("text-field", {
-      staticClass: "form-field",
-      attrs: {
-        type: "number",
-        name: "products[".concat(index, "][iva]"),
-        step: "0.0001",
-        min: "0",
-        max: "100"
-      },
-      on: {
-        input: function input($event) {
-          return _vm.updateSubtotal(index);
-        }
-      },
-      model: {
-        value: product.iva,
-        callback: function callback($$v) {
-          _vm.$set(product, "iva", _vm._n($$v));
-        },
-        expression: "product.iva"
-      }
     })], 1), _vm._v(" "), _c("td", [_vm._v("\n                    $" + _vm._s(_vm.calculateSubtotal(product).toFixed(4)) + "\n                ")]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn--danger btn--sm",
       attrs: {
@@ -5736,15 +5718,6 @@ var render = function render() {
       colspan: "2"
     }
   }, [_vm._v("- $" + _vm._s(_vm.totalDescuentos.toFixed(4)))])]), _vm._v(" "), _c("tr", [_c("td", {
-    staticClass: "text-right font-bold",
-    attrs: {
-      colspan: "5"
-    }
-  }, [_vm._v("IVA:")]), _vm._v(" "), _c("td", {
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("+ $" + _vm._s(_vm.totalIva.toFixed(4)))])]), _vm._v(" "), _c("tr", [_c("td", {
     staticClass: "text-right font-bold",
     attrs: {
       colspan: "5"
@@ -5787,7 +5760,9 @@ var render = function render() {
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Producto")]), _vm._v(" "), _c("th", [_vm._v("Cantidad")]), _vm._v(" "), _c("th", [_vm._v("Precio unitario")]), _vm._v(" "), _c("th", [_vm._v("Descuento (%)")]), _vm._v(" "), _c("th", [_vm._v("IVA (%)")]), _vm._v(" "), _c("th", [_vm._v("Subtotal")]), _vm._v(" "), _c("th", [_vm._v("Acciones")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Producto")]), _vm._v(" "), _c("th", [_vm._v("Cantidad")]), _vm._v(" "), _c("th", [_vm._v("Precio unitario")]), _vm._v(" "), _c("th", [_vm._v("Descuento "), _c("span", {
+    staticClass: "description"
+  }, [_vm._v("(%)")])]), _vm._v(" "), _c("th", [_vm._v("Subtotal")]), _vm._v(" "), _c("th", [_vm._v("Acciones")])])]);
 }];
 render._withStripped = true;
 
@@ -10167,7 +10142,7 @@ var render = function render() {
     staticClass: "md:col-1/3"
   }, [_c("div", {
     staticClass: "form-control"
-  }, [_c("label", [_vm._v("Almacen")]), _vm._v(" "), _c("select-field", {
+  }, [_c("label", [_vm._v("Almacén")]), _vm._v(" "), _c("select-field", {
     attrs: {
       name: "item" + _vm.index + "_warehouse_id",
       options: _vm.warehouses,

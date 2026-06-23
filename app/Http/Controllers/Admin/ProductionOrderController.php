@@ -12,11 +12,13 @@ use App\Models\ProductionOrderProduct;
 use App\Models\RawMaterialMovement;
 use App\Models\RawMaterialLot;
 use App\Models\ProductLot;
+use App\Models\Warehouse;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ProductionOrderRequest;
 use DB; 
+
 
 class ProductionOrderController extends Controller
 {
@@ -931,6 +933,8 @@ class ProductionOrderController extends Controller
             */
             if ($oldStatus !== 'Finalizada' && $request->status === 'Finalizada') {
 
+            $warehouse = Warehouse::where('warehouse_type', 'Productos terminados')->firstOrFail();
+
                 $productionOrder->load('products.manufactured');
 
                 foreach ($productionOrder->products as $product) {
@@ -949,7 +953,7 @@ class ProductionOrderController extends Controller
                     ProductLot::create([
                         'product_id' => $productid,
                         'production_order_id' => $productionOrder->id,
-                        'warehouse_id' => 4,
+                        'warehouse_id' => $warehouse->id,
                         'lot_number' => $lotNumber,
                         'production_date' => now(),
                         'expiration_date' => now()->addDays(30),

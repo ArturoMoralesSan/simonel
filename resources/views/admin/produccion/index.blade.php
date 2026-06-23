@@ -11,7 +11,7 @@
         <div class="md:row justify-between">
             <div class="md:col-1/2">
                 <h1 class="dashboard-heading__title">
-                    Ordenes de producción
+                    Órdenes de producción
                 </h1>
                 
             </div>

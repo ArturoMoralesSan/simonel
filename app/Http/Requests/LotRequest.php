@@ -17,8 +17,7 @@ class LotRequest extends FormRequest
             'warehouse_id' => ['required', 'max:5'],
             'supplier_id' => ['required', 'max:100'],
             'entry_date' => ['required', 'max:100'],
-            'initial_quantity' => ['required', 'max:10'],
-            'available_quantity' => ['required','max:10'],
+            'quantity' => ['required', 'max:10'],
             'cost' => ['required','max:10'],
         ];
     }

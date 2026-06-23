@@ -29,8 +29,8 @@
                     <th>Producto</th>
                     <th>Cantidad</th>
                     <th>Precio unitario</th>
-                    <th>Descuento (%)</th>
-                    <th>IVA (%)</th>
+                    <th>Descuento <span class="description">(%)</span></th>
+                    <!-- <th>IVA (%)</th> -->
                     <th>Subtotal</th>
                     <th>Acciones</th>
                 </tr>
@@ -95,7 +95,7 @@
                     </td>
 
                     <!-- IVA -->
-                    <td>
+                    <!-- <td>
                         <text-field
                         type="number"
                         v-model.number="product.iva"
@@ -106,7 +106,7 @@
                         max="100"
                         @input="updateSubtotal(index)"
                         />
-                    </td>
+                    </td> -->
 
                     <!-- Subtotal -->
                     <td>
@@ -134,10 +134,10 @@
                         <td colspan="5" class="text-right font-bold">Descuentos:</td>
                         <td colspan="2">- ${{ totalDescuentos.toFixed(4) }}</td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td colspan="5" class="text-right font-bold">IVA:</td>
                         <td colspan="2">+ ${{ totalIva.toFixed(4) }}</td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <td colspan="5" class="text-right font-bold">Total general:</td>
                         <td colspan="2" class="font-bold">
@@ -223,7 +223,7 @@
                         quantity: p.quantity || 1,
                         unit_price: p.base_price || 0,
                         discount: p.discount || 0,
-                        iva: p.iva || 16,
+                        // iva: p.iva || 16,
                         subtotal: p.subtotal || 0,
                     }));
                 }
@@ -271,7 +271,7 @@
                 return total;
             },
 
-            totalIva() {
+            /* totalIva() {
 
                 return this.fields.products.reduce((sum, p) => {
 
@@ -285,10 +285,10 @@
                     ((base - discount) * (p.iva / 100));
 
                 }, 0);
-            },
+            }, */
 
             totalGeneral() {
-                return (this.subtotalGeneral - this.totalDescuentos +  this.totalIva);
+                return (this.subtotalGeneral - this.totalDescuentos); //+  this.totalIva
             }
         },
 
@@ -301,7 +301,7 @@
                     quantity: 1,
                     unit_price: 0,
                     discount: 0,
-                    iva: 16,
+                    //iva: 16,
                     subtotal: 0
                 });
 

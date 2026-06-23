@@ -1,15 +1,15 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Catalogo de productos')
-@section('tab_title', 'Catalogo de productos | ' . config('app.name'))
-@section('description', 'Lista de catalogo  de productos.')
+@section('title', 'Catálogo de productos')
+@section('tab_title', 'Catálogo de productos | ' . config('app.name'))
+@section('description', 'Lista de Catálogo  de productos.')
 @section('css_classes', 'dashboard')
 
 @section('content')
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Catalogo de productos
+            Catálogo de productos
         </h1>
 
         <p class="dashboard-heading__caption">

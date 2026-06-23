@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\ProductLotController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ManufacturedProductController;
+use App\Http\Controllers\Admin\ExpirationController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -187,6 +188,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('lotes-producto/{id}/detalle',[ProductLotController::class, 'details']);
     Route::get('lotes-producto/{id}/etiqueta',[ProductLotController::class, 'label']);
     
+    //Caducidades
+    Route::get('caducidades', [ExpirationController::class, 'index'])->name('caducidades.index');    
     //Medidas
     Route::get('medidas', [MeasureController::class, 'index']);
     Route::view('agregar-medidas', 'admin.medidas.crear');

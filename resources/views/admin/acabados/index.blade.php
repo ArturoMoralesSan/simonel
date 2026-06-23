@@ -36,7 +36,7 @@
                             <tr class="table-resource__headings">
                                 <th>Presentación</th>
                                 <th>Medida / Peso</th>
-                                <th>Costo</th>
+                                <th>Costo <span class="description">$</span></th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>

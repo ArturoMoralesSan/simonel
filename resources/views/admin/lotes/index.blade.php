@@ -1,15 +1,15 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'lotes')
-@section('tab_title', 'lotes | ' . config('app.name'))
-@section('description', 'Lista de lotes.')
+@section('title', 'Lotes')
+@section('tab_title', 'Lotes | ' . config('app.name'))
+@section('description', 'Lista de Lotes.')
 @section('css_classes', 'dashboard')
 
 @section('content')
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            lotes
+            Lotes
         </h1>
 
         <p class="dashboard-heading__caption">
@@ -35,13 +35,13 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Materia prima</th>
-                                <th>Almacen</th>
+                                <th>Almacén</th>
                                 <th>Numero de lote</th>
                                 <th>Proveedor</th>
                                 <th>Fecha de entrada</th>
                                 <th>Fecha de caducidad</th>
-                                <th>Cantidad inicial</th>
-                                <th>Cantidad disponible</th>
+                                <th>Cantidad recibida</th>
+                                <th>Existencia actual</th>
                                 <th>Costo</th>
                                 <th>Estado</th>
                                 <th class="pr-4">Acciones</th>
@@ -53,7 +53,7 @@
                                 <td data-label="Materia prima:">
                                     @{{ lotItem.material.name }}
                                 </td>
-                                <td data-label="Almacen:">
+                                <td data-label="Almacén:">
                                     @{{ lotItem.warehouse.name }} <span class="description">(@{{ lotItem.warehouse.warehouse_type }})</span>
                                 </td>
                                 <td data-label="Número de lote:">
@@ -69,10 +69,10 @@
                                 <td data-label="Fecha de caducidad:">
                                     @{{ lotItem.formated_expiration_date }}
                                 </td>
-                                <td data-label="Cantidad inicial:">
+                                <td data-label="Cantidad recibida:">
                                     @{{ lotItem.initial_quantity }}
                                 </td>
-                                <td data-label="Cantidad disponible:">
+                                <td data-label="Existencia actual:">
                                     @{{ lotItem.available_quantity }}
                                 </td>
                                 <td data-label="Costo:">

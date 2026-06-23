@@ -139,7 +139,7 @@
             </div>
             <div class="md:col-1/3">
                 <div class="form-control">
-                    <label>Almacen</label>
+                    <label>Almacén</label>
 
                     <select-field
                         :name="'item' + index + '_warehouse_id'"

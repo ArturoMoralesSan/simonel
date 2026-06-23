@@ -1,15 +1,15 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Almacen')
-@section('tab_title', 'Almacen | ' . config('app.name'))
+@section('title', 'Almacenes')
+@section('tab_title', 'Almacenes | ' . config('app.name'))
 @section('description', 'Lista de almacen.')
 @section('css_classes', 'dashboard')
 
 @section('content')
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Almacen
+            Almacenes
         </h1>
 
         <p class="dashboard-heading__caption">
@@ -34,8 +34,8 @@
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
-                                <th>Almacen</th>
-                                <th>Tipo de almacen</th>
+                                <th>Nombre</th>
+                                <th>Tipo de almacén</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -46,7 +46,7 @@
                                 <td data-label="Nombre:">
                                     @{{ warehouseItem.name }}
                                 </td>
-                                <td data-label="Tipo de almacen:">
+                                <td data-label="Tipo de almacén:">
                                     @{{ warehouseItem.warehouse_type }}
                                 </td>
                                 <td class="table-resource__actions" data-label="Acciones:">

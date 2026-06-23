@@ -49,7 +49,7 @@
                             </div>
                             <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="warehouse_id">Almacen</label>
+                                    <label for="warehouse_id">Almacén</label>
                                     <select-field class="form-select" name="warehouse_id" v-model="fields.warehouse_id"
                                         :options="{{ $warehouses }}" initial="{{ $lot->warehouse_id }}">
                                     </select-field>
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="md:row mt-4">
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="supplier_id">Proveedor</label>
@@ -70,7 +70,7 @@
 
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="entry_date">Fecha de entrada</label>
                                     <date-field 
@@ -81,20 +81,13 @@
                                     <field-errors name="'entry_date'"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="initial_quantity">Cantidad inicial</label>
-                                    <text-field name="initial_quantity" v-model="fields.initial_quantity" maxlength="20" initial="{{ $lot->initial_quantity }}"></text-field>
-                                    <field-errors name="initial_quantity"></field-errors>
-                                </div>
-                            </div>
                         </div>
                         <div class="md:row mt-4">
                             <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="available_quantity">Cantidad inicial</label>
-                                    <text-field name="available_quantity" v-model="fields.available_quantity" maxlength="20" initial="{{ $lot->available_quantity }}"></text-field>
-                                    <field-errors name="available_quantity"></field-errors>
+                                    <label for="quantity">Cantidad de lote</label>
+                                    <text-field name="quantity" v-model="fields.quantity" maxlength="20" initial="{{ $lot->initial_quantity }}"></text-field>
+                                    <field-errors name="quantity"></field-errors>
                                 </div>
                             </div>
                             <div class="md:col-1/2">

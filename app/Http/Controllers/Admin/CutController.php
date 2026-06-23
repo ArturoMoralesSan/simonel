@@ -25,7 +25,7 @@ class CutController extends Controller
         $cut = new Cut;
         $cut->name = $request->name;
         $cut->key_name = Str::slug($request->name);
-        $cut->measures = $request->measures;
+        $cut->measure = $request->measure;
         $cut->cost = $request->cost;
         $cut->save();
 
@@ -52,7 +52,7 @@ class CutController extends Controller
         $cut = Cut::find($id);
         $cut->name = $request->name;
         $cut->key_name = Str::slug($request->name);
-        $cut->measures = $request->measures;
+        $cut->measure = $request->measure;
         $cut->cost = $request->cost;
         $cut->save();
 

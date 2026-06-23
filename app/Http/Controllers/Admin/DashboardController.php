@@ -13,11 +13,24 @@ use App\Models\User;
 use App\Models\SaleProduct;
 use App\Models\ProductLot;
 use App\Models\Inventory;
+use App\Services\NotificationService;
 
 class DashboardController extends Controller
 {
+    protected $service;
+
+    public function __construct(NotificationService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
+        $this->service->checkProductExpiry();
+        $this->service->checkMaterialExpiry();
+        $this->service->checkStockLow();
+        $this->service->checkStockMaterialLow();
+
         if (Auth::user()->isSuperAdmin()) {
 
             $dateNow     = Carbon::now();

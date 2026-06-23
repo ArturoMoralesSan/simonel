@@ -45,7 +45,7 @@
                                 <th>Número de lote</th>
                                 <th>Órden de producción</th>
                                 <th>Producto</th>
-                                <th>Almacen</th>
+                                <th>almacén</th>
                                 <th>Código de barras</th>
                                 <th>Cantidad inicial</th>
                                 <th>Cantidad disponible</th>
@@ -65,7 +65,7 @@
                                 <td data-label="Producto:">
                                     @{{ ProductLotItem.product.manufactured.name }}
                                 </td>
-                                <td data-label="Almacen:">
+                                <td data-label="almacén:">
                                     @{{ ProductLotItem.warehouse.name }}
                                 </td>
                                 <td data-label="Código de barras:">

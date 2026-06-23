@@ -17,7 +17,7 @@ class ManufacturedProductController extends Controller
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
 
-        $catalogo = ManufacturedProduct::orderBy('id', 'desc')->get();
+        $catalogo = ManufacturedProduct::orderBy('name', 'ASC')->get();
 
         return view('admin.catalogo.index', compact('catalogo'));
     }

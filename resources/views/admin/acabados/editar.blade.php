@@ -51,7 +51,7 @@
                             </div>
                             <div class="md:col-1/3">
                                 <div class="form-control">
-                                    <label for="cost">Costo</label>
+                                    <label for="cost">Costo <span class="description">$</span></label>
                                     <text-field name="cost" v-model="fields.cost" maxlength="100" initial="{{ $cut->cost }}"></text-field>
                                     <field-errors name="cost"></field-errors>
                                 </div>

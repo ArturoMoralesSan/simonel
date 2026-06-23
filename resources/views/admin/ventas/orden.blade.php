@@ -122,17 +122,17 @@
                         </th>
 
                         <td class="order-table__cell">
-                            $ {{ number_format($sale->total_sale_price,4) }}
+                            $ {{ number_format($sale->gross_amount,4) }}
                         </td>
                     </tr>
 
                     <tr class="order-table__row">
                         <th class="order-table__cell--heading">
-                            IVA:
+                            Descuento:
                         </th>
 
                         <td class="order-table__cell">
-                            $ {{ number_format($sale->iva,4) }}
+                            $ {{ number_format($sale->discount,4) }}
                         </td>
                     </tr>
 
@@ -168,8 +168,6 @@
                         <th>Cantidad</th>
                         <th>Precio Unitario</th>
                         <th>Descuento</th>
-                        <th>IVA</th>
-                        <th>Subtotal</th>
                         <th>Total</th>
                     </tr>
                 </thead>
@@ -198,14 +196,6 @@
 
                             <td>
                                 {{ number_format($saleProduct->discount,2) }} %
-                            </td>
-
-                            <td>
-                                {{ number_format($saleProduct->iva,2) }} %
-                            </td>
-
-                            <td>
-                                $ {{ number_format($saleProduct->subtotal,4) }}
                             </td>
 
                             <td>

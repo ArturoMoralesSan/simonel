@@ -47,28 +47,32 @@ class LotController extends Controller
 
         $rawMaterial = RawMaterial::findOrFail($request->raw_material_id);
 
-        $lot = new RawMaterialLot;
+        $lastLot = (RawMaterialLot::max('id') ?? 0) + 1;
+
+        $lot = new RawMaterialLot();
         $lot->raw_material_id = $request->raw_material_id;
         $lot->warehouse_id = $request->warehouse_id;
-        $lot->lot_number = 'LOT-' . date('Ymd') . '-' . str_pad($lastLot, 5, '0', STR_PAD_LEFT);
         $lot->supplier_id = $request->supplier_id;
+        $lot->lot_number = 'LOT-' . date('Ymd') . '-' . str_pad($lastLot, 5, '0', STR_PAD_LEFT);
         $lot->entry_date = $request->entry_date;
         $lot->expiration_date = $rawMaterial->expiration_days
             ? Carbon::parse($request->entry_date)
                 ->addDays($rawMaterial->expiration_days)
                 ->format('Y-m-d')
             : null;
+            
+        $lot->initial_quantity = $request->quantity;
+        $lot->available_quantity = $request->quantity;
 
-        $lot->initial_quantity = $request->initial_quantity;
-        $lot->available_quantity = $request->available_quantity;
         $lot->cost = $request->cost;
         $lot->status = 'Disponible';
+
         $lot->save();
 
-        alert('Se ha agregado un elemento.');
+        alert('Se ha agregado un lote.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/lotes/')
+            'Redirect-To' => url('admin/lotes')
         ]);
     }
 
@@ -108,11 +112,8 @@ class LotController extends Controller
                 ->addDays($rawMaterial->expiration_days)
                 ->format('Y-m-d')
             : null;
-
-        $lot->initial_quantity = $request->initial_quantity;
-        $lot->available_quantity = $request->available_quantity;
+        $lot->initial_quantity = $request->quantity;
         $lot->cost = $request->cost;
-        $lot->status = 'Disponible';
         $lot->save();
 
         alert('Se ha actualizado un elemento.');
