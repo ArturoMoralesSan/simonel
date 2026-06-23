@@ -35,6 +35,7 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Nombre</th>
+                                <th>Descripción</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -43,6 +44,9 @@
                             <tr v-for="productItem in resourceList" class="table-resource__row" :key="productItem.id">
                                 <td data-label="Nombre:">
                                     @{{ productItem.name }}
+                                </td>
+                                <td data-label="Descripción:">
+                                    @{{ productItem.description }}
                                 </td>
                                 
 

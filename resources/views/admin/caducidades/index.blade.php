@@ -120,7 +120,7 @@
 
                             <td>{{ $lot['type'] }}</td>
 
-                            <td>{{ $lot['name'] }}</td>
+                            <td>{{ $lot['name'] }} <span class="description">{{ $lot['description'] }}</span></td>
 
                             <td>{{ $lot['lot_number'] }}</td>
 

@@ -60,7 +60,7 @@
                             >
 
                                 <td data-label="Producto:">
-                                    @{{ recipe.manufactured.name }}
+                                    @{{ recipe.manufactured.name }} <span class="description">@{{ recipe.manufactured.description }}</span>
                                 </td>
 
                                 <td data-label="Rendimiento:">

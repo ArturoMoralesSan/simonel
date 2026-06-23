@@ -139,7 +139,7 @@
                         <tr>
 
                             <td>
-                                {{ $product->manufactured->name ?? '-' }}
+                                {{ $product->manufactured->name ?? '-' }} <span class="description">{{ $product->manufactured->description ?? '-' }}</span>
                             </td>
 
                             <td>

@@ -58,17 +58,8 @@
                         </h3>
 
                         <div class="md:row">
-                        <div class="md:col-1/4">
-                                {{-- nombres --}}
-                                <div class="form-control">
-                                    <label for="type">Presentación</label>
-                                    <select-field class="form-select" name="cut_id" v-model="fields.cut_id"
-                                        :options="{{ $presentationsOptions }}" initial="{{ $product->cut_id }}">
-                                    </select-field>                                      
-                                    <field-errors name="type"></field-errors>
-                                </div>
-                            </div>
-                            <div class="md:col-1/4">
+                        
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="vinil_cost">Costo de fabricación <span class="description">$</span></label>
                                     <text-field name="vinil_cost" v-model="fields.vinil_cost" maxlength="80" initial="{{ $product->vinil_cost }}"></text-field>
@@ -76,15 +67,15 @@
                                 </div>
                             </div>
 
-                            <div class="md:col-1/4">
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="impresion_cost">Costo de presentación <span class="description">$</span></label>
-                                    <text-field disabled name="impresion_cost" v-model="fields.impresion_cost" maxlength="80" initial="{{ $product->impresion_cost }}"></text-field>
+                                    <text-field name="impresion_cost" v-model="fields.impresion_cost" maxlength="80" initial="{{ $product->impresion_cost }}"></text-field>
                                     <field-errors name="impresion_cost"></field-errors>
                                 </div>
                             </div>
 
-                            <div class="md:col-1/4">
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="indirect_cost">Costo indirecto <span class="description">$</span></label>
                                     <text-field name="indirect_cost" v-model="fields.indirect_cost" maxlength="80" initial="{{ $product->indirect_cost }}"></text-field>

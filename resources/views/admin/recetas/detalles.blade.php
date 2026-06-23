@@ -18,7 +18,9 @@
         <div class="row">
             <div class="md:col-1/2">
                 <strong>Producto</strong>
-                <p>{{ $recipe->manufactured->name }}</p>
+                <p>{{ $recipe->manufactured->name }}
+                    <span class="description">{{ $recipe->manufactured->description }}</span>
+                </p>
             </div>
         </div>
         <hr>

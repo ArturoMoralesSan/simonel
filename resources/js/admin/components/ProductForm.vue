@@ -23,30 +23,17 @@ export default {
     },
 
     watch: {
-
-        'fields.cut_id'(value) {
-
-            const presentation = this.presentations.find(
-                item => item.id == value
-            );
-
-            if (presentation) {
-                this.fields.impresion_cost = presentation.cost;
-            }
-        },
-
         fields: {
             deep: true,
 
             handler() {
 
                 const parseNumber = (value) => {
-
                     if (typeof value === "string") {
                         value = value.replace(/,/g, "");
                     }
-                    const num = parseFloat(value);
 
+                    const num = parseFloat(value);
                     return isNaN(num) ? 0 : num;
                 };
 

@@ -36,9 +36,9 @@ class ManufacturedProductController extends Controller
 
         $manufactured = ManufacturedProduct::create([
             'name' => $request->name,
+            'description' => $request->desc
         ]);
 
-            
         alert('Se ha agregado un elemento.');
 
         return response('', 204, [
@@ -62,9 +62,10 @@ class ManufacturedProductController extends Controller
         $manufactured = ManufacturedProduct::findOrFail($id);
         $manufactured->update([
             'name' => $request->name,
+            'description' => $request->desc
         ]);
 
-        alert('Se ha agregado un elemento.');
+        alert('Se ha actualizado un elemento.');
 
         return response('', 204, [
             'Redirect-To' => url('admin/catalogo/')
@@ -78,7 +79,6 @@ class ManufacturedProductController extends Controller
         $manufactured = ManufacturedProduct::findOrFail($id);
         $manufactured->delete();
 
-        return redirect()->route('manufactured-products.index')
-            ->with('success', 'Producto eliminado correctamente');
+        return response('', 204);
     }
 }

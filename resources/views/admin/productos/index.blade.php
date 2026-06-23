@@ -60,13 +60,13 @@
                         <tbody>
                             <tr v-for="productItem in resourceList" class="table-resource__row" :key="productItem.id">
                                 <td data-label="Nombre:">
-                                    @{{ productItem.manufactured.name }}
+                                    @{{ productItem.manufactured.name }} <span class="description">@{{ productItem.manufactured.description }}</span>
                                 </td>
                                 <td data-label="Costo:">
                                     $@{{ productItem.vinil_cost }} 
                                 </td>
                                 <td data-label="Costo de presentacion:">
-                                    $@{{ productItem.impresion_cost }} <span class="description">@{{ productItem.cut.name }}(@{{ productItem.cut.measure }})</span> 
+                                    $@{{ productItem.impresion_cost }}
                                 </td>
                                 <td data-label="Costo indirecto:">
                                     $@{{ productItem.indirect_cost }}

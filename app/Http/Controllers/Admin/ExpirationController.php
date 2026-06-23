@@ -43,6 +43,7 @@ class ExpirationController extends Controller
             return [
                 'type' => 'Materia Prima',
                 'name' => $lot->material->name ?? '-',
+                'description' => "",
                 'lot_number' => $lot->lot_number,
                 'entry_date' => $lot->entry_date,
                 'expiration_date' => $lot->expiration_date,
@@ -73,6 +74,7 @@ class ExpirationController extends Controller
             return [
                 'type' => 'Producto Terminado',
                 'name' => $lot->product->manufactured->name ?? '-',
+                'description' => $lot->product->manufactured->description,
                 'lot_number' => $lot->lot_number,
                 'entry_date' => $lot->production_date,
                 'expiration_date' => $lot->expiration_date,

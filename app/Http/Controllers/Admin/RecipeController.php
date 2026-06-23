@@ -37,7 +37,17 @@ class RecipeController extends Controller
     {
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
     
-        $products = ManufacturedProduct::orderBy('name', 'ASC')->pluck('name','id');
+        $products = ManufacturedProduct::orderBy('name', 'ASC')
+            ->get()
+            ->mapWithKeys(function ($product) {
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$product->id => $label];
+            });
         $rawmaterials  = RawMaterial::pluck('name','id');
 
         return view('admin.recetas.crear', compact('products','rawmaterials'));   
@@ -124,8 +134,18 @@ class RecipeController extends Controller
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
 
         $recipe = ProductRecipe::with(['items.rawMaterial'])->findOrFail($id);
-        $products = ManufacturedProduct::orderBy('name', 'ASC')->pluck('name', 'id');
-        $rawmaterials = RawMaterial::orderBy('name', 'ASC')->pluck('name', 'id');
+        $products = ManufacturedProduct::orderBy('name', 'ASC')
+            ->get()
+            ->mapWithKeys(function ($product) {
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$product->id => $label];
+            });        
+            $rawmaterials = RawMaterial::orderBy('name', 'ASC')->pluck('name', 'id');
 
         return view('admin.recetas.editar', compact('recipe','products','rawmaterials'));   
     }

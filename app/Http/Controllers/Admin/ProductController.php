@@ -36,8 +36,18 @@ class ProductController extends Controller
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
         $types = Type::pluck('name','id');
-        $manufactured = ManufacturedProduct::pluck('name','id');
-        $presentationsOptions = Cut::selectRaw("id, CONCAT(name, ' (', measure, ')') as name")->pluck('name', 'id');
+        $manufactured = ManufacturedProduct::orderBy('name', 'ASC')
+            ->get()
+            ->mapWithKeys(function ($product) {
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$product->id => $label];
+            });  
+            $presentationsOptions = Cut::selectRaw("id, CONCAT(name, ' (', measure, ')') as name")->pluck('name', 'id');
         $presentations = Cut::selectRaw("
             id,
             CONCAT(name, ' (', measure, ')') as name,
@@ -56,7 +66,7 @@ class ProductController extends Controller
         $product = new Product;
         $product->manufactured_product_id = $request->manufactured_product_id;
         //$product->type_id        = $request->type_id;
-        $product->cut_id         = $request->cut_id;
+        //$product->cut_id         = $request->cut_id;
         $product->vinil_cost     = $request->vinil_cost;
         $product->impresion_cost = $request->impresion_cost;
         $product->indirect_cost  = $request->indirect_cost;
@@ -95,7 +105,17 @@ class ProductController extends Controller
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('edit.products'), 403);
         $product = Product::find($id);
-        $manufactured = ManufacturedProduct::pluck('name','id');
+        $manufactured = ManufacturedProduct::orderBy('name', 'ASC')
+            ->get()
+            ->mapWithKeys(function ($product) {
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$product->id => $label];
+            });  
         $types = Type::pluck('name','id');
         $presentationsOptions = Cut::selectRaw("id, CONCAT(name, ' (', measure, ')') as name")->pluck('name', 'id');
         $presentations = Cut::selectRaw("
@@ -113,7 +133,7 @@ class ProductController extends Controller
         $product = Product::find($id);
         $product->manufactured_product_id = $request->manufactured_product_id;
         //$product->type_id        = $request->type_id;
-        $product->cut_id         = $request->cut_id;
+        //$product->cut_id         = $request->cut_id;
         $product->vinil_cost     = $request->vinil_cost;
         $product->impresion_cost = $request->impresion_cost;
         $product->indirect_cost  = $request->indirect_cost;

@@ -35,11 +35,18 @@
                         </h3>
 
                         <div class="md:row">
-                            <div class="md:col-2/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="name">Nombre</label>
                                     <text-field name="name" v-model="fields.name" maxlength="100" initial="{{ $catalogo->name }}"></text-field>
                                     <field-errors name="name"></field-errors>
+                                </div>
+                            </div>
+                            <div class="md:col-1/2">
+                                <div class="form-control">
+                                    <label for="desc">Descripción</label>
+                                    <text-field name="desc" v-model="fields.desc" maxlength="100" initial="{{ $catalogo->desc }}"></text-field>
+                                    <field-errors name="description"></field-errors>
                                 </div>
                             </div>
                         </div>

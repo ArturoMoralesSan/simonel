@@ -34,7 +34,7 @@
                         </h3>
 
                         <div class="md:row">
-                            <div class="md:col-2/3">
+                            <div class="md:col-1/2">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="name">Nombre</label>
@@ -43,7 +43,15 @@
 
                                 </div>
                             </div>
+                            <div class="md:col-1/2">
+                                {{-- nombres --}}
+                                <div class="form-control">
+                                    <label for="desc">Descripción</label>
+                                    <text-field name="desc" v-model="fields.desc" maxlength="255" initial=""></text-field>
+                                    <field-errors name="desc"></field-errors>
 
+                                </div>
+                            </div>
                         </div>
                     </section>
                     <div class="text-center">

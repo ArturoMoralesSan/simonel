@@ -96,8 +96,17 @@ class ProductionOrderController extends Controller
                     return 'Producto no definido';
                 }
 
-                return $item->manufactured->name .
-                    ' (' . number_format($item->quantity, 3) . ')';
+                $product = $item->manufactured;
+
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                $label .= ' (' . number_format($item->quantity, 3) . ')';
+
+                return $label;
 
             })->implode(', ');
 
@@ -140,7 +149,22 @@ class ProductionOrderController extends Controller
         $recipes = ProductRecipe::with('manufactured')
             ->where('active', 1)
             ->get()
-            ->pluck('manufactured.name', 'id');
+            ->mapWithKeys(function ($recipe) {
+
+                if (!$recipe->manufactured) {
+                    return [$recipe->id => 'Sin producto'];
+                }
+
+                $product = $recipe->manufactured;
+
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$recipe->id => $label];
+            });
 
         $statusLabels = collect([
             'Creada'       => 'Creada',
@@ -330,8 +354,24 @@ class ProductionOrderController extends Controller
         */
 
         $recipes = ProductRecipe::with('manufactured')
+            ->where('active', 1)
             ->get()
-            ->pluck('manufactured.name', 'id');
+            ->mapWithKeys(function ($recipe) {
+
+                if (!$recipe->manufactured) {
+                    return [$recipe->id => 'Sin producto'];
+                }
+
+                $product = $recipe->manufactured;
+
+                $label = $product->name;
+
+                if (!empty($product->description)) {
+                    $label .= ' (' . $product->description . ')';
+                }
+
+                return [$recipe->id => $label];
+            });
 
         /*
         |--------------------------------------------------------------------------

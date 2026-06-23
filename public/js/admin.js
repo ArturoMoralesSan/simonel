@@ -1774,14 +1774,6 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   watch: {
-    'fields.cut_id': function fieldsCut_id(value) {
-      var presentation = this.presentations.find(function (item) {
-        return item.id == value;
-      });
-      if (presentation) {
-        this.fields.impresion_cost = presentation.cost;
-      }
-    },
     fields: {
       deep: true,
       handler: function handler() {

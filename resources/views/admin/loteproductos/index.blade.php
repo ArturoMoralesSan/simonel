@@ -63,7 +63,7 @@
                                     @{{ ProductLotItem.order.order_number }}
                                 </td>
                                 <td data-label="Producto:">
-                                    @{{ ProductLotItem.product.manufactured.name }}
+                                    @{{ ProductLotItem.product.manufactured.name }} <span class="description">@{{ ProductLotItem.product.manufactured.description }}</span>
                                 </td>
                                 <td data-label="almacén:">
                                     @{{ ProductLotItem.warehouse.name }}
