@@ -40,19 +40,20 @@
                         </thead>
 
                         <tbody>
-                            <tr v-for="permissionItem in resourceList" class="table-resource__row" :key="permissionItem.id">
+                            <tr v-for="productItem in resourceList" class="table-resource__row" :key="productItem.id">
                                 <td data-label="Nombre:">
-                                    @{{ permissionItem.name }}
+                                    @{{ productItem.name }}
                                 </td>
                                 
 
                                 <td class="table-resource__actions" data-label="Acciones:">
-                                    <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/catalogo/' + permissionItem.id + '/editar' ">
+                                    <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/catalogo/' + productItem.id + '/editar' ">
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
                                     </a>
-                                    <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/catalogo/eliminar/' + permissionItem.id"
-                                        :resource-id="permissionItem.id"
+                                    <delete-button v-if="productItem.recipes_count == 0" 
+                                        class="btn--danger table-resource__button" :url="$root.path + '/admin/catalogo/eliminar/' + productItem.id"
+                                        :resource-id="productItem.id"
                                         :options="{ onDelete: onResourceDelete }"
                                     >
                                         <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">

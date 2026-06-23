@@ -23,9 +23,12 @@
                         :name="'item' + index + '_raw_material_id'"
                         v-model="fields['item' + index + '_raw_material_id']"
                         :options="materials"
-                        :initial="((typeof assignedMaterials[index-1] !== 'undefined')
-                            ? assignedMaterials[index-1].raw_material_id.toString()
-                            : '')"
+                        :initial="(
+                            typeof assignedMaterials[index-1] !== 'undefined' &&
+                            assignedMaterials[index-1].raw_material_id != null
+                        )
+                            ? String(assignedMaterials[index-1].raw_material_id)
+                            : ''"
                     >
                     </select-field>
 
@@ -107,9 +110,12 @@
                         :name="'item' + index + '_supplier_lot'"
                         v-model="fields['item' + index + '_supplier_lot']"
                         maxlength="100"
-                        :initial="((typeof assignedMaterials[index-1] !== 'undefined')
-                            ? assignedMaterials[index-1].supplier_lot.toString()
-                            : '')"
+                        :initial="(
+                            typeof assignedMaterials[index-1] !== 'undefined' &&
+                            assignedMaterials[index-1].supplier_lot != null
+                        )
+                            ? String(assignedMaterials[index-1].supplier_lot)
+                            : ''"
                     >
                     </text-field>
 
@@ -145,9 +151,12 @@
                         :name="'item' + index + '_warehouse_id'"
                         v-model="fields['item' + index + '_warehouse_id']"
                         :options="warehouses"
-                        :initial="((typeof assignedMaterials[index-1] !== 'undefined')
-                            ? assignedMaterials[index-1].warehouse_id.toString()
-                            : '')"
+                        :initial="(
+                            typeof assignedMaterials[index-1] !== 'undefined' &&
+                            assignedMaterials[index-1].warehouse_id != null
+                        )
+                            ? String(assignedMaterials[index-1].warehouse_id)
+                            : ''"
                     >
                     </select-field>
 

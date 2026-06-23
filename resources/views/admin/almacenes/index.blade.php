@@ -54,7 +54,8 @@
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
                                     </a>
-                                    <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/almacenes/eliminar/' + warehouseItem.id"
+                                    <delete-button v-if="warehouseItem.lots_count == 0" 
+                                        class="btn--danger table-resource__button" :url="$root.path + '/admin/almacenes/eliminar/' + warehouseItem.id"
                                         :resource-id="warehouseItem.id"
                                         :options="{ onDelete: onResourceDelete }"
                                     >

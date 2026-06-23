@@ -17,6 +17,7 @@ class SupplierController extends Controller
         $search = request('search');
 
         $suppliers = Supplier::query()
+            ->withCount('purchases')
             ->when($search, function ($q) use ($search) {
                 $q->where('business_name', 'like', "%{$search}%")
                 ->orWhere('trade_name', 'like', "%{$search}%")

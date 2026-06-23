@@ -10023,7 +10023,7 @@ var render = function render() {
     attrs: {
       name: "item" + _vm.index + "_raw_material_id",
       options: _vm.materials,
-      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" ? _vm.assignedMaterials[_vm.index - 1].raw_material_id.toString() : ""
+      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" && _vm.assignedMaterials[_vm.index - 1].raw_material_id != null ? String(_vm.assignedMaterials[_vm.index - 1].raw_material_id) : ""
     },
     model: {
       value: _vm.fields["item" + _vm.index + "_raw_material_id"],
@@ -10104,7 +10104,7 @@ var render = function render() {
     attrs: {
       name: "item" + _vm.index + "_supplier_lot",
       maxlength: "100",
-      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" ? _vm.assignedMaterials[_vm.index - 1].supplier_lot.toString() : ""
+      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" && _vm.assignedMaterials[_vm.index - 1].supplier_lot != null ? String(_vm.assignedMaterials[_vm.index - 1].supplier_lot) : ""
     },
     model: {
       value: _vm.fields["item" + _vm.index + "_supplier_lot"],
@@ -10146,7 +10146,7 @@ var render = function render() {
     attrs: {
       name: "item" + _vm.index + "_warehouse_id",
       options: _vm.warehouses,
-      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" ? _vm.assignedMaterials[_vm.index - 1].warehouse_id.toString() : ""
+      initial: typeof _vm.assignedMaterials[_vm.index - 1] !== "undefined" && _vm.assignedMaterials[_vm.index - 1].warehouse_id != null ? String(_vm.assignedMaterials[_vm.index - 1].warehouse_id) : ""
     },
     model: {
       value: _vm.fields["item" + _vm.index + "_warehouse_id"],

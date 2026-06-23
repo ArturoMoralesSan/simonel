@@ -15,7 +15,9 @@ class RawMaterialController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.rawmaterials') || Gate::allows('create.rawmaterials'), 403);
-        $material = RawMaterial::all();
+        $material = RawMaterial::withCount('lots')
+        ->orderBy('name')
+        ->get();
         return view('admin.materia-prima.index', compact('material'));   
     }
 

@@ -14,8 +14,9 @@ class WarehouseController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.warehouses') || Gate::allows('create.warehouses'), 403);
-        $warehouses = Warehouse::all();
-        return view('admin.almacenes.index', compact('warehouses'));   
+        $warehouses = Warehouse::withCount('lots')
+        ->orderBy('name')
+        ->get();        return view('admin.almacenes.index', compact('warehouses'));   
     }
 
     public function create()
