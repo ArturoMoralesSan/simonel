@@ -156,7 +156,7 @@
         <section class="db-panel">
 
             <h3 class="db-panel__title">
-                Productos Vendidos
+                Productos vendidos
             </h3>
 
             <table class="table size-caption mx-auto md:table--responsive">
@@ -179,7 +179,7 @@
                         <tr>
 
                             <td>
-                                {{ optional($saleProduct->product->manufactured)->name ?? 'Producto eliminado' }}                            
+                                {{ optional($saleProduct->product->manufactured)->name ?? 'Producto eliminado' }} <span class="description">{{ $saleProduct->product->manufactured->description }}</span>                         
                             </td>
 
                             <td>

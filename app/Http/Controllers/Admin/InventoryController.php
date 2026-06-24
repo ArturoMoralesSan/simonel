@@ -13,6 +13,7 @@ use App\Models\InventoryMovement;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Models\SaleProduct;
+use App\Models\Sale;
 
 class InventoryController extends Controller
 {
@@ -39,25 +40,37 @@ class InventoryController extends Controller
         $movementsSalidas = $movements->where('type', 'salida')->values();
 
         $pendingProducts = SaleProduct::selectRaw("
-                sale_products.id,
-                sale_products.product_id,
-                CONCAT(
-                    manufactured_products.name,
-                    ' (Venta #',
-                    sales.id,
-                    ' - ',
-                    sale_products.quantity,
-                    ' kg)'
-                ) as name
-            ")
-            ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
-            ->join('products', 'products.id', '=', 'sale_products.product_id')
-            ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
-            ->where('sales.user_id', $clientId)
-            ->where('sales.status', 'paid')
-            ->orderBy('manufactured_products.name')
-            ->pluck('name', 'product_id');
+            sale_products.id,
+            sale_products.product_id,
+            CONCAT(
+                manufactured_products.name,
+                ' ',
+                manufactured_products.description,
+                ' (Venta #',
+                sales.id,
+                ' - ',
+                sale_products.quantity,
+                ' kg)'
+            ) as name
+        ")
+        ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
+        ->join('products', 'products.id', '=', 'sale_products.product_id')
+        ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
+        ->where('sales.user_id', $clientId)
+        ->where('sales.status', 'paid')
+        ->orderBy('manufactured_products.name')
+        ->pluck('name', 'product_id');
 
+        $pendingProductsData = SaleProduct::selectRaw("
+            sale_products.sale_id,
+            sale_products.product_id,
+            sale_products.quantity
+        ")
+        ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
+        ->where('sales.user_id', $clientId)
+        ->where('sales.status', 'paid')
+        ->get()
+        ->keyBy('product_id');
         $customer = User::with('customer')->findOrFail($clientId);
 
         return response()->json([
@@ -65,6 +78,7 @@ class InventoryController extends Controller
             'movementsEntradas' => $movementsEntradas,
             'movementsSalidas' => $movementsSalidas,
             'pendingProducts' => $pendingProducts,
+            'pendingProductsData' => $pendingProductsData,
             'customer_type' => $customer->customer->customer_type,
         ]);
     }
@@ -72,7 +86,6 @@ class InventoryController extends Controller
 
     public function storeMovement(InventoryRequest $request)
     {
-
         for($i = 1; $i <= $request->product_count; $i++){
             $inventory = Inventory::firstOrCreate(
                 [
@@ -100,6 +113,12 @@ class InventoryController extends Controller
             $movement->quantity = $request['inventory' . $i . '_quantity'];
 
             $inventory->movements()->save($movement);
+
+            if ($request['type'] === 'entrada' && !empty($request['inventory' . $i . '_sale_id'])) {
+                $sale = Sale::findOrFail($request['inventory' . $i . '_sale_id']);
+                $sale->status = 'assortment';
+                $sale->save();
+            }
 
             // Actualizar inventario
             if ($request['type'] === 'entrada') {
@@ -136,10 +155,9 @@ class InventoryController extends Controller
             return response()->json(['error' => 'Inventario no encontrado'], 404);
         }
 
-        // Revertir el efecto anterior
         if ($movement->type === 'entrada') {
             $inventory->quantity -= $movement->quantity;
-        } else { // salida
+        } else { 
             $inventory->quantity += $movement->quantity;
         }
 
@@ -192,12 +210,17 @@ class InventoryController extends Controller
 
         // 4. Formatear items
         $inventoriesItems = $paginatedClients->map(function ($user) {
-            $inventories = $user->inventories()->with('product')->get();
+
+            $inventories = $user->inventories()->with('product.manufactured')->get();
 
             return [
                 'client' => $user,
                 'count' => $inventories->count(),
-                'inventories' => $inventories->pluck('product.name')->implode(', '),
+                'inventories' => $inventories->map(function ($inv) {
+                    return $inv->product->manufactured->name
+                        . ' ('
+                        . $inv->product->manufactured->description. ')';
+                })->implode(', '),
             ];
         });
 
@@ -209,12 +232,14 @@ class InventoryController extends Controller
     
     public function details($id)
     {
-        $user = User::find($id);
-        $inventory = Inventory::with('product')
+        $user = User::with('customer')->findOrFail($id);
+        $clienteTipo = $user->customer?->customer_type ?? 'minorista'; // o el campo real que uses
+
+        $inventory = Inventory::with('product.manufactured')
             ->where('user_id', $id)
             ->get();
 
-        $movements = InventoryMovement::with('inventory.product')
+        $movements = InventoryMovement::with('inventory.product.manufactured')
             ->whereHas('inventory', function ($q) use ($id) {
                 $q->where('user_id', $id);
             })
@@ -224,9 +249,14 @@ class InventoryController extends Controller
         $movementsEntradas = $movements->where('type', 'entrada')->values();
         $movementsSalidas = $movements->where('type', 'salida')->values();
 
-        return view('admin.inventario.details', compact('inventory', 'movementsEntradas','movementsSalidas', 'user' ));
+        return view('admin.inventario.details', compact(
+            'inventory',
+            'movementsEntradas',
+            'movementsSalidas',
+            'user',
+            'clienteTipo'
+        ));
     }
-
     public function create()
     {
         abort_unless(

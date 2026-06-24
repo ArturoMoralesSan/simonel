@@ -232,17 +232,26 @@
 
         computed: {
 
-            productsOptions() {
+           productsOptions() {
+            return this.products.reduce((obj, p) => {
 
-                return this.products.reduce((obj, p) => {
+                if (!p.manufactured) {
+                    obj[p.id] = 'Sin producto';
+                    return obj;
+                }
 
-                obj[p.id] = p.manufactured.name;
+                let label = p.manufactured.name;
+
+                if (p.manufactured.description) {
+                    label += ` (${p.manufactured.description})`;
+                }
+
+                obj[p.id] = label;
 
                 return obj;
 
-                }, {});
-            },
-
+            }, {});
+        },
             subtotalGeneral() {
 
                 const total = this.fields.products.reduce((sum, p) => {
