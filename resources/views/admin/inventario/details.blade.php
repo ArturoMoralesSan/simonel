@@ -129,6 +129,49 @@
 
             @endif
         </section>
+        {{-- MERMAS --}}
+        <section class="db-panel">
+            <h3 class="db-panel__title">
+                Mermas
+            </h3>
+
+            @if (!$movementsMermas->count())
+                <p class="text-center py-1">
+                    No hay registros.
+                </p>
+            @else
+
+                <resource-table :breakpoint="800" :model="{{ $movementsMermas }}" inline-template>
+                    <table class="table size-caption mx-auto md:table--responsive">
+                        <thead>
+                            <tr class="table-resource__headings">
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr v-for="item in resourceList" :key="item.id">
+                                <td>
+                                    @{{ new Date(item.date).toLocaleDateString('es-MX') }}
+                                </td>
+                                <td>
+                                    @{{ item.inventory.product.manufactured.name }}
+                                    <span class="description">
+                                        @{{ item.inventory.product.manufactured.description }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @{{ item.quantity }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </resource-table>
+
+            @endif
+        </section>
 
     @else
 

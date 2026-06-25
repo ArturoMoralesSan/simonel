@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Models\SaleProduct;
 use App\Models\Sale;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class InventoryController extends Controller
 {
@@ -38,6 +40,7 @@ class InventoryController extends Controller
 
         $movementsEntradas = $movements->where('type', 'entrada')->values();
         $movementsSalidas = $movements->where('type', 'salida')->values();
+        $movementsMermas = $movements->where('type', 'merma')->values();
 
         $pendingProducts = SaleProduct::selectRaw("
             sale_products.id,
@@ -77,6 +80,7 @@ class InventoryController extends Controller
             'inventory' => $inventory,
             'movementsEntradas' => $movementsEntradas,
             'movementsSalidas' => $movementsSalidas,
+            'movementsMermas' => $movementsMermas,
             'pendingProducts' => $pendingProducts,
             'pendingProductsData' => $pendingProductsData,
             'customer_type' => $customer->customer->customer_type,
@@ -84,109 +88,80 @@ class InventoryController extends Controller
     }
 
 
-    public function storeMovement(InventoryRequest $request)
+   public function storeMovement(InventoryRequest $request)
     {
-        for($i = 1; $i <= $request->product_count; $i++){
-            $inventory = Inventory::firstOrCreate(
-                [
-                    'user_id'    => $request['client_id'],
-                    'product_id'=> $request['inventory' . $i . '_product_id'],
-                ],
-                [
-                    'inventory_type' => 'Externo',
-                    'tag' => 'Sin etiqueta',
-                    'quantity' => 0,
-                    'quantity_min' => 0,
-                    'total_value' => 0,
-                ]
-            );
+        DB::transaction(function () use ($request) {
 
-            $movement = new InventoryMovement();
+            for ($i = 1; $i <= $request->product_count; $i++) {
 
-            if ($request['type'] === 'salida') {
-                $movement->sale_id = $request['inventory' . $i . '_sale_id'];
-                $movement->name = $request['inventory' . $i . '_name'];
+                $inventory = Inventory::firstOrCreate(
+                    [
+                        'user_id' => $request['client_id'],
+                        'product_id' => $request['inventory' . $i . '_product_id'],
+                    ],
+                    [
+                        'inventory_type' => 'Externo',
+                        'tag' => 'Sin etiqueta',
+                        'quantity' => 0,
+                        'quantity_min' => 0,
+                        'total_value' => 0,
+                    ]
+                );
+
+                $qty = (float) $request['inventory' . $i . '_quantity'];
+
+                if (in_array($request['type'], ['salida', 'merma']) && $inventory->quantity < $qty) {
+                   throw ValidationException::withMessages([
+                        'inventory' . $i . '_quantity' => [
+                            'inventario insuficiente'
+                        ]
+                    ]);
+                }
+
+                $movement = new InventoryMovement();
+
+                if ($request['type'] === 'salida') {
+                    $movement->sale_id = $request['inventory' . $i . '_sale_id'] ?? null;
+                    $movement->name = $request['inventory' . $i . '_name'] ?? null;
+                }
+
+                $movement->product_id = $request['inventory' . $i . '_product_id'];
+                $movement->type = $request['type'];
+                $movement->date = $request['inventory' . $i . '_date'];
+                $movement->quantity = $qty;
+
+                $inventory->movements()->save($movement);
+
+                // Actualizar venta cuando entra a cámara
+                if ($request['type'] === 'entrada' && !empty($request['inventory' . $i . '_sale_id'])) {
+                    $sale = Sale::find($request['inventory' . $i . '_sale_id']);
+
+                    if ($sale && $sale->status !== 'assortment') {
+                        $sale->status = 'assortment';
+                        $sale->save();
+                    }
+                }
+
+                switch ($request['type']) {
+
+                    case 'entrada':
+                        $inventory->quantity += $qty;
+                        break;
+
+                    case 'salida':
+                    case 'merma':
+                        $inventory->quantity -= $qty;
+                        break;
+                }
+
+                $inventory->inventory_type = 'Externo';
+                $inventory->tag = 'Sin etiqueta';
+                $inventory->save();
             }
-            $movement->product_id = $request['inventory' . $i . '_product_id'];
-            $movement->type = $request['type'];
-            $movement->date  = $request['inventory' . $i . '_date'];
-            $movement->quantity = $request['inventory' . $i . '_quantity'];
-
-            $inventory->movements()->save($movement);
-
-            if ($request['type'] === 'entrada' && !empty($request['inventory' . $i . '_sale_id'])) {
-                $sale = Sale::findOrFail($request['inventory' . $i . '_sale_id']);
-                $sale->status = 'assortment';
-                $sale->save();
-            }
-
-            // Actualizar inventario
-            if ($request['type'] === 'entrada') {
-                $inventory->quantity += $request['inventory' . $i . '_quantity'];
-            } else {
-                $inventory->quantity -= $request['inventory' . $i . '_quantity'];
-            }
-
-            $inventory->inventory_type = 'Externo';
-            $inventory->tag = 'Sin etiqueta';
-            $inventory->save();
-        }
+        });
 
         return response('', 204, [
             'Redirect-To' => url('admin/inventario-clientes/')
-        ]);
-    }
-
-    public function updateMovement(Request $request, $id)
-    {
-        // Validar datos
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'quantity' => 'required|numeric|min:0',
-            'product_id' => 'required|exists:product_templates,id',
-            'sale_id' => 'max:20', // Para salidas
-            'name' => 'max:120', // Para salidas
-        ]);
-
-        $movement = InventoryMovement::findOrFail($id);
-        $inventory = $movement->inventory;
-
-        if (!$inventory) {
-            return response()->json(['error' => 'Inventario no encontrado'], 404);
-        }
-
-        if ($movement->type === 'entrada') {
-            $inventory->quantity -= $movement->quantity;
-        } else { 
-            $inventory->quantity += $movement->quantity;
-        }
-
-        // Actualizar datos del movimiento
-        $movement->date = $validated['date'];
-        $movement->quantity = $validated['quantity'];
-        $movement->product_id = $validated['product_id'];
-
-        if ($movement->type === 'salida') {
-            $movement->sale_id = $validated['sale_id'] ?? $movement->sale_id;
-            $movement->name = $validated['name'] ?? $movement->name;
-        }
-
-        // Aplicar nuevamente el efecto
-        if ($movement->type === 'entrada') {
-            $inventory->quantity += $validated['quantity'];
-        } else { // salida
-            $inventory->quantity -= $validated['quantity'];
-        }
-
-        $inventory->product_id = $validated['product_id'];
-
-        $inventory->save();
-        $movement->save();
-
-        return response()->json([
-            'message' => 'Movimiento actualizado correctamente',
-            'movement' => $movement,
-            'inventory' => $inventory,
         ]);
     }
 
@@ -248,11 +223,14 @@ class InventoryController extends Controller
 
         $movementsEntradas = $movements->where('type', 'entrada')->values();
         $movementsSalidas = $movements->where('type', 'salida')->values();
+        $movementsMermas = $movements->where('type', 'merma')->values();
+
 
         return view('admin.inventario.details', compact(
             'inventory',
             'movementsEntradas',
             'movementsSalidas',
+            'movementsMermas',
             'user',
             'clienteTipo'
         ));

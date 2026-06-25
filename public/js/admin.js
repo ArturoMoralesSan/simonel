@@ -1272,6 +1272,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       inventoryOptions: {},
       movementsEntradas: {},
       movementsSalidas: {},
+      movementsMermas: {},
       pendingProducts: {},
       pendingProductsData: {},
       fields: {
@@ -1316,47 +1317,63 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     },
     productsOptions: function productsOptions() {
       if (!this.esMayorista) return this.pendingProducts;
-      if (this.fields.type === 'entrada') return this.pendingProducts;
-      if (this.fields.type === 'salida') return this.inventoryOptions;
+      if (this.fields.type === 'entrada') {
+        return this.pendingProducts;
+      }
+      if (this.fields.type === 'salida' || this.fields.type === 'merma') {
+        return this.inventoryOptions;
+      }
       return {};
     },
     resumen: function resumen() {
       var _this2 = this;
       var resumen = {};
       var productos = Object.values(this.inventory).map(function (i) {
-        return i.product.manufactured.name;
+        return {
+          key: i.product.manufactured.name + ' ' + i.product.manufactured.description,
+          item: i
+        };
       });
       productos.forEach(function (p) {
         var inv = Object.values(_this2.inventory).find(function (i) {
-          return i.product.manufactured.name === p;
+          return i.product.manufactured.name + ' ' + i.product.manufactured.description === p.key;
         });
         var stock = inv ? Number(inv.quantity || 0) : 0;
         var entradas = Object.values(_this2.movementsEntradas || {}).reduce(function (acc, m) {
-          return m.inventory.product.manufactured.name === p ? acc + Number(m.quantity || 0) : acc;
+          return m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description === p.key ? acc + Number(m.quantity || 0) : acc;
         }, 0);
         var salidasArray = Object.values(_this2.movementsSalidas || {}).filter(function (m) {
-          return m.inventory.product.manufactured.name === p;
+          return m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description === p.key;
         });
         var salidas = salidasArray.reduce(function (acc, m) {
           return acc + Number(m.quantity || 0);
         }, 0);
+        var mermasArray = Object.values(_this2.movementsMermas || {}).filter(function (m) {
+          return m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description === p.key;
+        });
+        var mermas = mermasArray.reduce(function (acc, m) {
+          return acc + Number(m.quantity || 0);
+        }, 0);
+        var movimientosConsumo = [].concat(_toConsumableArray(salidasArray), _toConsumableArray(mermasArray));
         var promedio = 0;
         var sugerencia = 0;
-        if (salidasArray.length > 0) {
-          var fechas = salidasArray.map(function (m) {
+        if (movimientosConsumo.length > 0) {
+          var fechas = movimientosConsumo.map(function (m) {
             return new Date(m.date);
           });
           var minFecha = new Date(Math.min.apply(Math, _toConsumableArray(fechas)));
           var maxFecha = new Date(Math.max.apply(Math, _toConsumableArray(fechas)));
           var diffMs = maxFecha - minFecha;
           var dias = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60 * 24)) : 1;
-          promedio = (salidas / dias).toFixed(1);
-          sugerencia = Math.max(0, Math.ceil(promedio * dias - stock));
+          var consumoTotal = salidas + mermas;
+          promedio = (consumoTotal / dias).toFixed(1);
+          sugerencia = Math.max(0, Math.ceil(consumoTotal - stock));
         }
-        resumen[p] = {
+        resumen[p.key] = {
           stock: stock,
           entradas: entradas,
           salidas: salidas,
+          mermas: mermas,
           promedio: promedio,
           sugerencia: sugerencia
         };
@@ -1428,13 +1445,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               _this4.inventoryOptions = {};
               _this4.inventory.forEach(function (item) {
                 if (Number(item.quantity) <= 0) return;
-                _this4.inventoryOptions[item.product_id] = item.product.manufactured.name + ' (' + item.quantity + ' disponibles)';
+                _this4.inventoryOptions[item.product_id] = item.product.manufactured.name + ' ' + item.product.manufactured.description + ' (' + item.quantity + ' disponibles)';
               });
               _this4.movementsEntradas = response.data.movementsEntradas || [];
               _this4.movementsSalidas = response.data.movementsSalidas || [];
+              _this4.movementsMermas = response.data.movementsMermas || [];
               _this4.pendingProducts = response.data.pendingProducts || {};
               _this4.pendingProductsData = response.data.pendingProductsData || {};
-            case 17:
+            case 18:
             case "end":
               return _context.stop();
           }
@@ -6700,7 +6718,16 @@ var render = function render() {
         _vm.fields.type = "salida";
       }
     }
-  }, [_vm._v("\n                    En piso\n                ")]), _vm._v(" "), _c("a", {
+  }, [_vm._v("\n                    En piso de venta\n                ")]), _vm._v(" "), _c("a", {
+    "class": ["btn tab-btn", {
+      active: _vm.fields.type === "merma"
+    }],
+    on: {
+      click: function click($event) {
+        _vm.fields.type = "merma";
+      }
+    }
+  }, [_vm._v("\n                    Merma\n                ")]), _vm._v(" "), _c("a", {
     "class": ["btn tab-btn", {
       active: _vm.fields.type === "resumen"
     }],
@@ -6709,11 +6736,11 @@ var render = function render() {
         _vm.fields.type = "resumen";
       }
     }
-  }, [_vm._v("\n                    Resumen\n                ")])]) : _vm._e(), _vm._v(" "), !_vm.esMayorista || _vm.fields.type === "entrada" || _vm.fields.type === "salida" ? _c("section", {
+  }, [_vm._v("\n                    Resumen\n                ")])]) : _vm._e(), _vm._v(" "), !_vm.esMayorista || _vm.fields.type === "entrada" || _vm.fields.type === "salida" || _vm.fields.type === "merma" ? _c("section", {
     staticClass: "db-panel"
   }, [_c("h3", {
     staticClass: "db-panel__title"
-  }, [_vm._v("\n                    " + _vm._s(_vm.esMayorista ? "Agregar " + _vm.fields.type : "Agregar inventario") + "\n                ")]), _vm._v(" "), _vm._l(_vm.fields.product_count, function (index) {
+  }, [_vm._v("\n                    " + _vm._s(_vm.esMayorista ? _vm.fields.type === "entrada" ? "Agregar a cámara de refrigeración" : _vm.fields.type === "salida" ? "Agregar a piso de venta" : "Registrar merma" : "Agregar inventario") + "\n                ")]), _vm._v(" "), _vm._l(_vm.fields.product_count, function (index) {
     return _c("div", {
       key: "entrada-" + index,
       staticClass: "mb-4 product-row"
@@ -6800,7 +6827,7 @@ var render = function render() {
         _vm.fields.product_count++;
       }
     }
-  }, [_vm._v("\n                    " + _vm._s(_vm.esMayorista ? "Agregar productos a ".concat(_vm.fields.type == "entrada" ? "camara de refrigeración" : "piso") : "Agregar producto") + "\n                ")])], 2) : _vm._e(), _vm._v(" "), !_vm.esMayorista || _vm.fields.type === "entrada" || _vm.fields.type === "salida" ? _c("div", {
+  }, [_vm._v("\n                    " + _vm._s(_vm.esMayorista ? "Agregar productos a ".concat(_vm.fields.type === "entrada" ? "camara de refrigeración" : _vm.fields.type === "salida" ? "piso" : "merma") : "Agregar producto") + "\n                ")])], 2) : _vm._e(), _vm._v(" "), !_vm.esMayorista || _vm.fields.type === "entrada" || _vm.fields.type === "salida" || _vm.fields.type === "merma" ? _c("div", {
     staticClass: "text-center p-8"
   }, [_c("form-button", {
     staticClass: "btn--primary btn--wide"
@@ -6824,16 +6851,26 @@ var render = function render() {
     return _c("tr", {
       key: productItem.id
     }, [_c("td", [_vm._v(_vm._s(_vm.formatearFecha(productItem.date)))]), _vm._v(" "), _c("td", [_vm._v("\n                                    " + _vm._s(productItem.inventory.product.manufactured.name) + "\n                                    " + _vm._s(productItem.inventory.product.manufactured.description) + "\n                                ")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(productItem.quantity))])]);
+  }), 0)])])]) : _vm._e(), _vm._v(" "), _vm.esMayorista && _vm.fields.type === "merma" ? _c("div", [_c("section", {
+    staticClass: "db-panel"
+  }, [_c("h3", {
+    staticClass: "db-panel__title"
+  }, [_vm._v("\n                        Historial de mermas\n                    ")]), _vm._v(" "), _c("table", {
+    staticClass: "table size-caption mx-auto md:table--responsive"
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.movementsMermas, function (productItem) {
+    return _c("tr", {
+      key: productItem.id
+    }, [_c("td", [_vm._v(_vm._s(_vm.formatearFecha(productItem.date)))]), _vm._v(" "), _c("td", [_vm._v("\n                                    " + _vm._s(productItem.inventory.product.manufactured.name) + "\n                                    " + _vm._s(productItem.inventory.product.manufactured.description) + "\n                                ")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(productItem.quantity))])]);
   }), 0)])])]) : _vm._e(), _vm._v(" "), _vm.esMayorista && _vm.fields.type === "resumen" ? _c("div", [_c("section", {
     staticClass: "db-panel"
   }, [_c("h3", {
     staticClass: "db-panel__title"
   }, [_vm._v("Resumen de Inventario")]), _vm._v(" "), _c("table", {
     staticClass: "table size-caption mx-auto md:table--responsive"
-  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.resumen, function (producto, nombre) {
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.resumen, function (producto, nombre) {
     return _c("tr", {
       key: nombre
-    }, [_c("td", [_vm._v(_vm._s(nombre))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.stock))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.entradas))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.salidas))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.promedio))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.sugerencia))])]);
+    }, [_c("td", [_vm._v(_vm._s(nombre))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.stock))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.entradas))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.salidas))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.mermas))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.promedio))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(producto.sugerencia))])]);
   }), 0)])])]) : _vm._e()]) : _vm._e()])]);
 };
 var staticRenderFns = [function () {
@@ -6859,7 +6896,13 @@ var staticRenderFns = [function () {
     _c = _vm._self._c;
   return _c("thead", [_c("tr", {
     staticClass: "table-resource__headings"
-  }, [_c("th", [_vm._v("Producto")]), _vm._v(" "), _c("th", [_vm._v("Stock actual")]), _vm._v(" "), _c("th", [_vm._v("Total en camara de refrigeración")]), _vm._v(" "), _c("th", [_vm._v("Total en piso")]), _vm._v(" "), _c("th", [_vm._v("Promedio")]), _vm._v(" "), _c("th", [_vm._v("Recomendación de compra")])])]);
+  }, [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Producto")]), _vm._v(" "), _c("th", [_vm._v("Cantidad")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", {
+    staticClass: "table-resource__headings"
+  }, [_c("th", [_vm._v("Producto")]), _vm._v(" "), _c("th", [_vm._v("Stock actual")]), _vm._v(" "), _c("th", [_vm._v("Total en cámara")]), _vm._v(" "), _c("th", [_vm._v("Total en piso")]), _vm._v(" "), _c("th", [_vm._v("Total merma")]), _vm._v(" "), _c("th", [_vm._v("Promedio venta")]), _vm._v(" "), _c("th", [_vm._v("Recomendación de compra")])])]);
 }];
 render._withStripped = true;
 

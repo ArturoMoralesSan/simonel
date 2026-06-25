@@ -48,7 +48,12 @@
                         :class="['btn tab-btn', { active: fields.type === 'salida' }]"
                         @click="fields.type = 'salida'"
                     >
-                        En piso
+                        En piso de venta
+                    </a>
+                    <a :class="['btn tab-btn', { active: fields.type === 'merma' }]"
+                        @click="fields.type = 'merma'"
+                    >
+                        Merma
                     </a>
 
                     <a
@@ -59,9 +64,19 @@
                     </a>
                 </div>
 
-                <section v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida'" class="db-panel">
+                <section v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida' || fields.type === 'merma'" class="db-panel">
                     <h3 class="db-panel__title">
-                        {{ esMayorista ? 'Agregar ' + fields.type : 'Agregar inventario' }}
+                        {{
+                            esMayorista
+                                ? (
+                                    fields.type === 'entrada'
+                                        ? 'Agregar a cámara de refrigeración'
+                                        : fields.type === 'salida'
+                                            ? 'Agregar a piso de venta'
+                                            : 'Registrar merma'
+                                )
+                                : 'Agregar inventario'
+                        }}
                     </h3>
 
                     <div v-for="index in fields.product_count" :key="'entrada-'+index" class="mb-4 product-row">
@@ -121,13 +136,19 @@
                     >
                         {{
                             esMayorista
-                                ? `Agregar productos a ${fields.type == 'entrada' ? 'camara de refrigeración' : 'piso'}`
+                                ? `Agregar productos a ${
+                                    fields.type === 'entrada'
+                                        ? 'camara de refrigeración'
+                                        : fields.type === 'salida'
+                                            ? 'piso'
+                                            : 'merma'
+                                }`
                                 : 'Agregar producto'
                         }}
                     </button>
                 </section>
 
-                <div v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida'" class="text-center p-8">
+                <div v-if="!esMayorista || fields.type === 'entrada' || fields.type === 'salida' || fields.type === 'merma'" class="text-center p-8">
                     <form-button class="btn--primary btn--wide">
                         Guardar
                     </form-button>
@@ -192,6 +213,35 @@
                         </table>
                     </section>
                 </div>
+                <!-- HISTORIAL MERMAS -->
+                <div v-if="esMayorista && fields.type==='merma'">
+                    <section class="db-panel">
+                        <h3 class="db-panel__title">
+                            Historial de mermas
+                        </h3>
+
+                        <table class="table size-caption mx-auto md:table--responsive">
+                            <thead>
+                                <tr class="table-resource__headings">
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr v-for="productItem in movementsMermas" :key="productItem.id">
+                                    <td>{{ formatearFecha(productItem.date) }}</td>
+                                    <td>
+                                        {{ productItem.inventory.product.manufactured.name }}
+                                        {{ productItem.inventory.product.manufactured.description }}
+                                    </td>
+                                    <td>{{ productItem.quantity }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
 
                 <!-- RESUMEN -->
                 <div v-if="esMayorista && fields.type==='resumen'">
@@ -203,9 +253,10 @@
                                 <tr class="table-resource__headings">
                                     <th>Producto</th>
                                     <th>Stock actual</th>
-                                    <th>Total en camara de refrigeración</th>
+                                    <th>Total en cámara</th>
                                     <th>Total en piso</th>
-                                    <th>Promedio</th>
+                                    <th>Total merma</th>
+                                    <th>Promedio venta</th>
                                     <th>Recomendación de compra</th>
                                 </tr>
                             </thead>
@@ -216,6 +267,7 @@
                                     <td>{{ producto.stock }}</td>
                                     <td>{{ producto.entradas }}</td>
                                     <td>{{ producto.salidas }}</td>
+                                    <td>{{ producto.mermas }}</td>
                                     <td>{{ producto.promedio }}</td>
                                     <td>{{ producto.sugerencia }}</td>
                                 </tr>
@@ -248,6 +300,7 @@ export default {
             inventoryOptions: {},
             movementsEntradas: {},
             movementsSalidas: {},
+            movementsMermas: {},
             pendingProducts: {},
             pendingProductsData: {},
             fields: {
@@ -301,44 +354,103 @@ export default {
 
         productsOptions() {
             if (!this.esMayorista) return this.pendingProducts;
-            if (this.fields.type === 'entrada') return this.pendingProducts;
-            if (this.fields.type === 'salida') return this.inventoryOptions;
+
+            if (this.fields.type === 'entrada') {
+                return this.pendingProducts;
+            }
+
+            if (
+                this.fields.type === 'salida' ||
+                this.fields.type === 'merma'
+            ) {
+                return this.inventoryOptions;
+            }
+
             return {};
         },
 
         resumen() {
             const resumen = {};
-            const productos = Object.values(this.inventory).map(i => i.product.manufactured.name);
+
+            const productos = Object.values(this.inventory).map(i => ({
+                key: i.product.manufactured.name + ' ' + i.product.manufactured.description,
+                item: i
+            }));
 
             productos.forEach(p => {
-                const inv = Object.values(this.inventory).find(i => i.product.manufactured.name === p);
-                const stock = inv ? Number(inv.quantity || 0) : 0;
 
-                const entradas = Object.values(this.movementsEntradas || {}).reduce((acc, m) =>
-                    m.inventory.product.manufactured.name === p ? acc + Number(m.quantity || 0) : acc
-                , 0);
-
-                const salidasArray = Object.values(this.movementsSalidas || {}).filter(
-                    m => m.inventory.product.manufactured.name === p
+                const inv = Object.values(this.inventory).find(
+                    i =>
+                        (i.product.manufactured.name + ' ' + i.product.manufactured.description)
+                        === p.key
                 );
 
-                const salidas = salidasArray.reduce((acc, m) => acc + Number(m.quantity || 0), 0);
+                const stock = inv ? Number(inv.quantity || 0) : 0;
+
+                const entradas = Object.values(this.movementsEntradas || {}).reduce(
+                    (acc, m) =>
+                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                            ? acc + Number(m.quantity || 0)
+                            : acc,
+                    0
+                );
+
+                const salidasArray = Object.values(this.movementsSalidas || {}).filter(
+                    m =>
+                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                );
+
+                const salidas = salidasArray.reduce(
+                    (acc, m) => acc + Number(m.quantity || 0),
+                    0
+                );
+
+                const mermasArray = Object.values(this.movementsMermas || {}).filter(
+                    m =>
+                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                );
+
+                const mermas = mermasArray.reduce(
+                    (acc, m) => acc + Number(m.quantity || 0),
+                    0
+                );
+
+                const movimientosConsumo = [...salidasArray, ...mermasArray];
 
                 let promedio = 0;
                 let sugerencia = 0;
 
-                if (salidasArray.length > 0) {
-                    const fechas = salidasArray.map(m => new Date(m.date));
+                if (movimientosConsumo.length > 0) {
+
+                    const fechas = movimientosConsumo.map(m => new Date(m.date));
+
                     const minFecha = new Date(Math.min(...fechas));
                     const maxFecha = new Date(Math.max(...fechas));
-                    const diffMs = maxFecha - minFecha;
-                    const dias = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60 * 24)) : 1;
 
-                    promedio = (salidas / dias).toFixed(1);
-                    sugerencia = Math.max(0, Math.ceil(promedio * dias - stock));
+                    const diffMs = maxFecha - minFecha;
+
+                    const dias = diffMs > 0
+                        ? Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+                        : 1;
+
+                    const consumoTotal = salidas + mermas;
+
+                    promedio = (consumoTotal / dias).toFixed(1);
+
+                    sugerencia = Math.max(
+                        0,
+                        Math.ceil(consumoTotal - stock)
+                    );
                 }
 
-                resumen[p] = { stock, entradas, salidas, promedio, sugerencia };
+                resumen[p.key] = {
+                    stock,
+                    entradas,
+                    salidas,
+                    mermas,
+                    promedio,
+                    sugerencia
+                };
             });
 
             return resumen;
@@ -401,11 +513,13 @@ export default {
                 
                 this.inventoryOptions[item.product_id] =
                     item.product.manufactured.name +
+                    ' ' + item.product.manufactured.description +
                     ' (' + item.quantity + ' disponibles)';
-            });
+                            });
 
             this.movementsEntradas = response.data.movementsEntradas || [];
             this.movementsSalidas = response.data.movementsSalidas || [];
+            this.movementsMermas = response.data.movementsMermas || [];
             this.pendingProducts = response.data.pendingProducts || {};
             this.pendingProductsData = response.data.pendingProductsData || {};
 
