@@ -18,7 +18,26 @@ class LotController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.rawmateriallot') || Gate::allows('create.rawmateriallot'), 403);
-        $lots = RawMaterialLot::with(['supplier', 'material', 'warehouse'])->get();
+       $search = request('search');
+
+        $lots = RawMaterialLot::with(['supplier', 'material', 'warehouse'])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('lot_number', 'like', "%{$search}%")
+                    ->orWhereHas('supplier', function ($supplier) use ($search) {
+                        $supplier->where('business_name', 'like', "%{$search}%")
+                                ->orWhere('trade_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('material', function ($material) use ($search) {
+                        $material->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('warehouse', function ($warehouse) use ($search) {
+                        $warehouse->where('name', 'like', "%{$search}%");
+                    });
+                });
+            })
+            ->orderByDesc('created_at')
+            ->get();
         return view('admin.lotes.index', compact('lots'));   
     }
 

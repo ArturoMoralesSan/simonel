@@ -14,9 +14,18 @@ class WarehouseController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.warehouses') || Gate::allows('create.warehouses'), 403);
+        $search = request('search');
+
         $warehouses = Warehouse::withCount('lots')
-        ->orderBy('name')
-        ->get();        return view('admin.almacenes.index', compact('warehouses'));   
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('warehouse_type', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->get();        
+        return view('admin.almacenes.index', compact('warehouses'));   
     }
 
     public function create()

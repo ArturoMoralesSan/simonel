@@ -26,16 +26,19 @@ class PurchaseController extends Controller
         $search = request('search');
 
         $purchases = Purchase::with('supplier')
-            ->withCount('items')
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('supplier', function ($q) use ($search) {
-                    $q->where('business_name', 'like', "%{$search}%")
-                    ->orWhere('trade_name', 'like', "%{$search}%");
-                })
-                ->orWhere('invoice_number', 'like', "%{$search}%");
+        ->withCount([
+            'items',
+            'lots'
+        ])
+        ->when($search, function ($query) use ($search) {
+            $query->whereHas('supplier', function ($q) use ($search) {
+                $q->where('business_name', 'like', "%{$search}%")
+                ->orWhere('trade_name', 'like', "%{$search}%");
             })
-            ->orderByDesc('purchase_date')
-            ->paginate(20);
+            ->orWhere('invoice_number', 'like', "%{$search}%");
+        })
+        ->orderByDesc('purchase_date')
+        ->paginate(20);
 
         $purchaseItems = collect($purchases->items())->map(function ($purchase) {
 

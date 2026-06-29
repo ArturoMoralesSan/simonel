@@ -15,7 +15,16 @@ class RawMaterialController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.rawmaterials') || Gate::allows('create.rawmaterials'), 403);
+
+        $search = request('search');
+
         $material = RawMaterial::withCount('lots')
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('raw_material_type', 'like', "%{$search}%");
+            });
+        })
         ->orderBy('name')
         ->get();
         return view('admin.materia-prima.index', compact('material'));   

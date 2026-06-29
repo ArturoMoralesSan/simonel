@@ -77,7 +77,6 @@
                             :key="purchase.id"
                             class="table-resource__row"
                         >
-
                             <td data-label="Fecha:">
                                 @{{ purchase.purchase_date_formatted }}
                             </td>
@@ -104,6 +103,12 @@
                             >
 
                                 <a
+                                    class="btn btn-nowrap btn--sm btn--primary table-resource__button mr-2"
+                                    :href="$root.path + '/admin/compras/' + purchase.id + '/detalle'"
+                                >
+                                    Ver
+                                </a>
+                                <a
                                     class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"
                                     :href="$root.path + '/admin/compras/' + purchase.id + '/editar'"
                                 >
@@ -114,18 +119,14 @@
                                     Editar
                                 </a>
 
-                                <a
-                                    class="btn btn-nowrap btn--sm btn--primary table-resource__button mr-2"
-                                    :href="$root.path + '/admin/compras/' + purchase.id + '/detalle'"
-                                >
-                                    Ver
-                                </a>
+                                
 
                                 <delete-button
                                     class="btn--danger table-resource__button"
                                     :url="$root.path + '/admin/compras/' + purchase.id"
                                     :resource-id="purchase.id"
                                     :options="{ onDelete: onResourceDelete }"
+                                    :disabled="purchase.lot_count != 0"
                                 >
                                     <img
                                         class="svg-icon"

@@ -18,10 +18,27 @@ class RecipeController extends Controller
     {
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
 
-        $recipes = ProductRecipe::with(['orders','manufactured','items.rawMaterial'])
-        ->withCount('orders')->orderBy('id', 'DESC')
-        ->paginate(20);
-        
+        $search = request('search');
+
+        $recipes = ProductRecipe::with([
+                'orders',
+                'manufactured',
+                'items.rawMaterial'
+            ])
+            ->withCount('orders')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+
+                    $q->whereHas('manufactured', function ($manufactured) use ($search) {
+                        $manufactured->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('items.rawMaterial', function ($material) use ($search) {
+                        $material->where('name', 'like', "%{$search}%");
+                    });
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate(20);
         $recipesItems = collect($recipes->items());
 
         return view(

@@ -18,11 +18,23 @@ class CustomerController extends Controller
     {
        abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
+        $search = request('search');
+
         $users = Customer::with([
             'user' => function ($query) {
                 $query->withCount('sales');
             }
-        ])->get();
+        ])
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('business_name', 'LIKE', "%{$search}%")
+                ->orWhere('rfc', 'LIKE', "%{$search}%")
+                ->orWhere('trade_name', 'LIKE', "%{$search}%")
+                ->orWhere('phone', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        })
+        ->get();
 
         return view('admin.clientes.index', compact('users'));
     }

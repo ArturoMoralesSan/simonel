@@ -16,11 +16,35 @@ class ProductLotController extends Controller
         abort_unless(Gate::allows('view.productlot') || Gate::allows('create.productlot'), 403);
 
         $search = request('search');
-        $query = ProductLot::with(['product.manufactured', 'order', 'warehouse'])->orderBy('created_at', 'desc');
 
-        if ($search) {
-            $query->where('name', 'LIKE', "%$search%");
-        }
+        $query = ProductLot::with([
+                'product.manufactured',
+                'order',
+                'warehouse'
+            ])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+
+                    // Si ProductLot tiene un código o lote
+                    $q->where('lot_number', 'like', "%{$search}%")
+
+                        ->orWhereHas('product.manufactured', function ($manufactured) use ($search) {
+                            $manufactured->where('name', 'like', "%{$search}%");
+                        })
+
+                        ->orWhereHas('warehouse', function ($warehouse) use ($search) {
+                            $warehouse->where('name', 'like', "%{$search}%");
+                        })
+
+                        ->orWhereHas('order', function ($order) use ($search) {
+                            $order->where('order_number', 'like', "%{$search}%");
+                            // o ->where('folio', 'like', "%{$search}%");
+                            // o ->where('order_number', 'like', "%{$search}%");
+                        });
+
+                });
+            })
+            ->orderByDesc('created_at');
 
         $paginatedProductLot = $query->paginate(10)->appends(request()->all());
         $ProductLotItems = Collect($paginatedProductLot->items());

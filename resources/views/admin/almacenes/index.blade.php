@@ -19,6 +19,17 @@
 
     <div class="fluid-container mb-16">
         @include('components.alert')
+        <form-search
+        selected="{{ request('search') }}"
+        >
+            <template slot="svg-search">
+                <img
+                    class="search-form_icon"
+                    src="{{ url('img/svg/search.svg') }}"
+                    alt=""
+                >
+            </template>
+        </form-search>
         <section class="db-panel">
             <h3 class="db-panel__title">
                 Lista de almacenes

@@ -19,6 +19,8 @@
 
     <div class="fluid-container mb-16">
 
+        
+        @include('components.alert')
         <form-search 
                 selected="{{ app('request')->input('search') }}"
             >
@@ -26,7 +28,6 @@
                 <img class="search-form_icon" src="{{ url('img/svg/search.svg') }}" alt="">
             </template>
         </form-search>
-        @include('components.alert')
         <section class="db-panel">
             <h3 class="db-panel__title">
                 Lotes de productos
@@ -46,7 +47,6 @@
                                 <th>Órden de producción</th>
                                 <th>Producto</th>
                                 <th>almacén</th>
-                                <th>Código de barras</th>
                                 <th>Cantidad inicial</th>
                                 <th>Cantidad disponible</th>
                                 <th>Estado</th>
@@ -68,9 +68,7 @@
                                 <td data-label="almacén:">
                                     @{{ ProductLotItem.warehouse.name }}
                                 </td>
-                                <td data-label="Código de barras:">
-                                    @{{ ProductLotItem.warehouse.name }}
-                                </td>
+                                
                                  <td data-label="Cantidad inicial:">
                                     @{{ ProductLotItem.initial_quantity }}
                                 </td>

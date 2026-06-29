@@ -17,9 +17,17 @@ class ManufacturedProductController extends Controller
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
 
+        $search = request('search');
+
         $catalogo = ManufacturedProduct::withCount('recipes')
-                ->orderBy('name', 'ASC')
-                ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name', 'ASC')
+            ->get();
         return view('admin.catalogo.index', compact('catalogo'));
     }
 
