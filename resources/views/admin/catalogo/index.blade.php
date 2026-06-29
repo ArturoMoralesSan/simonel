@@ -55,10 +55,11 @@
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
                                     </a>
-                                    <delete-button v-if="productItem.recipes_count == 0" 
+                                    <delete-button 
                                         class="btn--danger table-resource__button" :url="$root.path + '/admin/catalogo/eliminar/' + productItem.id"
                                         :resource-id="productItem.id"
                                         :options="{ onDelete: onResourceDelete }"
+                                        :disabled="productItem.recipes_count != 0"
                                     >
                                         <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
                                         Eliminar

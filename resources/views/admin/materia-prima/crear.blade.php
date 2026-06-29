@@ -81,7 +81,7 @@
                             </div>
                             <div class="md:col-1/4">
                                 <div class="form-control">
-                                    <label for="expiration_days">Días de expiración</label>
+                                    <label for="expiration_days">Días de expiración <span class="description">(opcional)</span></label>
                                     <text-field name="expiration_days" type="number" v-model="fields.expiration_days" maxlength="5" initial=""></text-field>
                                     <field-errors name="expiration_days"></field-errors>
                                 </div>

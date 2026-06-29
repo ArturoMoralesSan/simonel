@@ -42,7 +42,7 @@
                             <div class="md:col">
                                 {{-- nombres --}}
                                 <div class="form-control">
-                                    <label for="manufactured_product_id">Producto</label>
+                                    <label for="manufactured_product_id">Catálogo de productos</label>
                                     <select-field class="form-select" name="manufactured_product_id" v-model="fields.manufactured_product_id"
                                         :options="{{ $manufactured }}" initial="{{ $product->manufactured_product_id }}">
                                     </select-field>                                    

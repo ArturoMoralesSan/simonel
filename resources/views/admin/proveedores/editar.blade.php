@@ -27,7 +27,7 @@
         </p>
 
         <base-form
-            action="{{ url('admin/proveedores/' . $supplier->id . '/editar') }}"
+            action="{{ url('admin/proveedores/' . $supplier->id . '/actualizar') }}"
             method="PUT"
             enctype="multipart/form-data"
             inline-template
@@ -154,8 +154,7 @@
                         <text-area
                             name="address"
                             v-model="fields.address"
-                            initial="{{ $supplier->address }}"
-                        >
+                        >{{ $supplier->address }}
                         </text-area>
 
                         <field-errors name="address"></field-errors>
@@ -167,8 +166,7 @@
                         <text-area
                             name="notes"
                             v-model="fields.notes"
-                            initial="{{ $supplier->notes }}"
-                        >
+                        >{{ $supplier->notes }}
                         </text-area>
 
                         <field-errors name="notes"></field-errors>

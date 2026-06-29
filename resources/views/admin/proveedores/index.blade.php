@@ -109,10 +109,10 @@
                                     Editar
                                 </a>
                                 <delete-button
-                                    v-if="supplier.purchases_count == 0"
                                     class="btn--danger table-resource__button"
                                     :url="$root.path + '/admin/proveedores/eliminar/' + supplier.id"
                                     :resource-id="supplier.id"
+                                    :disabled="supplier.lots_count != 0"
                                     :options="{ onDelete: onResourceDelete }"
                                 >
                                     <img

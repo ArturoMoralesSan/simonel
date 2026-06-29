@@ -19,7 +19,7 @@
             <p class="mb-12">
                 @include('components.alert')
                 <span class="color-link">«</span>
-                <a href="{{ url('admin/inventario/') }}">Ver todo los elementos del inventario</a>
+                <a href="{{ url('admin/inventario-clientes/') }}">Ver todo los elementos del inventario</a>
             </p>
 
             <base-form action="{{ url('admin/inventario/' . $inventory->id . '/actualizar') }}" method="put"

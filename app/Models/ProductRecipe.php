@@ -18,4 +18,9 @@ class ProductRecipe extends Model
     {
         return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(ProductionOrderProduct::class);
+    }
 }

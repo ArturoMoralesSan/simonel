@@ -47,8 +47,11 @@
                         :initial="sale ? product.product_id : ''"
                         @input="onProductSelected(index, $event)"
                         />
-                        <small v-if="errors[index]?.product_id" class="text-red-600">
-                        {{ errors[index].product_id }}
+                        <small
+                            v-if="errors[`products.${index}.product_id`]"
+                            class="text-red-600"
+                        >
+                            {{ errors[`products.${index}.product_id`][0] }}
                         </small>
                     </td>
 
@@ -63,8 +66,11 @@
                         @input="updateSubtotal(index)"
                         :class="{ 'is-invalid': errors[index]?.quantity }"
                         />
-                        <small v-if="errors[index]?.quantity" class="text-red-600">
-                        {{ errors[index].quantity }}
+                        <small
+                            v-if="errors[`products.${index}.quantity`]"
+                            class="text-red-600"
+                        >
+                            {{ errors[`products.${index}.quantity`][0] }}
                         </small>
                     </td>
 
@@ -78,6 +84,12 @@
                         class="form-field"
                         @input="updateSubtotal(index)"
                         />
+                        <small
+                            v-if="errors[`products.${index}.unit_price`]"
+                            class="text-red-600"
+                        >
+                            {{ errors[`products.${index}.unit_price`][0] }}
+                        </small>
                     </td>
 
                     <!-- Descuento -->
@@ -92,6 +104,12 @@
                         max="100"
                         @input="updateSubtotal(index)"
                         />
+                        <small
+                            v-if="errors[`products.${index}.discount`]"
+                            class="text-red-600"
+                        >
+                            {{ errors[`products.${index}.discount`][0] }}
+                        </small>
                     </td>
 
                     <!-- IVA -->
@@ -119,7 +137,8 @@
                             type="button"
                             class="btn btn--danger btn--sm"
                             @click="removeRow(index)"
-                            >
+                            :disabled="index === 0 || fields.products.length === 1"
+                        >
                             Quitar
                         </button>
                     </td>
@@ -209,6 +228,7 @@
         },
 
         created() {
+            this.addRow();
 
             if (this.sale) {
 
@@ -228,6 +248,7 @@
                     }));
                 }
             }
+            
         },
 
         computed: {
@@ -318,6 +339,11 @@
             },
 
             removeRow(index) {
+
+                if (index === 0 || this.fields.products.length === 1) {
+                    return;
+                }
+
                 this.fields.products.splice(index, 1);
                 this.errors.splice(index, 1);
             },

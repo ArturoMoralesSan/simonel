@@ -71,6 +71,7 @@
                                     <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/clientes/eliminar/' + userItem.id"
                                         :resource-id="userItem.id"
                                         :options="{ onDelete: onResourceDelete }"
+                                        :disabled="userItem.user.sales_count > 0"
                                     >
                                         <img style="width: 15px;" class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
                                         Eliminar

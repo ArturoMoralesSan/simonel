@@ -18,8 +18,8 @@ class RecipeController extends Controller
     {
         abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
 
-        $recipes = ProductRecipe::with(['manufactured','items.rawMaterial'])
-        ->orderBy('id', 'DESC')
+        $recipes = ProductRecipe::with(['orders','manufactured','items.rawMaterial'])
+        ->withCount('orders')->orderBy('id', 'DESC')
         ->paginate(20);
         
         $recipesItems = collect($recipes->items());
@@ -148,5 +148,16 @@ class RecipeController extends Controller
             $rawmaterials = RawMaterial::orderBy('name', 'ASC')->pluck('name', 'id');
 
         return view('admin.recetas.editar', compact('recipe','products','rawmaterials'));   
+    }
+
+    public function delete($id)
+    {
+        abort_unless(Gate::allows('view.recipes') || Gate::allows('create.recipes'), 403);
+
+        $recipe = ProductRecipe::find($id);
+        $recipe->delete();
+        
+        return response('', 204);
+
     }
 }

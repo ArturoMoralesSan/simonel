@@ -18,7 +18,11 @@ class CustomerController extends Controller
     {
        abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
-        $users = Customer::with('user')->get();
+        $users = Customer::with([
+            'user' => function ($query) {
+                $query->withCount('sales');
+            }
+        ])->get();
 
         return view('admin.clientes.index', compact('users'));
     }
@@ -97,7 +101,8 @@ class CustomerController extends Controller
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
         if (Auth::user()->id !== $id) {
-            $user = User::find($id);
+            $customer = Customer::find($id);
+            $user = User::find($customer->user_id);
             $user->delete();
             alert('Se ha eliminado un cliente.');
         }

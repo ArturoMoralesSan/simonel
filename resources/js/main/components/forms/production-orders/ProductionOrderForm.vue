@@ -10,6 +10,7 @@
                         name="issue_date"
                         v-model="fields.issue_date"
                         :initial="orderData.issue_date || ''"
+                        :disabled="isAuthorized"
                     >
                     </date-field>
                     <field-errors name="issue_date"></field-errors>
@@ -24,6 +25,7 @@
                         name="delivery_date"
                         v-model="fields.delivery_date"
                         :initial="orderData.delivery_date || ''"
+                        :disabled="isAuthorized"
                     >
                     </date-field>
                     <field-errors name="delivery_date"></field-errors>
@@ -38,7 +40,7 @@
                     <select-field
                         name="status"
                         v-model="fields.status"
-                        :options="status"
+                        :options="availableStatus"
                         :initial="orderData.status || ''"
                     >
                     </select-field>
@@ -54,6 +56,7 @@
                 :index="i"
                 :min-item="minItem"
                 :recipes="recipes"
+                :isAuthorized="isAuthorized"
                 :assigned-recipes="assignedRecipes"
                 :errors="errors"
                 :fields="fields"
@@ -65,6 +68,7 @@
                 <button v-if="fields.item_count < item"
                     class="btn btn--light mr-4"
                     type="button"
+                    :disabled="isAuthorized"
                     @click="fields.item_count++"
                 >
                     <img class="mr-1 align-top"
@@ -143,6 +147,40 @@
                     item_count: this.minItem
                 }
             };
+        },
+
+        computed: {
+
+            availableStatus() {
+
+                const transitions = {
+                    'Creada': ['Creada', 'Autorizada'],
+                    'Autorizada': ['Autorizada', 'Producción','Cancelada'],
+                    'Producción': ['Producción', 'Finalizada'],
+                    'Finalizada': ['Finalizada']
+                };
+
+                return Object.entries(this.status)
+                    .filter(([key]) =>
+                        transitions[this.orderData.status].includes(key)
+                    )
+                    .reduce((obj, [key, value]) => {
+                        obj[key] = value;
+                        return obj;
+                    }, {});
+                },
+            
+            lockedStatuses() {
+                return [
+                    'Autorizada',
+                    'Producción',
+                    'Finalizada'
+                ];
+            },
+
+            isAuthorized() {
+                return this.lockedStatuses.includes(this.orderData.status);
+            }
         },
         
         mounted() {

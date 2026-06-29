@@ -19,6 +19,7 @@
                     :name="'item' + index + '_recipes_id'"
                     v-model="fields['item' + index + '_recipes_id']"
                     :options="recipes"
+                    :disabled="isAuthorized"
                     :initial="((typeof assignedRecipes[index-1] !== 'undefined') ? assignedRecipes[index-1].product_recipe_id.toString() : '')"
                     >
                     </select-field>
@@ -32,6 +33,7 @@
                         :name="'item' + index + '_quantity'" 
                         v-model="fields['item' + index + '_quantity']" 
                         maxlength="20" 
+                        :disabled="isAuthorized"
                         :initial="((typeof assignedRecipes[index-1] !== 'undefined') ? assignedRecipes[index-1].quantity.toString() : '')"
                     ></text-field>
                     <field-errors :name="'item' + index + '_quantity'"></field-errors>
@@ -78,6 +80,10 @@
                 required: true,
                 type: Array
             },
+            isAuthorized: {
+                required: true,
+                type: Boolean
+            }
         },
         data() {
             return {

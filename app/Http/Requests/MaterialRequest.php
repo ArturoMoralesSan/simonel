@@ -20,7 +20,7 @@ class MaterialRequest extends FormRequest
             'unit' => ['required', 'max:100'],
             'cost' => ['required','max:10'],
             'stock' => ['required', 'max:100'],
-            'expiration_days' => ['required','max:10'],
+            'expiration_days' => ['max:10'],
         ];
     }
 }

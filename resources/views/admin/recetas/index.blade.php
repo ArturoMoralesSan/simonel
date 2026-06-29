@@ -100,6 +100,7 @@
                                         :url="$root.path + '/admin/recetas/eliminar/' + recipe.id"
                                         :resource-id="recipe.id"
                                         :options="{ onDelete: onResourceDelete }"
+                                        :disabled="recipe.orders_count != 0"
                                     >
                                         <img
                                             class="svg-icon"

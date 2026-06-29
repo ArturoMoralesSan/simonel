@@ -19,7 +19,7 @@
             <p class="mb-12">
                 @include('components.alert')
                 <span class="color-link">«</span>
-                <a href="{{ url('admin/inventario/') }}">Ver todos los elementos en el inventario</a>
+                <a href="{{ url('admin/inventario-clientes/') }}">Ver todos los elementos en el inventario</a>
             </p>
 
             <inventory-form

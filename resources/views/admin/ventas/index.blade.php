@@ -129,16 +129,6 @@
                                                     <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                                     Editar
                                                 </a>
-                                                
-                                                <clone-button 
-                                                    class="btn btn-nowrap btn--sm btn--success table-resource__button mr-2" 
-                                                    :item="salesItem" 
-                                                    :url="$root.path + '/admin/ventas/clonar/' + salesItem.id" 
-                                                    @clone="cloneResource"
-                                                >
-                                                    <img class="svg-icon" src="{{ url('img/svg/clone.svg')}}">
-                                                    Clonar
-                                                </clone-button>
                                                 <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/ventas/eliminar/' + salesItem.id"
                                                     :resource-id="salesItem.id"
                                                     :options="{ onDelete: onResourceDelete }"

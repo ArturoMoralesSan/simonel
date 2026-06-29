@@ -265,6 +265,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   created: function created() {
+    this.addRow();
     if (this.sale) {
       this.fields.sale_id = this.sale.id;
       this.fields.client_id = this.sale.user_id;
@@ -340,6 +341,9 @@ __webpack_require__.r(__webpack_exports__);
       this.errors.push({});
     },
     removeRow: function removeRow(index) {
+      if (index === 0 || this.fields.products.length === 1) {
+        return;
+      }
       this.fields.products.splice(index, 1);
       this.errors.splice(index, 1);
     },
@@ -5101,6 +5105,10 @@ __webpack_require__.r(__webpack_exports__);
     assignedRecipes: {
       required: true,
       type: Array
+    },
+    isAuthorized: {
+      required: true,
+      type: Boolean
     }
   },
   data: function data() {
@@ -5122,6 +5130,12 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_BaseForm_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base/BaseForm.vue */ "./resources/js/main/components/forms/base/BaseForm.vue");
 /* harmony import */ var _ItemForm_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ItemForm.vue */ "./resources/js/main/components/forms/production-orders/ItemForm.vue");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -5164,6 +5178,34 @@ __webpack_require__.r(__webpack_exports__);
         item_count: this.minItem
       }
     };
+  },
+  computed: {
+    availableStatus: function availableStatus() {
+      var _this = this;
+      var transitions = {
+        'Creada': ['Creada', 'Autorizada'],
+        'Autorizada': ['Autorizada', 'Producción', 'Cancelada'],
+        'Producción': ['Producción', 'Finalizada'],
+        'Finalizada': ['Finalizada']
+      };
+      return Object.entries(this.status).filter(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 1),
+          key = _ref2[0];
+        return transitions[_this.orderData.status].includes(key);
+      }).reduce(function (obj, _ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+          key = _ref4[0],
+          value = _ref4[1];
+        obj[key] = value;
+        return obj;
+      }, {});
+    },
+    lockedStatuses: function lockedStatuses() {
+      return ['Autorizada', 'Producción', 'Finalizada'];
+    },
+    isAuthorized: function isAuthorized() {
+      return this.lockedStatuses.includes(this.orderData.status);
+    }
   },
   mounted: function mounted() {
     if (this.assignedRecipes.length != 0) {
@@ -5570,7 +5612,7 @@ var render = function render() {
   }, [_vm._v("\n        + Añadir producto\n        ")]), _vm._v(" "), _c("table", {
     staticClass: "table size-caption mx-auto md:table--responsive"
   }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.fields.products, function (product, index) {
-    var _vm$errors$index, _vm$errors$index2, _vm$errors$index3;
+    var _vm$errors$index;
     return _c("tr", {
       key: index
     }, [_c("td", [_c("search-select-field", {
@@ -5586,12 +5628,12 @@ var render = function render() {
           return _vm.onProductSelected(index, $event);
         }
       }
-    }), _vm._v(" "), (_vm$errors$index = _vm.errors[index]) !== null && _vm$errors$index !== void 0 && _vm$errors$index.product_id ? _c("small", {
+    }), _vm._v(" "), _vm.errors["products.".concat(index, ".product_id")] ? _c("small", {
       staticClass: "text-red-600"
-    }, [_vm._v("\n                    " + _vm._s(_vm.errors[index].product_id) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
+    }, [_vm._v("\n                        " + _vm._s(_vm.errors["products.".concat(index, ".product_id")][0]) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
       staticClass: "form-field",
       "class": {
-        "is-invalid": (_vm$errors$index2 = _vm.errors[index]) === null || _vm$errors$index2 === void 0 ? void 0 : _vm$errors$index2.quantity
+        "is-invalid": (_vm$errors$index = _vm.errors[index]) === null || _vm$errors$index === void 0 ? void 0 : _vm$errors$index.quantity
       },
       attrs: {
         type: "number",
@@ -5610,9 +5652,9 @@ var render = function render() {
         },
         expression: "product.quantity"
       }
-    }), _vm._v(" "), (_vm$errors$index3 = _vm.errors[index]) !== null && _vm$errors$index3 !== void 0 && _vm$errors$index3.quantity ? _c("small", {
+    }), _vm._v(" "), _vm.errors["products.".concat(index, ".quantity")] ? _c("small", {
       staticClass: "text-red-600"
-    }, [_vm._v("\n                    " + _vm._s(_vm.errors[index].quantity) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
+    }, [_vm._v("\n                        " + _vm._s(_vm.errors["products.".concat(index, ".quantity")][0]) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
       staticClass: "form-field",
       attrs: {
         type: "number",
@@ -5631,7 +5673,9 @@ var render = function render() {
         },
         expression: "product.unit_price"
       }
-    })], 1), _vm._v(" "), _c("td", [_c("text-field", {
+    }), _vm._v(" "), _vm.errors["products.".concat(index, ".unit_price")] ? _c("small", {
+      staticClass: "text-red-600"
+    }, [_vm._v("\n                        " + _vm._s(_vm.errors["products.".concat(index, ".unit_price")][0]) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_c("text-field", {
       staticClass: "form-field",
       attrs: {
         type: "number",
@@ -5652,10 +5696,13 @@ var render = function render() {
         },
         expression: "product.discount"
       }
-    })], 1), _vm._v(" "), _c("td", [_vm._v("\n                    $" + _vm._s(_vm.calculateSubtotal(product).toFixed(4)) + "\n                ")]), _vm._v(" "), _c("td", [_c("button", {
+    }), _vm._v(" "), _vm.errors["products.".concat(index, ".discount")] ? _c("small", {
+      staticClass: "text-red-600"
+    }, [_vm._v("\n                        " + _vm._s(_vm.errors["products.".concat(index, ".discount")][0]) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("td", [_vm._v("\n                    $" + _vm._s(_vm.calculateSubtotal(product).toFixed(4)) + "\n                ")]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn--danger btn--sm",
       attrs: {
-        type: "button"
+        type: "button",
+        disabled: index === 0 || _vm.fields.products.length === 1
       },
       on: {
         click: function click($event) {
@@ -11698,6 +11745,7 @@ var render = function render() {
     attrs: {
       name: "item" + _vm.index + "_recipes_id",
       options: _vm.recipes,
+      disabled: _vm.isAuthorized,
       initial: typeof _vm.assignedRecipes[_vm.index - 1] !== "undefined" ? _vm.assignedRecipes[_vm.index - 1].product_recipe_id.toString() : ""
     },
     model: {
@@ -11723,6 +11771,7 @@ var render = function render() {
     attrs: {
       name: "item" + _vm.index + "_quantity",
       maxlength: "20",
+      disabled: _vm.isAuthorized,
       initial: typeof _vm.assignedRecipes[_vm.index - 1] !== "undefined" ? _vm.assignedRecipes[_vm.index - 1].quantity.toString() : ""
     },
     model: {
@@ -11772,7 +11821,8 @@ var render = function render() {
   }, [_vm._v("\n                     Fecha de elaboración\n                 ")]), _vm._v(" "), _c("date-field", {
     attrs: {
       name: "issue_date",
-      initial: _vm.orderData.issue_date || ""
+      initial: _vm.orderData.issue_date || "",
+      disabled: _vm.isAuthorized
     },
     model: {
       value: _vm.fields.issue_date,
@@ -11796,7 +11846,8 @@ var render = function render() {
   }, [_vm._v("\n                     Fecha entrega\n                 ")]), _vm._v(" "), _c("date-field", {
     attrs: {
       name: "delivery_date",
-      initial: _vm.orderData.delivery_date || ""
+      initial: _vm.orderData.delivery_date || "",
+      disabled: _vm.isAuthorized
     },
     model: {
       value: _vm.fields.delivery_date,
@@ -11820,7 +11871,7 @@ var render = function render() {
   }, [_vm._v("\n                     Estado\n                 ")]), _vm._v(" "), _c("select-field", {
     attrs: {
       name: "status",
-      options: _vm.status,
+      options: _vm.availableStatus,
       initial: _vm.orderData.status || ""
     },
     model: {
@@ -11843,6 +11894,7 @@ var render = function render() {
         index: i,
         "min-item": _vm.minItem,
         recipes: _vm.recipes,
+        isAuthorized: _vm.isAuthorized,
         "assigned-recipes": _vm.assignedRecipes,
         errors: _vm.errors,
         fields: _vm.fields
@@ -11856,7 +11908,8 @@ var render = function render() {
   }, [_vm.fields.item_count < _vm.item ? _c("button", {
     staticClass: "btn btn--light mr-4",
     attrs: {
-      type: "button"
+      type: "button",
+      disabled: _vm.isAuthorized
     },
     on: {
       click: function click($event) {
