@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductionOrder extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $appends = [
         'formated_issue_date',
@@ -33,7 +35,7 @@ class ProductionOrder extends Model
 
     public function authorizer()
     {
-        return $this->belongsTo(User::class, 'authorized_by');
+        return $this->belongsTo(User::class, 'authorized_by')->withTrashed();
     }
 
     public function items()

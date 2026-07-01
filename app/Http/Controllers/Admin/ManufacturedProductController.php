@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ManufacturedRequest;
 use App\Models\ManufacturedProduct;
 use App\Models\Recipe;
 use App\Models\RecipeItem;
@@ -38,7 +39,7 @@ class ManufacturedProductController extends Controller
         return view('admin.catalogo.crear');
     }
 
-    public function save(Request $request)
+    public function save(ManufacturedRequest $request)
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
 
@@ -63,7 +64,7 @@ class ManufacturedProductController extends Controller
         return view('admin.catalogo.editar', compact('catalogo'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ManufacturedRequest $request, $id)
     {
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
         

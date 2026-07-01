@@ -227,7 +227,6 @@ class SaleController extends Controller
 
         $sale = Sale::with([
             'products.product.manufactured',
-            'products.product.type',
             'user',
             'payments'
         ])->findOrFail($id);

@@ -11,21 +11,21 @@ class ProductionOrderProduct extends Model
 
     public function productionOrder()
     {
-        return $this->belongsTo(ProductionOrder::class);
+        return $this->belongsTo(ProductionOrder::class)->withTrashed();
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 
     public function recipe()
     {
-        return $this->belongsTo(ProductRecipe::class, 'product_recipe_id');
+        return $this->belongsTo(ProductRecipe::class, 'product_recipe_id')->withTrashed();
     }
 
     public function manufactured()
     {
-        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
+        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id')->withTrashed();
     }
 }

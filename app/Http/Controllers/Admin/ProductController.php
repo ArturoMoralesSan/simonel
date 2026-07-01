@@ -20,7 +20,7 @@ class ProductController extends Controller
         abort_unless(Gate::allows('view.products') || Gate::allows('create.products'), 403);
         $search = \Request('search');
 
-        $query = Product::with('manufactured','type', 'cut')->orderBy('created_at', 'desc');
+        $query = Product::with('manufactured')->orderBy('created_at', 'desc');
         if ($search) {
             $query->where('name', 'LIKE', '%' . $search . '%')->orderBy('created_at', 'desc');
         }

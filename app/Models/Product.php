@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
     /*
@@ -15,27 +16,6 @@ class Product extends Model
     | Relationships
     |--------------------------------------------------------------------------
     */
-
-
-    /**
-     * Get the section that owns the types.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function type()
-    {
-        return $this->belongsTo(Type::class);
-    }
-
-    /**
-     * Get the section that owns the measure.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function cut()
-    {
-        return $this->belongsTo(Cut::class);
-    }
 
 
     /**
@@ -65,7 +45,7 @@ class Product extends Model
 
     public function manufactured()
     {
-        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
+        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id')->withTrashed();
     }
 }
 

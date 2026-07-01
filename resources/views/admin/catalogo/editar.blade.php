@@ -46,7 +46,7 @@
                                 <div class="form-control">
                                     <label for="desc">Descripción</label>
                                     <text-field name="desc" v-model="fields.desc" maxlength="100" initial="{{ $catalogo->desc }}"></text-field>
-                                    <field-errors name="description"></field-errors>
+                                    <field-errors name="desc"></field-errors>
                                 </div>
                             </div>
                         </div>

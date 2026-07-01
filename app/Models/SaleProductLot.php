@@ -17,12 +17,11 @@ class SaleProductLot extends Model
 
     public function saleProduct()
     {
-        return $this->belongsTo(SaleProduct::class, 'sale_product_id');
+        return $this->belongsTo(SaleProduct::class, 'sale_product_id')->withTrashed();
     }
 
     public function productLot()
     {
-        return $this->belongsTo(ProductLot::class, 'product_lot_id'
-        );
+        return $this->belongsTo(ProductLot::class, 'product_lot_id')->withTrashed();
     }
 }

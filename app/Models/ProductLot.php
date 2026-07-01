@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductLot extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'product_id',
@@ -34,16 +36,16 @@ class ProductLot extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 
     public function order()
     {
-        return $this->belongsTo(ProductionOrder::class, 'production_order_id');
+        return $this->belongsTo(ProductionOrder::class, 'production_order_id')->withTrashed();
     }
 
     public function warehouse()
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Warehouse::class)->withTrashed();
     }
 }

@@ -44,20 +44,20 @@ class RawMaterialLot extends Model
 
     public function material()
     {
-        return $this->belongsTo(RawMaterial::class, 'raw_material_id');
+        return $this->belongsTo(RawMaterial::class, 'raw_material_id')->withTrashed();
     }
 
     public function warehouse()
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Warehouse::class)->withTrashed();
     }
     public function purchase()
     {
-        return $this->belongsTo(Purchase::class);
+        return $this->belongsTo(Purchase::class)->withTrashed();
     }
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Supplier::class)->withTrashed();
     }
 }

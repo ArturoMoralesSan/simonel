@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+
 use App\Rules\NotLowercase;
 use App\Rules\NotUppercase;
 use Illuminate\Validation\Rule;

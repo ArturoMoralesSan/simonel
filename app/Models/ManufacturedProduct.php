@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ManufacturedProduct extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'name', 
@@ -21,6 +23,6 @@ class ManufacturedProduct extends Model
 
     public function product()
     {
-        return $this->hasOne(Product::class, 'manufactured_product_id');
+        return $this->hasOne(Product::class, 'manufactured_product_id')->withTrashed();
     }
 }

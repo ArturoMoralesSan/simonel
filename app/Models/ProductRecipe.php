@@ -16,7 +16,7 @@ class ProductRecipe extends Model
 
     public function manufactured()
     {
-        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id');
+        return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id')->withTrashed();
     }
 
     public function orders()
