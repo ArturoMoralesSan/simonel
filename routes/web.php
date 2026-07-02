@@ -61,7 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
-    Route::get('pdf-carrera/{id}', [PdfController::class, 'pdfRace']);
+    Route::get('pdf-cliente/{id}', [PdfController::class, 'customers']);
 
     Route::get('pdf-egreso/{id}', [PdfController::class, 'pdfEgreso']);
     Route::get('pdf-gasto/{id}', [PdfController::class, 'pdfGasto']);

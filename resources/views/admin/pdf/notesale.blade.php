@@ -1,197 +1,440 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cotización</title>
+
     <style>
-        @page {
-            size: letter;
-            margin-top:0px; /* Ajusta según sea necesario */
-            margin-bottom: 0px;
+        @page{
+            margin: 12mm;
         }
 
-    
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("{{ public_path('img/atvantage_note.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            z-index: -1; /* Lo manda al fondo */
-            opacity: 0.9; /* Ajusta la opacidad si el fondo es muy fuerte */
+        body{
+            font-family: DejaVu Sans, sans-serif;
+            font-size:11px;
+            color:#222;
+            margin:0;
+            padding:0;
         }
 
-        .contenido {
-            position: relative;
-            z-index: 1;
+        .page{
+            width:94%;          /* o 92% si quieres aún más margen */
+            margin:0 auto;      /* centra el contenido */
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            margin: 125px 0;
+        table{
+            width:100%;
+            border-collapse:collapse;
         }
-        .info {
-            display:block;
+
+        td,
+        th{
+            padding:5px;
+            vertical-align:top;
         }
-        .id_cotización {
-            float:right;
+
+        .border{
+            border:1px solid #000;
+        }
+
+        .text-center{
+            text-align:center;
+        }
+
+        .text-right{
             text-align:right;
         }
-        .header, .footer {
-            width: 100%;
-            border: 1px solid #000;
-            padding: 10px;
-            margin-bottom: 10px;
+
+        .title{
+            font-size:22px;
+            font-weight:bold;
         }
-        .header td, .footer td {
-            padding: 5px;
+
+        .subtitle{
+            font-size:13px;
+            font-weight:bold;
         }
-        .title {
-            font-weight: bold;
-            text-align: center;
-            font-size: 14px;
+
+        .small{
+            font-size:10px;
+            line-height:14px;
         }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+
+        .header{
+            margin-bottom:15px;
         }
-        .table th, .table td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
+
+        .note-box{
+            width:100%;
+            border-collapse:collapse;
         }
-        .table th {
-            background:rgb(77, 77, 77);
-            color: #fff;
+
+        .note-box td{
+            border:1px solid #000;
+            padding:5px;
         }
-        .totals {
-            width: 40%;
-            float: right;
-            margin-top: 10px;
+
+        .client{
+            margin-top:10px;
+            margin-bottom:15px;
         }
-        .totals td {
-            padding: 8px;
-            border: 1px solid #000;
+
+        .client td{
+            border:1px solid #000;
+        }
+
+        .products{
+            margin-top:10px;
+        }
+
+        .products th{
+            background:#efefef;
+            border:1px solid #000;
+        }
+
+        .products td{
+            border:1px solid #000;
+        }
+
+        .totals{
+            margin-top:12px;
+        }
+
+        .totals td{
+            border:1px solid #000;
+        }
+
+        .footer{
+            margin-top:18px;
+            font-size:10px;
+            text-align:justify;
+            line-height:15px;
         }
     </style>
 </head>
+
 <body>
-    <div class="background"></div>
-    <div class="contenido">
-            <div class="info">
-                <table width="100%">
-                    <tr>
-                        <td><strong>Fecha:</strong> {{ $sale->created_at->format('d/m/Y') }}</td>
-                        <td style="text-align: right;"><strong>ID de cotización:</strong> {{ $sale->id }}</td>
-                    </tr>
-                </table>
-            </div>
 
-            
-            <table class="header">
-                <tr>
-                    <td><strong>Razón social:</strong> {{ $sale->user->customer->business_name }}</td>
-                    <td><strong>Nombre comercial:</strong> {{ $sale->user->customer->trade_name }} </td>
-                    <td><strong>RFC:</strong> {{ $sale->user->customer->rfc }}</td>
+<div class="page">
 
-                </tr>
-                <tr>
-                    <td><strong>Régimen Fiscal:</strong> {{ $sale->user->customer->tax_regime }}</td>
-                    <td><strong>Contacto:</strong> {{ $sale->user->customer->contact }}</td>
-                    <td><strong>Teléfono:</strong> {{ $sale->user->customer->phone }}</td>
+<table class="header">
 
-                </tr>
-                <tr>
-                    <td><strong>Email:</strong> {{ $sale->user->customer->email }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Calle:</strong> {{ $sale->user->customer->street }}</td>
-                    <td><strong>Número Ext.:</strong> {{ $sale->user->customer->ext_number }}</td>
-                    <td><strong>Número Int.:</strong> {{ $sale->user->customer->int_number }}</td>
-                </tr>
-                <tr>
-                    <td colspan="3"><strong>Entre Calles:</strong> {{ $sale->user->customer->between_streets }} y {{ $sale->user->customer->and_street }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Colonia:</strong> {{ $sale->user->customer->colony }}</td>
-                    <td><strong>Código Postal:</strong> {{ $sale->user->customer->postal_code }}</td>
-                    <td><strong>Municipio:</strong> {{ $sale->user->customer->municipality }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Población:</strong> {{ $sale->user->customer->population }}</td>
-                    <td><strong>Estado:</strong> {{ $sale->user->customer->state }}</td>
-                    <td><strong>País:</strong> {{ $sale->user->customer->country }}</td>
-                </tr>
-            </table>
-            
-            <div class="title">Cotización de Productos</div>
-            
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>precio unitario</th>
-                        <th>Descuento</th>
-                        <th>IVA</th>
-                        <th>Importe</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($sale->templates as $template)
-                        <tr>
-                            <td>{{ $template->pivot->product_name }}</td>
-                            <td>{{ $template->pivot->quantity }}</td>
-                            <td>${{ $template->pivot->base_price }}</td>
-                            <td>{{ $template->pivot->discount }}</td>
-                            <td>{{ $template->pivot->iva }}</td>
-                            <td>${{ number_format($template->pivot->base_price * $template->pivot->quantity , 4) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            
-            <table class="totals">
-                <tr>
-                    <td>Subtotal</td>
-                    <td style="text-align:right;">${{ number_format($sale->gross_amount, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>Descuento</td>
-                    <td style="text-align:right;"> - ${{ number_format($sale->discount, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>IVA</td>
-                    <td style="text-align:right;"> + ${{ number_format($sale->iva, 2) }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Total</strong></td>
-                    <td style="text-align:right;"><strong>${{ number_format($sale->total_with_iva, 2) }}</strong></td>
-                </tr>
-            </table>
-            <div style="text-align: right; font-weight: bold; margin-top: 10px; clear: both;">
-                {{ $sale->letter }}
-            </div>
-            @if($sale->comment)
-                <table class="table" style="margin-top: 20px;">
-                    <thead>
-                        <tr>
-                            <th>Comentarios</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ $sale->comment }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            @endif
-    </div>
+<tr>
+
+    <td width="18%" class="border text-center">
+        <img style="width: 160px;display: block;margin: 30px auto;" src="{{ url('img/simonel.png')}}" alt="">
+    </td>
+
+    <td width="57%" class="text-center border">
+
+        <div class="title">
+            SIMONEL
+        </div>
+
+        <div class="subtitle">
+            PROFR. SIMON MOLINA MALDONADO
+        </div>
+
+        <br>
+
+        <div class="small">
+            RFC: MOMS-460704-aQ9
+        </div>
+
+        <table style="width:100%; margin-top:8px; border-collapse:collapse;">
+            <tr>
+                <td class="small" style="width:50%; text-align:left;">
+                    Calle Río Tamazula 210
+                </td>
+                <td class="small" style="width:50%; text-align:left;">
+                    Col. Gustavo Díaz Ordaz
+                </td>
+            </tr>
+
+            <tr>
+                <td class="small" style="width:50%; text-align:left;">
+                    TEL. (618) 143-19-84
+                </td>
+                <td class="small" style="width:50%; text-align:left;">
+                    CEL. (618) 171-95-12
+                </td>
+            </tr>
+        </table>
+
+    </td>
+
+    <td width="25%">
+
+        <table class="note-box">
+
+            <tr>
+                <td colspan="2" class="text-center">
+                    <strong>NOTA DE VENTA</strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td width="40%">
+                    Folio
+                </td>
+
+                <td class="text-center">
+                    <strong>#{{ $sale->id }}</strong>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Fecha</td>
+
+                <td class="text-center">
+                    {{ $sale->created_at->format('d/m/Y') }}
+                </td>
+
+            </tr>
+
+        </table>
+
+    </td>
+
+</tr>
+
+</table>
+
+<table class="client">
+
+<tr>
+
+    <td width="20%">
+        <strong>NOMBRE</strong>
+    </td>
+
+    <td width="80%">
+        {{ optional($sale->user->customer)->business_name }}
+    </td>
+
+</tr>
+<tr>
+
+    <td>
+        <strong>DIRECCIÓN</strong>
+    </td>
+
+    <td>
+        {{ optional($sale->user->customer)->street }} #{{ optional($sale->user->customer)->ext_number }}, {{ optional($sale->user->customer)->population }} {{ optional($sale->user->customer)->postal_code }} 
+    </td>
+
+</tr>
+<tr>
+
+    <td>
+        <strong>CIUDAD</strong>
+    </td>
+
+    <td>
+        {{ optional($sale->user->customer)->state }}
+    </td>
+
+</tr>
+
+</table>
+
+<table class="products">
+
+<thead>
+
+<tr>
+
+    <th width="10%">
+        Cant.
+    </th>
+
+    <th width="42%">
+        Producto
+    </th>
+
+    <th width="16%">
+        Precio Unit.
+    </th>
+
+    <th width="12%">
+        Desc.
+    </th>
+
+    <th width="20%">
+        Importe
+    </th>
+
+</tr>
+
+</thead>
+
+<tbody>
+    @foreach($sale->products as $product)
+
+<tr>
+
+    <td class="text-center">
+        {{ number_format($product->quantity,2) }}
+    </td>
+
+    <td>
+        {{ optional(optional($product->product)->manufactured)->name }}
+    </td>
+
+    <td class="text-right">
+        $ {{ number_format($product->base_price,2) }}
+    </td>
+
+    <td class="text-center">
+        {{ number_format($product->discount,2) }} %
+    </td>
+
+    <td class="text-right">
+        $ {{ number_format($product->subtotal,2) }}
+    </td>
+
+</tr>
+
+@endforeach
+
+
+@php
+    $rows = max(0, 10 - $sale->products->count());
+@endphp
+
+@for($i = 0; $i < $rows; $i++)
+
+<tr>
+
+    <td>&nbsp;</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+
+</tr>
+
+@endfor
+
+</tbody>
+
+</table>
+
+
+<table class="totals">
+
+<tr>
+
+    <td width="70%">
+
+        <strong>Cantidad con letra</strong>
+
+        <br><br>
+
+        {{ $sale->letter }}
+
+        @if($sale->comment)
+
+        <br><br>
+
+        <strong>Comentarios:</strong>
+
+        {{ $sale->comment }}
+
+        @endif
+
+    </td>
+
+    <td width="30%">
+
+        <table style="width:100%; border-collapse:collapse;">
+
+            <tr>
+
+                <td>
+                    Subtotal
+                </td>
+
+                <td class="text-right">
+                    $ {{ number_format($sale->gross_amount,2) }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td>
+                    Descuento
+                </td>
+
+                <td class="text-right">
+                    - $ {{ number_format($sale->discount,2) }}
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td style="font-size:15px;">
+
+                    <strong>TOTAL</strong>
+
+                </td>
+
+                <td class="text-right" style="font-size:16px;">
+
+                    <strong>
+
+                        $ {{ number_format($sale->total_sale_price,2) }}
+
+                    </strong>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </td>
+
+</tr>
+
+</table>
+<div class="footer">
+
+    <p style="text-align:justify; line-height:16px;">
+
+        Por este pagaré me obligo(amos) a pagar incondicionalmente la cantidad
+        indicada en esta nota de venta a favor de <strong>SIMONEL</strong>,
+        reconociendo haber recibido la mercancía descrita anteriormente a mi
+        entera satisfacción.
+
+        En caso de incumplimiento, acepto(amos) cubrir los intereses y gastos
+        que correspondan hasta la liquidación total del adeudo.
+
+    </p>
+
+</div>
+
+
+<table style="width:100%; margin-top:55px;">
+
+    <tr>
+        <td width="50%" class="text-center">
+            ______________________________
+            <br>
+            <strong>ACEPTO</strong>
+        </td>
+    </tr>
+</table>
+
+<div style="margin-top:25px; text-align:center; font-size:9px; color:#666;">
+    Documento generado automáticamente el
+    {{ now()->format('d/m/Y H:i') }}
+</div>
+
+</div>
+
 </body>
+
 </html>

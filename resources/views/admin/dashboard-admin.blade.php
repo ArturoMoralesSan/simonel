@@ -91,14 +91,31 @@
         </div>
     </section>
 
-    {{-- GRAFICA --}}
-    <section class="db-panel">
-        <h3 class="db-panel__title">
-            Evolución de ingresos
-        </h3>
 
-        <canvas id="canvas" class="graph-statistics-income"></canvas>
-    </section>
+    
+
+    <div class="row">
+        <div class="md:col-1/2 col">
+            {{-- GRAFICA --}}
+            <section class="db-panel">
+                <h3 class="db-panel__title">
+                    Evolución de ingresos
+                </h3>
+
+                <canvas id="canvas"></canvas>
+            </section>
+        </div>
+        <div class="md:col-1/2 col">
+            <section class="db-panel">
+                <h3 class="db-panel__title">
+                    Ingresos por método de pago
+                </h3>
+
+                <canvas id="paymentsCanvas"></canvas>
+            </section>
+        </div>
+    </div>
+    
 
     {{-- SEGUNDO BLOQUE DE KPIS --}}
     <section class="db-panel">
@@ -251,17 +268,32 @@
     </div>
 
 </div>
+@endsection
+
+
+@section('scripts')
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.js"></script>
 
 <script>
 
-    const amountPerDay = {!! $days !!};
+    const amountPerpayment = {!! json_encode($servicesPerPayments) !!};
+
+    const barChartDataPayment = {
+        labels: Object.keys(amountPerpayment),
+        datasets: [{
+            label: 'Ingresos por método de pago',
+            backgroundColor: 'rgba(64,157,205,0.40)',
+            borderColor: '#36A2EB',
+            data: Object.values(amountPerpayment)
+        }]
+    };
+
+
+    const amountPerDay = {!! json_encode($days) !!};
 
     const lineChartData = {
-
         labels: Object.keys(amountPerDay),
-
         datasets: [{
             label: 'Ingresos',
             fill: true,
@@ -272,35 +304,48 @@
         }]
     };
 
+
     window.onload = function () {
 
-        const ctx = document
+        // 📊 LINE CHART
+        const ctxLine = document
             .getElementById('canvas')
             .getContext('2d');
 
-        new Chart(ctx, {
-
+        new Chart(ctxLine, {
             type: 'line',
-
             data: lineChartData,
-
             options: {
-
                 responsive: true,
-
                 plugins: {
-                    legend: {
-                        display: true
-                    }
+                    legend: { display: true }
                 },
-
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
+
+
+        // 📊 BAR CHART (PAYMENTS)
+        const ctxBar = document
+            .getElementById('paymentsCanvas')
+            .getContext('2d');
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: barChartDataPayment,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
     };
 
 </script>

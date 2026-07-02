@@ -116,7 +116,7 @@ class SaleController extends Controller
 
         $products = Product::select('products.*')
         ->leftJoin('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
-        ->with(['manufactured', 'type'])
+        ->with(['manufactured'])
         ->orderBy('manufactured_products.name')
         ->get();
 

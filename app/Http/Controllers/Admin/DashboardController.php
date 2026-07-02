@@ -245,6 +245,21 @@ class DashboardController extends Controller
                 ->orderByDesc('total_quantity')
                 ->get();
 
+            $servicesPerPayments = DB::table('payment_sale')
+                ->join('sales', 'payment_sale.sale_id', '=', 'sales.id')
+                ->join('payments', 'payment_sale.payment_id', '=', 'payments.id')
+                ->whereBetween('sales.created_at', [
+                    Carbon::parse($start_date)->startOfDay(),
+                    Carbon::parse($end_date)->endOfDay()
+                ])
+                ->select(
+                    'payments.name',
+                    DB::raw('SUM(payment_sale.cost) as total')
+                )
+                ->groupBy('payments.name')
+                ->pluck('total', 'name');
+
+            
             return view('admin.dashboard-admin', compact(
                 'string_date',
                 'ingreso',
@@ -260,7 +275,8 @@ class DashboardController extends Controller
                 'lowLots',
                 'pendingAssortment',
                 'customerCount',
-                'customerInventory'
+                'customerInventory',
+                'servicesPerPayments'
             ));
         }
 
