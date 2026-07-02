@@ -46,7 +46,6 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Nombre</th>
-                                <th>Descripción</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -56,11 +55,6 @@
                                 <td data-label="Nombre:">
                                     @{{ productItem.name }}
                                 </td>
-                                <td data-label="Descripción:">
-                                    @{{ productItem.description }}
-                                </td>
-                                
-
                                 <td class="table-resource__actions" data-label="Acciones:">
                                     <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/catalogo/' + productItem.id + '/editar' ">
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">

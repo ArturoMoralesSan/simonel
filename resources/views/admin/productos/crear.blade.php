@@ -1,16 +1,16 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Agregar producto')
-@section('tab_title', 'Agregar producto | ' . config('app.name'))
-@section('description', 'Agregar producto.')
+@section('title', 'Agregar producto para venta')
+@section('tab_title', 'Agregar producto para venta | ' . config('app.name'))
+@section('description', 'Agregar producto para venta.')
 @section('css_classes', 'dashboard')
 @section('content')
 
 <section class="mb-16">
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Agregar producto
+            Agregar producto para venta
         </h1>
     </div>
 
@@ -18,7 +18,7 @@
         <p class="mb-12">
             @include('components.alert')
             <span class="color-link">«</span>
-            <a href="{{ url('admin/productos/') }}">Ver todos los productos</a>
+            <a href="{{ url('admin/productos/') }}">Ver todos los productos para venta</a>
         </p>
 
         <script>
@@ -65,31 +65,16 @@
                                 </div>
                             </div>
 
+                
+                        
                             <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="impresion_cost">Costo de presentacion <span class="description">$</span></label>
-                                    <text-field name="impresion_cost" v-model="fields.impresion_cost" maxlength="80" ></text-field>
-                                    <field-errors name="impresion_cost"></field-errors>
-                                </div>
-                            </div>
-
-                            <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="indirect_cost">Costo indirecto <span class="description">$</span></label>
-                                    <text-field name="indirect_cost" v-model="fields.indirect_cost" maxlength="80" ></text-field>
-                                    <field-errors name="indirect_cost"></field-errors>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="md:row mb-2">
-                            <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="subtotal">Costo base <span class="description">$</span></label>
                                     <text-field disabled name="subtotal" v-model="fields.subtotal" maxlength="80" type="number"></text-field>
                                     <field-errors name="subtotal"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/2">
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="utility">Utilidad <span class="description">%</span></label>
                                     <text-field name="utility" v-model="fields.utility" maxlength="80"></text-field>

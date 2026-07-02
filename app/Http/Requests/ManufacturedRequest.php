@@ -17,9 +17,7 @@ class ManufacturedRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', new NotUppercase, new NotLowercase, 'max:150'],
-            'desc' => ['required','max:255'],
-            
+            'name' => ['required', new NotUppercase, new NotLowercase, 'max:150'],            
         ];
     }
 }

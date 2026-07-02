@@ -20,10 +20,9 @@ class ProductRequest extends FormRequest
         return [
             
             'manufactured_product_id' => ['required', 'max:20'],
-            'cut_id' => ['required', 'max:20'],
             'vinil_cost' => 'required_unless:type_id,3,|max:10',
             'impresion_cost' => 'required_unless:type_id,3,|max:10',
-            'indirect_cost' => 'required|max:10',
+            'indirect_cost' => 'max:10',
             'subtotal' => 'required|max:10',
             'utility' => 'required|max:10',
             'costo_total' => 'required|max:10',

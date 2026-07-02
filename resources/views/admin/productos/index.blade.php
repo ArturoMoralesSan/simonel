@@ -1,19 +1,19 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'productos')
-@section('tab_title', 'productos | ' . config('app.name'))
-@section('description', 'Lista de productos.')
+@section('title', 'productos para venta')
+@section('tab_title', 'productos para venta | ' . config('app.name'))
+@section('description', 'Lista de productos para venta.')
 @section('css_classes', 'dashboard')
 
 @section('content')
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Productos
+            Productos para venta
         </h1>
 
         <p class="dashboard-heading__caption">
-            Hay {{ $ProductsItems->count() }} productos registrados.
+            Hay {{ $ProductsItems->count() }} productos para venta registrados.
         </p>
     </div>
 
@@ -32,7 +32,7 @@
         @include('components.alert')
         <section class="db-panel">
             <h3 class="db-panel__title">
-                Lista de productos
+                Lista de productos para venta
             </h3>
 
             @if (!$ProductsItems->count())
@@ -46,9 +46,9 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Nombre</th>
-                                <th>Costo</th>
-                                <th>Costo de presentación</th>
-                                <th>Costo indirecto</th>
+                                <th>Costo de fabricación</th>
+                                <!-- <th>Costo de presentación</th>
+                                <th>Costo indirecto</th> -->
                                 <th>Costo base</th>
                                 <th>Utilidad</th>
                                 <th>Subtotal</th>
@@ -62,15 +62,15 @@
                                 <td data-label="Nombre:">
                                     @{{ productItem.manufactured.name }} <span class="description">@{{ productItem.manufactured.description }}</span>
                                 </td>
-                                <td data-label="Costo:">
+                                <td data-label="Costo de fabricación:">
                                     $@{{ productItem.vinil_cost }} 
                                 </td>
-                                <td data-label="Costo de presentacion:">
+                                <!-- <td data-label="Costo de presentacion:">
                                     $@{{ productItem.impresion_cost }}
                                 </td>
                                 <td data-label="Costo indirecto:">
                                     $@{{ productItem.indirect_cost }}
-                                </td>
+                                </td> -->
                                 <td data-label="Costo base:">
                                     $@{{ productItem.subtotal }}
                                 </td>

@@ -23,8 +23,7 @@ class ManufacturedProductController extends Controller
         $catalogo = ManufacturedProduct::withCount('recipes')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    $q->where('name', 'like', "%{$search}%");
                 });
             })
             ->orderBy('name', 'ASC')
@@ -45,7 +44,6 @@ class ManufacturedProductController extends Controller
 
         $manufactured = ManufacturedProduct::create([
             'name' => $request->name,
-            'description' => $request->desc
         ]);
 
         alert('Se ha agregado un elemento.');
@@ -71,7 +69,6 @@ class ManufacturedProductController extends Controller
         $manufactured = ManufacturedProduct::findOrFail($id);
         $manufactured->update([
             'name' => $request->name,
-            'description' => $request->desc
         ]);
 
         alert('Se ha actualizado un elemento.');
