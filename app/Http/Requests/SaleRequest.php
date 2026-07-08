@@ -11,10 +11,13 @@ class SaleRequest extends FormRequest
     
     public function rules(): array
     {
-        return [
+        $rules = [
 
+            // Cliente
             'client_id' => ['required', 'exists:users,id'],
             'comment' => ['nullable', 'string', 'max:2000'],
+
+            // Productos
             'products' => ['required', 'array', 'min:1'],
             'products.*.product_id' => ['required', 'exists:products,id'],
             'products.*.quantity' => ['required', 'numeric', 'min:0.001'],
@@ -22,30 +25,79 @@ class SaleRequest extends FormRequest
             'products.*.discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'products.*.iva' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'products.*.subtotal' => ['nullable', 'numeric', 'min:0'],
+
+            // Pagos
+            'payments_count' => ['required', 'integer', 'min:1'],
         ];
+
+        for ($i = 1; $i <= request('payments_count', 1); $i++) {
+
+            $rules["payment{$i}_pago"] = [
+                'required',
+                'exists:payments,id',
+            ];
+
+            $rules["payment{$i}_cost"] = [
+                'required',
+                'numeric',
+                'min:0.01',
+            ];
+        }
+
+        return $rules;
     }
 
+    /**
+     * Custom validation.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+
+            $paymentsTotal = 0;
+
+            for ($i = 1; $i <= $this->input('payments_count', 1); $i++) {
+                $paymentsTotal += (float) $this->input("payment{$i}_cost", 0);
+            }
+
+            $gross = (float) $this->input('gross_amount', 0);
+            $discount = (float) $this->input('discounts', 0);
+
+            $saleTotal = $gross - $discount;
+
+            if (abs($paymentsTotal - $saleTotal) > 0.01) {
+
+                $validator->errors()->add(
+                    'payment1_cost',
+                    'La suma de los métodos de pago debe ser igual al total de la venta.'
+                );
+            }
+        });
+    }
+
+    /**
+     * Custom messages.
+     */
     public function messages(): array
     {
         return [
 
             'client_id.required' => 'Debe seleccionar un cliente.',
             'client_id.exists' => 'El cliente seleccionado no existe.',
+
             'products.required' => 'Debe agregar al menos un producto.',
-            'products.array' => 'La lista de productos es inválida.',
             'products.min' => 'Debe agregar al menos un producto.',
-            'products.*.product_id.required' => 'Debe seleccionar un producto.',
+
+            'products.*.product_id.required' => 'Seleccione un producto.',
             'products.*.product_id.exists' => 'El producto seleccionado no existe.',
-            'products.*.quantity.required' =>  'La cantidad es obligatoria.',
-            'products.*.quantity.numeric' => 'La cantidad debe ser numérica.',
+
+            'products.*.quantity.required' => 'Capture la cantidad.',
             'products.*.quantity.min' => 'La cantidad debe ser mayor a cero.',
-            'products.*.unit_price.required' => 'El precio es obligatorio.',
-            'products.*.unit_price.numeric' => 'El precio debe ser numérico.',
+
+            'products.*.unit_price.required' => 'Capture el precio.',
             'products.*.unit_price.min' => 'El precio no puede ser negativo.',
-            'products.*.discount.numeric' => 'El descuento debe ser numérico.',
-            'products.*.discount.max' => 'El descuento no puede ser mayor a 100%.',
-            'products.*.iva.numeric' => 'El IVA debe ser numérico.',
-            'products.*.iva.max' => 'El IVA no puede ser mayor a 100%.',
+
+            'payment1_pago.required' => 'Debe seleccionar un método de pago.',
         ];
     }
 }

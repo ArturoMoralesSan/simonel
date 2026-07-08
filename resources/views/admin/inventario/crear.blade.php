@@ -25,8 +25,6 @@
             <inventory-form
                 action="{{ url('admin/inventario-clientes/crear') }}"
                 :clients='@json($users)'
-                :labels='@json($labels)'
-                :products='@json($products)'
                 >
             </inventory-form>
 

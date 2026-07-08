@@ -166,6 +166,36 @@
                 </tfoot>
             </table>
         </div>
+        <div class="mb-4">
+            <PaymentForm v-for="i in fields.payments_count" :key="i"
+                :index="i"
+                :min-payment="minPayment"
+                :payments-data="paymentsData"
+                :assigned-payments="[]"
+                :errors="errors"
+                :fields="fields"
+                @removeP="removePayments"
+            >
+            </PaymentForm>
+
+            <p class="pt-4">
+                <button v-if="fields.payments_count < payment"
+                    class="btn btn--light mr-4"
+                    type="button"
+                    @click="fields.payments_count++"
+                >
+                    <img class="mr-1 align-top"
+                        :src="$root.path + '/img/svg/plus-circle-primary.svg'"
+                        alt=""
+                        width="20px"
+                    >
+                    <span class="align-top">Agregar metodo de pago</span>
+                </button>
+
+                <span v-if="payment > 1 "> Puedes registrar a un máximo de {{ payment }} métodos de pago.</span>
+                <span v-else> Puedes registrar únicamente un método de pago.</span>
+            </p>
+        </div>
 
         <div class="form-control">
             <label for="comment">Comentarios</label>
@@ -191,9 +221,13 @@
 
 <script>
     import BaseForm from '../../main/components/forms/base/BaseForm.vue';
+    import PaymentForm from '../../main/components/forms/order-status-form/PaymentForm.vue';
+
 
     export default {
         extends: BaseForm,
+
+        components: { PaymentForm },
 
         props: {
             products: {
@@ -212,6 +246,18 @@
                 type: Object,
                 default: null
             },
+            payment: {
+                required: true,
+                type: Number
+            },
+            minPayment: {
+                required: true,
+                type: Number
+            },
+            paymentsData: {
+                required: true,
+                type: [Array, Object]
+            },
         },
 
         data() {
@@ -222,6 +268,7 @@
                 comment: null,
                 discounts: null,
                 gross_amount: null,
+                payments_count: this.minPayment,
                 },
                 errors: [],
             };
@@ -346,6 +393,18 @@
 
                 this.fields.products.splice(index, 1);
                 this.errors.splice(index, 1);
+                this.$nextTick(() => {
+                    this.updateFirstPayment();
+                });
+            },
+
+            updateFirstPayment() {
+
+                if (this.fields.payment1_cost === undefined) {
+                    return;
+                }
+
+                this.fields.payment1_cost = this.totalGeneral.toFixed(2);
             },
 
             onProductSelected(index, productId) {
@@ -362,6 +421,10 @@
                 }
 
                 this.updateSubtotal(index);
+
+                this.$nextTick(() => {
+                    this.updateFirstPayment();
+                });
             },
 
             calculateSubtotal(product) {
@@ -376,6 +439,10 @@
                 const product = this.fields.products[index];
 
                 product.subtotal = this.calculateSubtotal(product);
+
+                this.$nextTick(() => {
+                    this.updateFirstPayment();
+                });
             },
 
             validateProducts() {
@@ -404,7 +471,57 @@
                 });
 
                 return valid;
+            },
+
+            /**
+             * Copy all author's fields from one card to another.
+             *
+             * @param {Integer} source
+             * @param {Integer} target
+             */
+             copyPaymentFields(source, target) {
+                const regex = new RegExp('^payment' + source + '_');
+
+                this.deleteAuthorFields(target);
+
+                for (let field in this.fields) {
+                    if (regex.test(field)) {
+                        this.$set(this.fields, field.replace(source, target), this.fields[field]);
+                    }
+                }
+            },
+
+            /**
+             * Delete all fields for the given author.
+             *
+             * @param {Integer} index
+             */
+             deletePaymentFields(index) {
+                const regex = new RegExp('^payment' + index + '_');
+
+                for (let field in this.fields) {
+                    if (regex.test(field)) {
+                        delete this.fields[field];
+                    }
+                }
+            },
+
+            /**
+             * Copy all necessary author fields to move their index
+             * and then remove the last card.
+             *
+             * @param {Integer} index
+             */
+             removePayments(index) {
+                for (let i = 0; i < this.fields.payments_count - index; i ++) {
+                    this.copyPaymentFields(index + i + 1, index + i);
+                }
+
+                this.fields.payments_count--;
+
+                this.deletePaymentFields(this.fields.payments_count + 1);
             }
+
         }
     };
 </script>

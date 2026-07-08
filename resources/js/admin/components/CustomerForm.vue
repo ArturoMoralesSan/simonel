@@ -4,7 +4,7 @@
             <h3 class="db-panel__title">
                 Datos Generales
             </h3>
-
+            
             <div class="md:row mb-2">
                 <div class="md:col-2/3">
                     <div class="form-control">
@@ -77,8 +77,22 @@
                     </div>
                 </div>
             </div>
+            <div class="row mb-2" v-if="isAdmin">
+                <div class="col-1/2">
+                    <div class="form-control">
+                        <label for="seller_id">Asignar vendedor</label>
+                        <select-field
+                            name="seller_id"
+                            v-model="fields.seller_id"
+                            :options="sellers"
+                            :initial="user.seller_id || ''"
+                        >
+                        </select-field>
+                        <field-errors name="seller_id"></field-errors>
+                    </div>
+                </div>
+            </div>
 
-            
             <!-- <div class="md:row mb-2">
                 <div class="md:col-1/2">
                     <div class="form-control">
@@ -217,6 +231,14 @@ import BaseForm from '../../main/components/forms/base/BaseForm.vue';
 export default {
     extends: BaseForm,
     props: {
+        sellers: {
+            required: true,
+            type: [Array, Object]
+        },
+        isAdmin: {
+            type: Boolean,
+            default: false
+        },
         user: {
             required: true,
             type: [Array, Object]

@@ -33,70 +33,92 @@ class SaleController extends Controller
 {
     public function index()
     {
-        abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
+        abort_unless(
+            Gate::allows('view.quotations') || Gate::allows('create.quotations'),
+            403
+        );
 
+        $actual_day = Carbon::now()->day;
         $actual_month = Carbon::now()->month;
         $actual_year  = Carbon::now()->year;
 
-        $search = \Request('search');
-        $month = \Request('month') ?? $actual_month;
-        $year  = \Request('year') ?? $actual_year;
-        
-        $years = collect([]);
-        for ($año = 2025; $año <= $actual_year; $año++) {
+        $search = request('search');
+        $day    = request('day', $actual_day);
+        $month  = request('month', $actual_month);
+        $year   = request('year', $actual_year);
+
+        $years = collect();
+        for ($año = 2026; $año <= $actual_year; $año++) {
             $years[$año] = $año;
         }
+
         $months = collect([
-            '1' => 'Enero', 
-            '2' => 'Febrero', 
-            '3' => 'Marzo', 
-            '4' => 'Abril',
-            '5' => 'Mayo', 
-            '6' => 'Junio', 
-            '7' => 'Julio', 
-            '8' => 'Agosto',
-            '9' => 'Septiembre', 
-            '10' => 'Octubre', 
-            '11' => 'Noviembre', 
-            '12' => 'Diciembre'
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre',
         ]);
-        
 
-        $statusLabels = [
-            'accepted' => 'Órdenes aceptadas',
-            'paid'     => 'Órdenes pagadas',
-        ];
+        $days = collect(range(1, 31))->mapWithKeys(function ($day) {
+            return [$day => $day];
+        });
 
-        $salesByStatus = collect([]);
-        foreach ($statusLabels as $status => $label) {
-            $query = Sale::with('products', 'user')
-                ->where('status', $status)
-                ->whereMonth('created_at', $month)
-                ->whereYear('created_at', $year)
-                ->orderBy('created_at', 'DESC');
+        $query = Sale::with('products', 'user')
+        ->whereDay('created_at', $day)
+        ->whereMonth('created_at', $month)
+        ->whereYear('created_at', $year)
+        ->latest()
+
+        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
 
             if (Auth::user()->isCustomer()) {
-                $query->where('user_id', Auth::user()->id)->orderBy('created_at', 'desc');
-            }
 
-            if ($search) {
-                $query->whereHas('user', function ($q) use ($search) {
-                    $q->where(function ($q2) use ($search) {
-                        $q2->where('name', 'LIKE', '%' . $search . '%')
-                        ->orWhere('last_name', 'LIKE', '%' . $search . '%');
-                    });
+                $query->where('user_id', Auth::id());
+
+            } else {
+
+                $query->whereHas('user.customer', function ($q) {
+                    $q->where('seller_id', Auth::id());
                 });
+
             }
 
-            $paginatedSales = $query->paginate(10)->appends(request()->all());
-            $salesByStatus[$status] = [
-                'items' => collect($paginatedSales->items()),
-                'links' => $paginatedSales->links('layout.pagination') 
-            ];
+        });
+
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('last_name', 'LIKE', "%{$search}%");
+                });
+            });
         }
 
-        return view('admin.ventas.index',compact('years', 'months', 'actual_month', 'actual_year', 'salesByStatus','statusLabels'));
+        $sales = $query->paginate(20)->appends(request()->query());
+
+        $saleItems = collect($sales->items());
+        $links = $sales->links('layout.pagination');
+
+        return view('admin.ventas.index', compact(
+            'years',
+            'months',
+            'days',
+            'actual_day',
+            'actual_month',
+            'actual_year',
+            'saleItems',
+            'links'
+        ));
     }
+
 
     public function create()
     {
@@ -104,15 +126,36 @@ class SaleController extends Controller
 
         if (Auth::user()->isCustomer()) {
 
-            $users = Customer::where('user_id', Auth::user()->id)
-                ->selectRaw("CONCAT(trade_name,' (',business_name,')') as full_name, user_id")
+            $users = Customer::where('user_id', Auth::id())
+                ->selectRaw("
+                    CONCAT(trade_name,' (',business_name,')') as full_name,
+                    user_id
+                ")
+                ->pluck('full_name', 'user_id');
+
+        } elseif (Auth::user()->isSuperAdmin()) {
+
+            $users = Customer::selectRaw("
+                    CONCAT(trade_name,' (',business_name,')') as full_name,
+                    user_id
+                ")
+                ->orderBy('trade_name')
                 ->pluck('full_name', 'user_id');
 
         } else {
 
-            $users = Customer::selectRaw("CONCAT(trade_name,' (',business_name,')') as full_name, user_id")
-                ->pluck('full_name','user_id');
+            // Vendedor
+            $users = Customer::where('seller_id', Auth::id())
+                ->selectRaw("
+                    CONCAT(trade_name,' (',business_name,')') as full_name,
+                    user_id
+                ")
+                ->orderBy('trade_name')
+                ->pluck('full_name', 'user_id');
         }
+
+
+        $payments = Payment::pluck('name','id');
 
         $products = Product::select('products.*')
         ->leftJoin('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
@@ -120,13 +163,47 @@ class SaleController extends Controller
         ->orderBy('manufactured_products.name')
         ->get();
 
-        return view('admin.ventas.crear',compact('users','products'));
+        return view('admin.ventas.crear',compact('users','products','payments'));
     }
 
-    public function save(SaleRequest $request)
+    public function order($id)
     {
         abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
 
+        if (Auth::user()->isCustomer()) {
+            return redirect('admin/ventas');
+        }
+
+        $sale = Sale::with([
+            'products.product.manufactured',
+            'user',
+            'payments'
+        ])->findOrFail($id);
+
+        $status = collect([
+            'accepted' => 'Aceptada',
+            'paid'     => 'Pagada',
+            'assortment' => 'Surtida',
+            'credit' => 'Crédito',
+
+        ]);
+
+        $paid = collect([
+            '1' => 'Pagado',
+            '0' => 'No pagado',
+        ]);
+
+        $payments = Payment::pluck('name','id');
+
+        return view('admin.ventas.orden', compact('sale', 'status', 'paid', 'payments'));
+        
+    }
+
+    /* public function save(SaleRequest $request)
+    {
+        abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
+
+        dd($request);
         $validated = $request->validated();
 
         DB::beginTransaction();
@@ -215,37 +292,218 @@ class SaleController extends Controller
                 'Redirect-To' => url('admin/ventas')
             ]);
         }
+    } */
+
+    public function save(SaleRequest $request)
+    {
+        abort_unless(
+            Gate::allows('view.quotations') || Gate::allows('create.quotations'),
+            403
+        );
+
+        $validated = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+
+            if (!$request->sale_id) {
+                $sale = new Sale;
+            } else {
+                $sale = Sale::findOrFail($request->sale_id);
+            }
+
+            $sale->user_id = $validated['client_id'];
+            $sale->comment = $validated['comment'] ?? null;
+            $sale->save();
+
+            $totals = $this->saveProducts($sale, $validated);
+
+            $sale->gross_amount = $request->gross_amount;
+            $sale->discount = $request->discounts;
+            $sale->total_sale_price = $totals['subtotal'];
+            $sale->iva = $totals['iva'];
+            $sale->total_with_iva = $totals['total'];
+
+            $formatter = new NumeroALetras();
+            $formatter->conector = 'Y';
+
+            $sale->letter = $formatter->toMoney(
+                $totals['total'],
+                2,
+                'pesos',
+                'centavos'
+            );
+
+            $sale->status = $this->savePayments($sale, $request);
+
+            $sale->save();
+
+            $this->handleSale($sale);
+
+            DB::commit();
+
+            alert(
+                !$request->sale_id
+                    ? 'Se ha creado la venta.'
+                    : 'Se ha actualizado la venta.'
+            );
+
+            return response('',204,[
+                'Redirect-To'=>url('admin/ventas')
+            ]);
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            report($e);
+
+            alert($e->getMessage(),'danger');
+
+            return response('',204,[
+                'Redirect-To'=>url('admin/ventas')
+            ]);
+        }
     }
 
-    public function order($id)
+    private function saveProducts(Sale $sale, array $validated)
     {
-        abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
+        SaleProduct::where('sale_id',$sale->id)->delete();
 
-        if (Auth::user()->isCustomer()) {
-            return redirect('admin/ventas');
+        $subtotal = 0;
+        $ivaTotal = 0;
+
+        foreach ($validated['products'] as $product) {
+
+            $quantity = (float)$product['quantity'];
+            $unitPrice = (float)$product['unit_price'];
+            $discount = (float)($product['discount'] ?? 0);
+            $iva = (float)($product['iva'] ?? 0);
+
+            $base = $quantity * $unitPrice;
+
+            $discounted = $base - ($base * $discount / 100);
+
+            $ivaAmount = $discounted * $iva / 100;
+
+            $subtotal += $discounted;
+            $ivaTotal += $ivaAmount;
+
+            SaleProduct::create([
+                'sale_id'        => $sale->id,
+                'product_id'     => $product['product_id'],
+                'quantity'       => $quantity,
+                'base_price'     => $unitPrice,
+                'discount'       => $discount,
+                'iva'            => $iva,
+                'subtotal'       => $discounted,
+                'total_with_iva' => $discounted + $ivaAmount,
+            ]);
         }
 
-        $sale = Sale::with([
-            'products.product.manufactured',
-            'user',
-            'payments'
-        ])->findOrFail($id);
-
-        $status = collect([
-            'accepted' => 'Aceptada',
-            'paid'     => 'Pagada',
-        ]);
-
-        $paid = collect([
-            '1' => 'Pagado',
-            '0' => 'No pagado',
-        ]);
-
-        $payments = Payment::pluck('name','id');
-
-        return view('admin.ventas.orden', compact('sale', 'status', 'paid', 'payments'));
-        
+        return [
+            'subtotal'=>$subtotal,
+            'iva'=>$ivaTotal,
+            'total'=>$subtotal + $ivaTotal
+        ];
     }
+
+    private function savePayments(Sale $sale, Request $request)
+    {
+        $status = 'paid';
+
+        $sale->payments()->detach();
+
+        for ($i = 1; $i <= $request->payments_count; $i++) {
+
+            if (!$request->input("payment{$i}_pago")) {
+                continue;
+            }
+
+            $paymentId = $request->input("payment{$i}_pago");
+
+            $sale->payments()->attach(
+                $paymentId,
+                [
+                    'cost' => $request->input("payment{$i}_cost", 0)
+                ]
+            );
+
+            // Crédito Simonel
+            if ($paymentId == 9) {
+                $status = 'credit';
+            }
+        }
+
+        if ($status == 'paid') {
+            $sale->is_paid = 1;
+            $sale->finish_date = now()->format('Y-m-d');
+        } else {
+            $sale->is_paid = 0;
+            $sale->finish_date = null;
+        }
+
+        $sale->status = $status;
+
+        return $status;
+    }
+
+    private function handleSale(Sale $sale)
+    {
+        foreach ($sale->products as $saleProduct) {
+
+            $remaining = $saleProduct->quantity;
+
+            $lots = ProductLot::where('product_id',$saleProduct->product_id)
+                ->where('available_quantity','>',0)
+                ->where('status','Disponible')
+                ->orderBy('production_date')
+                ->orderBy('id')
+                ->get();
+
+            $available = $lots->sum('available_quantity');
+
+            if ($available < $remaining) {
+
+                throw new \Exception(
+                    'No hay existencia suficiente de '
+                    .$saleProduct->product->name.
+                    '. Disponible: '.number_format($available,3).
+                    ', Solicitado: '.number_format($remaining,3)
+                );
+            }
+
+            foreach ($lots as $lot) {
+
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $consume = min($remaining,$lot->available_quantity);
+
+                SaleProductLot::create([
+                    'sale_product_id'=>$saleProduct->id,
+                    'product_lot_id'=>$lot->id,
+                    'quantity'=>$consume,
+                ]);
+
+                $lot->available_quantity -= $consume;
+                $lot->total_cost = $lot->available_quantity * $lot->cost_per_unit;
+
+                if ($lot->available_quantity <= 0) {
+                    $lot->available_quantity = 0;
+                    $lot->status = 'Agotado';
+                }
+
+                $lot->save();
+
+                $remaining -= $consume;
+            }
+        }
+    }
+
+    
 
     public function orderupdate(OrderRequest $request, $id)
     {
@@ -363,7 +621,7 @@ class SaleController extends Controller
     }
     
 
-    private function handleAcceptedSale(Sale $sale, $request)
+    /* private function handleAcceptedSale(Sale $sale, $request)
     {
         if ($sale->status !== 'accepted') {
             return;
@@ -424,7 +682,7 @@ class SaleController extends Controller
         }
 
         $sale->save();
-    }
+    } */
 
     public function edit($id)
     {

@@ -231,9 +231,14 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _main_components_forms_base_BaseForm_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../main/components/forms/base/BaseForm.vue */ "./resources/js/main/components/forms/base/BaseForm.vue");
+/* harmony import */ var _main_components_forms_order_status_form_PaymentForm_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../main/components/forms/order-status-form/PaymentForm.vue */ "./resources/js/main/components/forms/order-status-form/PaymentForm.vue");
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   "extends": _main_components_forms_base_BaseForm_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+  components: {
+    PaymentForm: _main_components_forms_order_status_form_PaymentForm_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
   props: {
     products: {
       type: Array,
@@ -250,6 +255,18 @@ __webpack_require__.r(__webpack_exports__);
     sale: {
       type: Object,
       "default": null
+    },
+    payment: {
+      required: true,
+      type: Number
+    },
+    minPayment: {
+      required: true,
+      type: Number
+    },
+    paymentsData: {
+      required: true,
+      type: [Array, Object]
     }
   },
   data: function data() {
@@ -259,7 +276,8 @@ __webpack_require__.r(__webpack_exports__);
         products: [],
         comment: null,
         discounts: null,
-        gross_amount: null
+        gross_amount: null,
+        payments_count: this.minPayment
       },
       errors: []
     };
@@ -341,13 +359,24 @@ __webpack_require__.r(__webpack_exports__);
       this.errors.push({});
     },
     removeRow: function removeRow(index) {
+      var _this = this;
       if (index === 0 || this.fields.products.length === 1) {
         return;
       }
       this.fields.products.splice(index, 1);
       this.errors.splice(index, 1);
+      this.$nextTick(function () {
+        _this.updateFirstPayment();
+      });
+    },
+    updateFirstPayment: function updateFirstPayment() {
+      if (this.fields.payment1_cost === undefined) {
+        return;
+      }
+      this.fields.payment1_cost = this.totalGeneral.toFixed(2);
     },
     onProductSelected: function onProductSelected(index, productId) {
+      var _this2 = this;
       var product = this.fields.products[index];
       product.product_id = productId;
       var selectedProduct = this.products.find(function (p) {
@@ -359,6 +388,9 @@ __webpack_require__.r(__webpack_exports__);
         product.unit_price = 0;
       }
       this.updateSubtotal(index);
+      this.$nextTick(function () {
+        _this2.updateFirstPayment();
+      });
     },
     calculateSubtotal: function calculateSubtotal(product) {
       var base = product.quantity * product.unit_price;
@@ -366,8 +398,12 @@ __webpack_require__.r(__webpack_exports__);
       return base - discount;
     },
     updateSubtotal: function updateSubtotal(index) {
+      var _this3 = this;
       var product = this.fields.products[index];
       product.subtotal = this.calculateSubtotal(product);
+      this.$nextTick(function () {
+        _this3.updateFirstPayment();
+      });
     },
     validateProducts: function validateProducts() {
       var valid = true;
@@ -384,6 +420,47 @@ __webpack_require__.r(__webpack_exports__);
         return rowErrors;
       });
       return valid;
+    },
+    /**
+     * Copy all author's fields from one card to another.
+     *
+     * @param {Integer} source
+     * @param {Integer} target
+     */
+    copyPaymentFields: function copyPaymentFields(source, target) {
+      var regex = new RegExp('^payment' + source + '_');
+      this.deleteAuthorFields(target);
+      for (var field in this.fields) {
+        if (regex.test(field)) {
+          this.$set(this.fields, field.replace(source, target), this.fields[field]);
+        }
+      }
+    },
+    /**
+     * Delete all fields for the given author.
+     *
+     * @param {Integer} index
+     */
+    deletePaymentFields: function deletePaymentFields(index) {
+      var regex = new RegExp('^payment' + index + '_');
+      for (var field in this.fields) {
+        if (regex.test(field)) {
+          delete this.fields[field];
+        }
+      }
+    },
+    /**
+     * Copy all necessary author fields to move their index
+     * and then remove the last card.
+     *
+     * @param {Integer} index
+     */
+    removePayments: function removePayments(index) {
+      for (var i = 0; i < this.fields.payments_count - index; i++) {
+        this.copyPaymentFields(index + i + 1, index + i);
+      }
+      this.fields.payments_count--;
+      this.deletePaymentFields(this.fields.payments_count + 1);
     }
   }
 });
@@ -478,6 +555,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ __webpack_exports__["default"] = ({
   "extends": _main_components_forms_base_BaseForm_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
   props: {
+    sellers: {
+      required: true,
+      type: [Array, Object]
+    },
+    isAdmin: {
+      type: Boolean,
+      "default": false
+    },
     user: {
       required: true,
       type: [Array, Object]
@@ -1262,10 +1347,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     clients: {
       required: true,
       type: [Array, Object]
-    },
-    products: {
-      required: true,
-      type: [Array, Object]
     }
   },
   data: function data() {
@@ -1320,6 +1401,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       return this.clienteTipo === 'mayorista';
     },
     productsOptions: function productsOptions() {
+      console.log(this.pendingProducts);
       if (!this.esMayorista) return this.pendingProducts;
       if (this.fields.type === 'entrada') {
         return this.pendingProducts;
@@ -4356,7 +4438,7 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     },
     errors: {
-      type: Object,
+      type: [Object, Array],
       required: true
     },
     fields: {
@@ -5739,6 +5821,44 @@ var render = function render() {
       colspan: "2"
     }
   }, [_vm._v("\n                        $" + _vm._s(_vm.totalGeneral.toFixed(4)) + "\n                    ")])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_vm._l(_vm.fields.payments_count, function (i) {
+    return _c("PaymentForm", {
+      key: i,
+      attrs: {
+        index: i,
+        "min-payment": _vm.minPayment,
+        "payments-data": _vm.paymentsData,
+        "assigned-payments": [],
+        errors: _vm.errors,
+        fields: _vm.fields
+      },
+      on: {
+        removeP: _vm.removePayments
+      }
+    });
+  }), _vm._v(" "), _c("p", {
+    staticClass: "pt-4"
+  }, [_vm.fields.payments_count < _vm.payment ? _c("button", {
+    staticClass: "btn btn--light mr-4",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.fields.payments_count++;
+      }
+    }
+  }, [_c("img", {
+    staticClass: "mr-1 align-top",
+    attrs: {
+      src: _vm.$root.path + "/img/svg/plus-circle-primary.svg",
+      alt: "",
+      width: "20px"
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "align-top"
+  }, [_vm._v("Agregar metodo de pago")])]) : _vm._e(), _vm._v(" "), _vm.payment > 1 ? _c("span", [_vm._v(" Puedes registrar a un máximo de " + _vm._s(_vm.payment) + " métodos de pago.")]) : _c("span", [_vm._v(" Puedes registrar únicamente un método de pago.")])])], 2), _vm._v(" "), _c("div", {
     staticClass: "form-control"
   }, [_c("label", {
     attrs: {
@@ -6018,7 +6138,34 @@ var render = function render() {
     attrs: {
       name: "email"
     }
-  })], 1)])])]), _vm._v(" "), _c("section", {
+  })], 1)])]), _vm._v(" "), _vm.isAdmin ? _c("div", {
+    staticClass: "row mb-2"
+  }, [_c("div", {
+    staticClass: "col-1/2"
+  }, [_c("div", {
+    staticClass: "form-control"
+  }, [_c("label", {
+    attrs: {
+      "for": "seller_id"
+    }
+  }, [_vm._v("Asignar vendedor")]), _vm._v(" "), _c("select-field", {
+    attrs: {
+      name: "seller_id",
+      options: _vm.sellers,
+      initial: _vm.user.seller_id || ""
+    },
+    model: {
+      value: _vm.fields.seller_id,
+      callback: function callback($$v) {
+        _vm.$set(_vm.fields, "seller_id", $$v);
+      },
+      expression: "fields.seller_id"
+    }
+  }), _vm._v(" "), _c("field-errors", {
+    attrs: {
+      name: "seller_id"
+    }
+  })], 1)])]) : _vm._e()]), _vm._v(" "), _c("section", {
     staticClass: "db-panel mb-16"
   }, [_c("h3", {
     staticClass: "db-panel__title"

@@ -16,25 +16,33 @@ class CustomerController extends Controller
 {
     public function index()
     {
-       abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
+        abort_unless(
+            Gate::allows('view.customers') || Gate::allows('create.customers'),
+            403
+        );
 
         $search = request('search');
 
         $users = Customer::with([
-            'user' => function ($query) {
-                $query->withCount('sales');
-            }
-        ])
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('business_name', 'LIKE', "%{$search}%")
-                ->orWhere('rfc', 'LIKE', "%{$search}%")
-                ->orWhere('trade_name', 'LIKE', "%{$search}%")
-                ->orWhere('phone', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%");
-            });
-        })
-        ->get();
+                'user' => function ($query) {
+                    $query->withCount('sales');
+                }
+            ])
+            ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('seller_id', Auth::id());
+                });
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('business_name', 'LIKE', "%{$search}%")
+                        ->orWhere('rfc', 'LIKE', "%{$search}%")
+                        ->orWhere('trade_name', 'LIKE', "%{$search}%")
+                        ->orWhere('phone', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
+            ->get();
 
         return view('admin.clientes.index', compact('users'));
     }
@@ -44,7 +52,14 @@ class CustomerController extends Controller
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
 
-        return view('admin.clientes.crear');
+        $isSuperAdmin = auth()->user()->isSuperAdmin();
+        $sellers = User::whereHas('role', function ($query) {
+            $query->where('key_name', 'superadmin');
+        })
+        ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
+        ->orderBy('name')
+        ->pluck('full_name', 'id');
+        return view('admin.clientes.crear', compact('isSuperAdmin', 'sellers'));
     }
 
 
@@ -57,6 +72,13 @@ class CustomerController extends Controller
         } else {
             $user = User::find($request->user_id);
         }
+
+        $seller_id = Auth::id();
+
+        if (Auth::user()->isSuperAdmin() && $request->filled('seller_id')) {
+            $seller_id = $request->seller_id;
+        }
+
         $user->name    = $request->business_name;
         $user->email   = $request->email;
         $user->role_id = 2;
@@ -67,6 +89,7 @@ class CustomerController extends Controller
         } else {
             $customer = Customer::find($request->customer_id);
         }
+
         $customer->user_id       = $user->id;
         $customer->business_name = $request->business_name;
         $customer->rfc           = $request->rfc;
@@ -86,6 +109,7 @@ class CustomerController extends Controller
         $customer->population      = $request->population;
         $customer->colony          = $request->colony;
         $customer->postal_code     = $request->postal_code;
+        $customer->seller_id = $seller_id;
         $customer->save();
 
         if ($request->customer_id == null) {

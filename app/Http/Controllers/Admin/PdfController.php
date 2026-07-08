@@ -17,52 +17,52 @@ class PdfController extends Controller
 
 
     public function customers(Request $request, $id)
-{
-    $user = User::with('customer')->findOrFail($id);
+    {
+        $user = User::with('customer')->findOrFail($id);
 
-    $dateNow = Carbon::now();
+        $dateNow = Carbon::now();
 
-    $start_date = $request->start_date
-        ?: $dateNow->copy()->subDays(5)->format('Y-m-d');
+        $start_date = $request->start_date
+            ?: $dateNow->copy()->subDays(5)->format('Y-m-d');
 
-    $end_date = $request->end_date
-        ?: $dateNow->format('Y-m-d');
+        $end_date = $request->end_date
+            ?: $dateNow->format('Y-m-d');
 
-    $salesQuery = $user->sales()
-    ->with(['products.product.manufactured', 'customer'])
-    ->where('status', 'paid')
-    ->orderBy('created_at', 'desc');
+        $salesQuery = $user->sales()
+        ->with(['products.product.manufactured', 'customer'])
+        ->where('status', 'paid')
+        ->orderBy('created_at', 'desc');
 
-    $salesQuery->whereBetween('created_at', [
-        Carbon::parse($start_date)->startOfDay(),
-        Carbon::parse($end_date)->endOfDay()
-    ]);
+        $salesQuery->whereBetween('created_at', [
+            Carbon::parse($start_date)->startOfDay(),
+            Carbon::parse($end_date)->endOfDay()
+        ]);
 
-    $sales = $salesQuery->get();
+        $sales = $salesQuery->get();
 
-    // 🧠 MAPEAR PRODUCTOS DESDE SALEPRODUCT
-    $sales->each(function ($sale) {
+        // 🧠 MAPEAR PRODUCTOS DESDE SALEPRODUCT
+        $sales->each(function ($sale) {
 
-        $sale->products_list = $sale->products
-            ->map(function ($sp) {
-                return ($sp->product->manufactured->name ?? 'Sin producto');
-            })
-            ->implode(', ');
-    });
+            $sale->products_list = $sale->products
+                ->map(function ($sp) {
+                    return ($sp->product->manufactured->name ?? 'Sin producto');
+                })
+                ->implode(', ');
+        });
 
-    $totalGeneral = $sales->sum('total_with_iva');
+        $totalGeneral = $sales->sum('total_with_iva');
 
-    $pdf = PDF::loadView('admin.pdf.customer_sales', [
-        'user' => $user,
-        'customer' => $user->customer,
-        'sales' => $sales,
-        'totalGeneral' => $totalGeneral,
-        'start_date' => $start_date,
-        'end_date' => $end_date
-    ]);
+        $pdf = PDF::loadView('admin.pdf.customer_sales', [
+            'user' => $user,
+            'customer' => $user->customer,
+            'sales' => $sales,
+            'totalGeneral' => $totalGeneral,
+            'start_date' => $start_date,
+            'end_date' => $end_date
+        ]);
 
-    return $pdf->stream("user-{$user->id}.pdf");
-}
+        return $pdf->stream("user-{$user->id}.pdf");
+    }
 
     public function pdfSale($id)
     {

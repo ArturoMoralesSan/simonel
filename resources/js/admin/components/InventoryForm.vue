@@ -289,7 +289,6 @@ export default {
 
     props: {
         clients: { required: true, type: [Array, Object] },
-        products: { required: true, type: [Array, Object] },
     },
 
     data() {
@@ -353,6 +352,8 @@ export default {
         },
 
         productsOptions() {
+            console.log(this.pendingProducts);
+            
             if (!this.esMayorista) return this.pendingProducts;
 
             if (this.fields.type === 'entrada') {

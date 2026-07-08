@@ -63,7 +63,7 @@
             },
 
             errors: {
-                type: Object,
+                type: [Object, Array],
                 required: true
             },
 

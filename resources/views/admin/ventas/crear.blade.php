@@ -25,6 +25,9 @@
         <add-products-form
             :products="{{ $products }}"
             :users="{{ json_encode($users) }}"
+            :payment="4"
+            :min-payment="1"
+            :payments-data="{{ $payments }}"
             action="{{ url('admin/ventas/crear') }}"
             
         ></add-products-form>

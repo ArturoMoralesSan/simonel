@@ -299,7 +299,7 @@
 
 
 @php
-    $rows = max(0, 10 - $sale->products->count());
+    $rows = max(0, 7 - $sale->products->count());
 @endphp
 
 @for($i = 0; $i < $rows; $i++)
@@ -400,12 +400,51 @@
 </tr>
 
 </table>
+<table style="width:100%; margin-top:15px; border-collapse:collapse;">
+
+    <tr>
+        <td colspan="2" style="border:1px solid #000; background:#efefef;">
+            <strong>Detalle de pagos</strong>
+        </td>
+    </tr>
+
+
+    @foreach($sale->payments as $payment)
+
+    <tr>
+
+        <td style="border:1px solid #000; width:70%;">
+            {{ $payment->name }}
+        </td>
+
+        <td style="border:1px solid #000; width:30%; text-align:right;">
+            $ {{ number_format($payment->pivot->cost,2) }}
+        </td>
+
+    </tr>
+
+    @endforeach
+
+</table>
+@php
+    $credito = $sale->payments->firstWhere('key_name', 'credito-simonel');
+    $saldoCredito = $credito ? $credito->pivot->cost : 0;
+@endphp
+
+@if($credito)
+
+
 <div class="footer">
 
     <p style="text-align:justify; line-height:16px;">
 
-        Por este pagaré me obligo(amos) a pagar incondicionalmente la cantidad
-        indicada en esta nota de venta a favor de <strong>SIMONEL</strong>,
+        Por este pagaré me obligo(amos) a pagar incondicionalmente la cantidad de
+
+        <strong>
+            $ {{ number_format($saldoCredito,2) }}
+        </strong>
+
+        a favor de <strong>SIMONEL</strong>,
         reconociendo haber recibido la mercancía descrita anteriormente a mi
         entera satisfacción.
 
@@ -415,7 +454,6 @@
     </p>
 
 </div>
-
 
 <table style="width:100%; margin-top:55px;">
 
@@ -427,6 +465,7 @@
         </td>
     </tr>
 </table>
+@endif
 
 <div style="margin-top:25px; text-align:center; font-size:9px; color:#666;">
     Documento generado automáticamente el

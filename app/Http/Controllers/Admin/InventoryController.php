@@ -16,6 +16,7 @@ use App\Models\SaleProduct;
 use App\Models\Sale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Auth;
 
 class InventoryController extends Controller
 {
@@ -47,20 +48,18 @@ class InventoryController extends Controller
             sale_products.product_id,
             CONCAT(
                 manufactured_products.name,
-                ' ',
-                manufactured_products.description,
                 ' (Venta #',
                 sales.id,
                 ' - ',
                 sale_products.quantity,
-                ' kg)'
+                ')'
             ) as name
         ")
         ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
         ->join('products', 'products.id', '=', 'sale_products.product_id')
         ->join('manufactured_products', 'manufactured_products.id', '=', 'products.manufactured_product_id')
         ->where('sales.user_id', $clientId)
-        ->where('sales.status', 'paid')
+        ->whereIn('sales.status', ['paid', 'credit'])        
         ->orderBy('manufactured_products.name')
         ->pluck('name', 'product_id');
 
@@ -71,11 +70,10 @@ class InventoryController extends Controller
         ")
         ->join('sales', 'sales.id', '=', 'sale_products.sale_id')
         ->where('sales.user_id', $clientId)
-        ->where('sales.status', 'paid')
+        ->whereIn('sales.status', ['paid', 'credit'])
         ->get()
         ->keyBy('product_id');
         $customer = User::with('customer')->findOrFail($clientId);
-
         return response()->json([
             'inventory' => $inventory,
             'movementsEntradas' => $movementsEntradas,
@@ -168,40 +166,55 @@ class InventoryController extends Controller
     
     public function index()
     {
-        abort_unless(Gate::allows('view.inventories') || Gate::allows('create.inventories'), 403);
+        abort_unless(
+            Gate::allows('view.inventories') || Gate::allows('create.inventories'),
+            403
+        );
 
         $search = request('search');
 
-        // 1. Usuarios que tienen inventarios
-        $query = User::whereHas('inventories');
+        $query = User::whereHas('inventories')
+        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+            $query->whereHas('customer', function ($q) {
+                $q->whereHas('user', function ($u) {
+                    $u->where('seller_id', Auth::id());
+                });
+            });
+        });
 
-        // 2. Búsqueda
         if ($search) {
-            $query->where('name', 'LIKE', "%$search%");
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('last_name', 'LIKE', "%{$search}%");
+            });
         }
 
-        // 3. Paginar clientes/usuarios
         $paginatedClients = $query->paginate(10);
 
-        // 4. Formatear items
-        $inventoriesItems = $paginatedClients->map(function ($user) {
+        $inventoriesItems = $paginatedClients->through(function ($user) {
 
-            $inventories = $user->inventories()->with('product.manufactured')->get();
+            $inventories = $user->inventories()
+                ->with('product.manufactured')
+                ->get();
 
             return [
                 'client' => $user,
                 'count' => $inventories->count(),
                 'inventories' => $inventories->map(function ($inv) {
-                    return $inv->product->manufactured->name
-                        . ' ('
-                        . $inv->product->manufactured->description. ')';
+                    return $inv->product->manufactured->name .
+                        ' (' .
+                        $inv->product->manufactured->description .
+                        ')';
                 })->implode(', '),
             ];
         });
 
         $links = $paginatedClients->links('layout.pagination');
 
-        return view('admin.inventario.index', compact('inventoriesItems', 'links'));
+        return view('admin.inventario.index', compact(
+            'inventoriesItems',
+            'links'
+        ));
     }
 
     
@@ -235,6 +248,7 @@ class InventoryController extends Controller
             'clienteTipo'
         ));
     }
+
     public function create()
     {
         abort_unless(
@@ -242,26 +256,19 @@ class InventoryController extends Controller
             403
         );
 
-        $labels = [
-            'entradas' => 'Entradas',
-            'salidas'  => 'Salidas',
-            'Resumen'  => 'Resumen',
-        ];
-
-        $users = Customer::selectRaw("
-            CONCAT(trade_name, ' (', business_name,')') as full_name,
+        $users = Customer::when(!Auth::user()->isSuperAdmin(), function ($query) {
+            $query->whereHas('user', function ($q) {
+                $q->where('seller_id', Auth::id());
+            });
+        })
+        ->selectRaw("
+            CONCAT(trade_name, ' (', business_name, ')') as full_name,
             user_id
-        ")->pluck('full_name', 'user_id');
-
-        $products = Product::with('manufactured')
-            ->get()
-            ->sortBy(fn($p) => optional($p->manufactured)->name)
-            ->values();
+        ")
+        ->pluck('full_name', 'user_id');
 
         return view('admin.inventario.crear', compact(
-            'users',
-            'labels',
-            'products'
+         'users'
         ));
     }
 
