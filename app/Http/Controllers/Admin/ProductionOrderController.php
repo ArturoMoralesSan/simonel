@@ -336,10 +336,7 @@ class ProductionOrderController extends Controller
     
     public function edit($id)
     {
-        abort_unless(
-            Gate::allows('view.roles') || Gate::allows('create.roles'),
-            403
-        );
+        abort_unless(Gate::allows('view.productionorders') || Gate::allows('create.productionorders'), 403);
 
         $order = ProductionOrder::with([
             'products',
