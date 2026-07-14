@@ -27,7 +27,7 @@
             </div>
             <div class="md:col-1/2 sm:col">
                 <div class="form-control">
-                    <label for="cost">Monto</label>
+                    <label for="cost">Monto<span class="description">($)</span></label>
                     <text-field 
                         class="field-get-researcher" 
                         :name="'payment' + index + '_cost'" 

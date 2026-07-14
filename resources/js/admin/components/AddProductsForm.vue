@@ -28,7 +28,7 @@
                 <tr>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Precio unitario</th>
+                    <th>Precio unitario <span class="description">($)</span></th>
                     <th>Descuento <span class="description">(%)</span></th>
                     <!-- <th>IVA (%)</th> -->
                     <th>Subtotal</th>
@@ -76,8 +76,9 @@
 
                     <!-- Precio unitario -->
                     <td>
+                        {{ Number(product.unit_price).toFixed(2) }}
                         <text-field
-                        type="number"
+                        type="hidden"
                         v-model.number="product.unit_price"
                         :name="`products[${index}][unit_price]`"
                         step="0.0001"

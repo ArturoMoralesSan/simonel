@@ -24,7 +24,7 @@
         
         <product-recipe-form 
             action="{{ url('admin/recetas/crear') }}"
-            :item="4"
+            :item="20"
             :min-item="1"
             :products="{{ $products }}"
             :materials-data="{{ $rawmaterials }}"

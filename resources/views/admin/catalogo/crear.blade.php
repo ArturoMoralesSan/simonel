@@ -19,7 +19,7 @@
         <p class="mb-12">
             @include('components.alert')
             <span class="color-link">«</span>
-            <a href="{{ url('admin/catalogo de productoss/') }}">Ver todo el catálogo de productos</a>
+            <a href="{{ url('admin/catalogo/') }}">Ver todo el catálogo de productos</a>
         </p>
 
             <base-form action="{{ url('admin/catalogo/crear') }}"

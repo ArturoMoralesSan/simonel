@@ -29,7 +29,7 @@
 
         <product-order-form 
             action="{{ url('admin/produccion/crear') }}"
-            :item="10"
+            :item="20"
             :min-item="1"
             :recipes="{{ $recipes }}"
             :status="{{ $statusLabels }}"

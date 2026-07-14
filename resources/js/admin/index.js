@@ -38,6 +38,7 @@ import TagCalculator from './components/TagCalculator.vue';
 import InventoryForm from './components/InventoryForm.vue';
 import InventoryProductForm from './components/InventoryProductForm.vue';
 import AddProductsForm from './components/AddProductsForm.vue';
+import RoleSelect from './components/RoleSelect.vue';
 
 
 (function() {
@@ -86,6 +87,7 @@ import AddProductsForm from './components/AddProductsForm.vue';
     Vue.component('product-recipe-form', ProductRecipeForm);
     Vue.component('material-purchase-form', MaterialPurchaseForm);
     Vue.component('product-order-form', ProductionOrderForm);
+    Vue.component('role-select', RoleSelect);
     
 
 

@@ -118,6 +118,7 @@
                                 <div class="form-control">
                                     <label>Cantidad</label>
                                     <text-field
+                                        :disabled="fields.type === 'entrada'"
                                         :name="'inventory' + index + '_quantity'"
                                         v-model="fields['inventory' + index + '_quantity']"
                                         type="number"

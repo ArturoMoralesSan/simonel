@@ -57,6 +57,9 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('notas/{id}', [PdfController::class, 'pdfSale']);
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], function() {
+
+    Route::post('cambiar-rol', [DashboardController::class, 'switchRole'])->name('admin.switch-role');
+
     Route::get('/', [DashboardController::class, 'index']);
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);

@@ -30,7 +30,7 @@
         <product-order-form 
             action="{{ url('admin/produccion/'. $order->id .'/actualizar') }}"
             method="put"
-            :item="10"
+            :item="20"
             :min-item="1"
             :recipes="{{ $recipes }}"
             :status="{{ $statusLabels }}"

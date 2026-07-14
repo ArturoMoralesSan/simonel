@@ -24,6 +24,22 @@ class DashboardController extends Controller
         $this->service = $service;
     }
 
+
+
+    public function switchRole(Request $request)
+    {
+        $user = Auth::user();
+
+        $user->role_id = $request->role_id;
+        $user->save();
+
+        Auth::login($user->fresh());
+
+        return response('', 204, [
+            'Redirect-To' => url('admin')
+        ]);
+    }
+
     public function index()
     {
         $this->service->checkProductExpiry();

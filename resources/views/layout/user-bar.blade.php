@@ -33,6 +33,13 @@
                 </a>
             </div>
             <div class="d-flex items-center">
+                <role-select
+                    name="role_id"
+                    url="{{ url('admin/cambiar-rol') }}"
+                    selected="{{ auth()->user()->role_id }}"
+                    :options="{{ $rolesSelect }}"
+                >
+                </role-select>
                 <notifications></notifications>
 
                 <div class="user-bar__profile" @mouseenter="profileMenuVisible = true" @mouseleave="profileMenuVisible = false">

@@ -307,6 +307,10 @@ class SaleController extends Controller
 
         try {
 
+            // Validar disponibilidad de productos antes de crear la venta
+            $this->validateProductsStock($validated);
+
+
             if (!$request->sale_id) {
                 $sale = new Sale;
             } else {
@@ -317,13 +321,16 @@ class SaleController extends Controller
             $sale->comment = $validated['comment'] ?? null;
             $sale->save();
 
+
             $totals = $this->saveProducts($sale, $validated);
+
 
             $sale->gross_amount = $request->gross_amount;
             $sale->discount = $request->discounts;
             $sale->total_sale_price = $totals['subtotal'];
             $sale->iva = $totals['iva'];
             $sale->total_with_iva = $totals['total'];
+
 
             $formatter = new NumeroALetras();
             $formatter->conector = 'Y';
@@ -335,13 +342,17 @@ class SaleController extends Controller
                 'centavos'
             );
 
+
             $sale->status = $this->savePayments($sale, $request);
 
             $sale->save();
 
+
             $this->handleSale($sale);
 
+
             DB::commit();
+
 
             alert(
                 !$request->sale_id
@@ -352,6 +363,7 @@ class SaleController extends Controller
             return response('',204,[
                 'Redirect-To'=>url('admin/ventas')
             ]);
+
 
         } catch (\Throwable $e) {
 
@@ -364,6 +376,53 @@ class SaleController extends Controller
             return response('',204,[
                 'Redirect-To'=>url('admin/ventas')
             ]);
+        }
+    }
+
+    private function validateProductsStock($validated)
+    {
+        foreach ($validated['products'] as $item) {
+
+            $product = Product::find($item['product_id']);
+
+            if (!$product) {
+                throw new \Exception("El producto no existe.");
+            }
+
+
+            $lot = ProductLot::where('product_id', $product->id)
+                ->where('available_quantity', '>', 0)
+                ->where(function ($query) {
+                    $query->whereNull('expiration_date')
+                        ->orWhereDate('expiration_date', '>=', now());
+                })
+                ->orderBy('expiration_date', 'asc')
+                ->first();
+
+
+            if (!$lot) {
+
+                $name = $product->manufactured
+                    ? $product->manufactured->name
+                    : $product->name;
+
+                throw new \Exception(
+                    "No hay lote disponible para '{$name}'. " .
+                    "El producto no tiene stock o sus lotes están caducados."
+                );
+            }
+
+            if ($lot->available_quantity < $item['quantity']) {
+
+                $name = $product->manufactured
+                    ? $product->manufactured->name
+                    : $product->name;
+
+                throw new \Exception(
+                    "Stock insuficiente para '{$name}'. " .
+                    "Disponible: {$lot->available_quantity}, solicitado: {$item['quantity']}."
+                );
+            }
         }
     }
 

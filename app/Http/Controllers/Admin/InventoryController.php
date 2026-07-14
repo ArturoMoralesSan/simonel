@@ -189,9 +189,9 @@ class InventoryController extends Controller
             });
         }
 
-        $paginatedClients = $query->paginate(10);
+        $paginatedClients = $query->paginate(10)->appends(request()->all());
 
-        $inventoriesItems = $paginatedClients->through(function ($user) {
+        $inventoriesItems = collect($paginatedClients->items())->transform(function ($user) {
 
             $inventories = $user->inventories()
                 ->with('product.manufactured')
@@ -200,12 +200,9 @@ class InventoryController extends Controller
             return [
                 'client' => $user,
                 'count' => $inventories->count(),
-                'inventories' => $inventories->map(function ($inv) {
-                    return $inv->product->manufactured->name .
-                        ' (' .
-                        $inv->product->manufactured->description .
-                        ')';
-                })->implode(', '),
+                'inventories' => $inventories
+                    ->map(fn ($inv) => $inv->product->manufactured->name)
+                    ->implode(', '),
             ];
         });
 

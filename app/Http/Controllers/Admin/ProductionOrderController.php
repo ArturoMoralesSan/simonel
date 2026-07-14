@@ -55,7 +55,7 @@ class ProductionOrderController extends Controller
         ]);
 
         $statusLabels = [
-            'creada'      => 'Borradores',
+            'creada'      => 'Pre ordenadas',
             'autorizada'  => 'Autorizadas',
             'produccion'  => 'En producción',
             'finalizada'  => 'Finalizadas',
@@ -134,7 +134,7 @@ class ProductionOrderController extends Controller
     {
         abort_unless(Gate::allows('view.productionorders') || Gate::allows('create.productionorders'), 403);
 
-        $order = ProductionOrder::with(['products.manufactured', 'products.recipe.items.rawMaterial', 'items.rawMaterial','authorizer'
+        $order = ProductionOrder::with(['products', 'items.rawMaterial','authorizer'
 
         ])->findOrFail($id);
 
@@ -342,8 +342,7 @@ class ProductionOrderController extends Controller
         );
 
         $order = ProductionOrder::with([
-            'products.manufactured',
-            'products.recipe',
+            'products',
             'items.rawMaterial'
         ])->findOrFail($id);
 
@@ -973,7 +972,7 @@ class ProductionOrderController extends Controller
             */
             if ($oldStatus !== 'Finalizada' && $request->status === 'Finalizada') {
 
-            $warehouse = Warehouse::where('warehouse_type', 'Productos terminados')->firstOrFail();
+                $warehouse = Warehouse::where('warehouse_type', 'Productos terminados')->firstOrFail();
 
                 $productionOrder->load('products.manufactured');
 
@@ -987,8 +986,13 @@ class ProductionOrderController extends Controller
                         '-' . str_pad($productionOrder->id, 5, '0', STR_PAD_LEFT) .
                         '-' . $product->id;
 
-                    
+                    if (!$product->manufactured || !$product->manufactured->product) {
+                        throw new \Exception(
+                            "El producto fabricado {$product->manufactured->name} requiere un producto de venta para crear el lote de producto terminado."
+                        );
+                    }
                     $productid = $product->manufactured->product->id;
+                    
                     
                     ProductLot::create([
                         'product_id' => $productid,
@@ -1016,7 +1020,7 @@ class ProductionOrderController extends Controller
             ]);
 
         } catch (\Exception $e) {
-
+            
             DB::rollBack();
 
             alert($e->getMessage(), 'danger');
