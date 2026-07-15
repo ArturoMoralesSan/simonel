@@ -15,4 +15,14 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class)->withTrashed();
     }
+
+    public function creditSetting()
+    {
+        return $this->hasOne(CustomerCreditSetting::class);
+    }
+
+    public function creditAuthorizations()
+    {
+        return $this->hasMany(CustomerCreditAuthorization::class);
+    }
 }

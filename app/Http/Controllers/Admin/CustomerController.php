@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserCustomerRequest;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\CustomerCreditSetting;
 use Illuminate\Support\Facades\Gate;
 use Hash;
 use Auth;
 use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -112,6 +114,23 @@ class CustomerController extends Controller
         $customer->seller_id = $seller_id;
         $customer->save();
 
+        if ($request->credit == 1) {
+
+        
+            CustomerCreditSetting::updateOrCreate(['customer_id' => $customer->id],
+                [
+                    'enabled' => $request->credit,
+                    'credit_limit' => $request->credit_limit,
+                    'credit_days'  => $request->credit_days,
+                    'block_on_debt' => 0,
+                    'authorized_by'  => Auth::id(),
+                    'authorized_at'=> Carbon::now()
+
+                ]
+            );
+
+        }
+
         if ($request->customer_id == null) {
             alert('Se ha agregado un cliente.');
         } else {
@@ -127,9 +146,18 @@ class CustomerController extends Controller
     {
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
-        $user  = Customer::find($id);
+        $user = Customer::with('creditSetting')->findOrFail($id);
+    
+        $isSuperAdmin = auth()->user()->isSuperAdmin();
 
-        return view('admin.clientes.editar', compact('user'));
+        $sellers = User::whereHas('role', function ($query) {
+            $query->where('key_name', 'superadmin');
+        })
+        ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
+        ->orderBy('name')
+        ->pluck('full_name', 'id');
+
+        return view('admin.clientes.editar', compact('user', 'isSuperAdmin', 'sellers'));
     }
 
     public function destroy($id)
