@@ -83,6 +83,85 @@
                 <span v-else> Puedes registrar únicamente un elemento.</span>
             </p>
         </div>
+
+        <div class="db-panel mb-4">
+            <h3 class="db-panel__title">
+                Despiece del combo
+            </h3>
+
+            <div class="row">
+
+                <div class="col">
+                    <div class="form-control">
+                        <label>Peso del combo recibido <span class="description">kg</span></label>
+
+                        <text-field
+                            name="combo_weight"
+                            type="number"
+                            step="0.0001"
+                            v-model="fields.combo_weight"
+                            :initial="orderData.combo_weight || ''"
+                            :disabled="isAuthorized"
+                        />
+
+                        <field-errors name="combo_weight"/>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div
+                    class="col md:col-auto"
+                    v-for="(yieldItem,index) in fields.yields"
+                    :key="index"
+                >
+
+                    <div class="form-control">
+
+                        <label>
+                            {{ yieldItem.type }} 
+                            <span class="description">
+                                {{ yieldItem.unit }}
+                            </span>
+                        </label>
+
+                        <div class="flex">
+
+                            <text-field
+                                type="number"
+                                step="0.0001"
+                                :name="'yields['+index+'][quantity]'"
+                                v-model="yieldItem.quantity"
+                                :initial="getYieldQuantity(yieldItem.type)"
+                                :disabled="isAuthorized"                            
+                                />
+                            <field-errors :name="'yields['+index+'][quantity]'"></field-errors>
+
+                            <input
+                                type="hidden"
+                                :name="'yields['+index+'][type]'"
+                                :value="yieldItem.type"
+                                :disabled="isAuthorized"
+                            />
+
+                            <input
+                                type="hidden"
+                                :name="'yields['+index+'][unit]'"
+                                :value="yieldItem.unit"
+                                :disabled="isAuthorized"
+                            />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
         <div class="md:row">
             <div class="md:col">
                 <div class="form-control">
@@ -144,8 +223,72 @@
                 currentDate: null,
                 firstTime: null,
                 fields: {
-                    item_count: this.minItem
-                }
+                    item_count: this.minItem,
+                    yields: [
+                        {
+                            type: 'carne',
+                            quantity: null,
+                            unit: 'kg'
+                        },
+                        {
+                            type: 'grasa',
+                            quantity: null,
+                            unit: 'kg'
+                        },
+                        {
+                            type: 'hueso',
+                            quantity: null,
+                            unit: 'kg'
+                        },
+                        {
+                            type: 'cuero',
+                            quantity: null,
+                            unit: 'kg'
+                        },
+                        {
+                            type: 'merma',
+                            quantity: null,
+                            unit: 'kg'
+                        },
+                        {
+                            type: 'desjugue',
+                            quantity: null,
+                            unit: '%'
+                        }
+                    ]
+                },
+                yieldTypes: [
+                    {
+                        key: 'carne',
+                        name: 'Carne',
+                        unit: 'kg'
+                    },
+                    {
+                        key: 'grasa',
+                        name: 'Grasa',
+                        unit: 'kg'
+                    },
+                    {
+                        key: 'hueso',
+                        name: 'Hueso',
+                        unit: 'kg'
+                    },
+                    {
+                        key: 'cuero',
+                        name: 'Cuero',
+                        unit: 'kg'
+                    },
+                    {
+                        key: 'merma',
+                        name: 'Merma',
+                        unit: 'kg'
+                    },
+                    {
+                        key: 'desjugue',
+                        name: 'Desjugue',
+                        unit: '%'
+                    }
+                ]
             };
         },
 
@@ -184,6 +327,22 @@
         },
         
         mounted() {
+            if (this.orderData.yields && this.orderData.yields.length) {
+
+                this.fields.yields.forEach(yieldItem => {
+
+                    const savedYield = this.orderData.yields.find(
+                        item => item.type === yieldItem.type
+                    );
+
+                    if (savedYield) {
+                        yieldItem.quantity = savedYield.quantity;
+                    }
+
+                });
+
+            }
+            
             if (this.assignedRecipes.length != 0) {
                 this.fields.item_count = this.assignedRecipes.length || this.minItem;
             }
@@ -202,6 +361,23 @@
         },
 
         methods: {
+            
+            
+
+            getYieldQuantity(type) {
+                
+                if (!this.orderData.yields) {
+                    return '';
+                }
+
+                const yieldData = this.orderData.yields.find(
+                    item => item.type === type
+                );
+
+                console.log(yieldData);
+                return yieldData ? yieldData.quantity : '';
+
+            },
             
 
             /**

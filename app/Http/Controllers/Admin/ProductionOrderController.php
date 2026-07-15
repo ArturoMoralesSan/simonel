@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ProductionOrder;
 use App\Models\ProductRecipe;
-
+use App\Models\ProductionOrderYield;
 use App\Models\ProductionOrderItem;
 use App\Models\ProductionOrderProduct;
 use App\Models\RawMaterialMovement;
@@ -70,7 +70,7 @@ class ProductionOrderController extends Controller
             ->where('status', $status)
             ->whereMonth('issue_date', $month)
             ->whereYear('issue_date', $year)
-            ->orderBy('issue_date', 'DESC');
+            ->orderBy('order_number', 'DESC');
 
             if ($search) {
 
@@ -204,6 +204,7 @@ class ProductionOrderController extends Controller
             $productionOrder->notes = $request->notes;
             $productionOrder->estimated_cost = 0;
             $productionOrder->active = 1;
+            $productionOrder->combo_weight = $request->combo_weight;
             $productionOrder->save();
 
             $rawMaterials = [];
@@ -312,6 +313,31 @@ class ProductionOrderController extends Controller
             $productionOrder->estimated_cost = $totalCost;
             $productionOrder->save();
 
+            /*
+            |--------------------------------------------------------------------------
+            | GUARDAR DESPIECE / YIELDS
+            |--------------------------------------------------------------------------
+            */
+            
+            if ($request->has('yields')) {
+                foreach ($request->yields as $yield) {
+
+                    if (
+                        empty($yield['quantity']) ||
+                        $yield['quantity'] <= 0
+                    ) {
+                        continue;
+                    }
+
+                    ProductionOrderYield::create([
+                        'production_order_id' => $productionOrder->id,
+                        'type' => $yield['type'],
+                        'quantity' => $yield['quantity'],
+                        'unit' => $yield['unit'],
+                    ]);
+                }
+            }
+
             DB::commit();
 
             alert('Se ha generado la orden de producción.');
@@ -340,8 +366,10 @@ class ProductionOrderController extends Controller
 
         $order = ProductionOrder::with([
             'products',
-            'items.rawMaterial'
+            'items.rawMaterial',
+            'yields'
         ])->findOrFail($id);
+
 
         /*
         |--------------------------------------------------------------------------
@@ -812,6 +840,7 @@ class ProductionOrderController extends Controller
             $productionOrder->delivery_date = $request->delivery_date;
             $productionOrder->status = $request->status;
             $productionOrder->notes = $request->notes;
+            $productionOrder->combo_weight = $request->combo_weight;
 
             if ($oldStatus !== 'Autorizada' && $request->status === 'Autorizada') {
                 $productionOrder->authorized_by = auth()->id();
@@ -827,6 +856,7 @@ class ProductionOrderController extends Controller
             */
             $productionOrder->products()->delete();
             $productionOrder->items()->delete();
+            $productionOrder->yields()->delete();
 
             $rawMaterials = [];
             $totalCost = 0;
@@ -892,6 +922,32 @@ class ProductionOrderController extends Controller
 
                 $productionProduct->estimated_cost = $productCost;
                 $productionProduct->save();
+
+                /*
+                |--------------------------------------------------------------------------
+                | GUARDAR DESPIECE / YIELDS
+                |--------------------------------------------------------------------------
+                */
+
+                if ($request->has('yields')) {
+
+                    foreach ($request->yields as $yield) {
+
+                        if (
+                            empty($yield['quantity']) ||
+                            $yield['quantity'] <= 0
+                        ) {
+                            continue;
+                        }
+
+                        ProductionOrderYield::create([
+                            'production_order_id' => $productionOrder->id,
+                            'type' => $yield['type'],
+                            'quantity' => $yield['quantity'],
+                            'unit' => $yield['unit'],
+                        ]);
+                    }
+                }
 
                 $totalCost += $productCost;
             }

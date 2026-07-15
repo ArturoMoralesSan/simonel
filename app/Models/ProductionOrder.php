@@ -47,4 +47,9 @@ class ProductionOrder extends Model
     {
         return $this->hasMany(ProductionLot::class, 'production_order_id');
     }
+
+    public function yields()
+    {
+        return $this->hasMany(ProductionOrderYield::class);
+    }
 }

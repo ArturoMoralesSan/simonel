@@ -1,6 +1,6 @@
 <template>
-    <div class="box box--lg bg-white b-1 rounded relative">
-        <h3>
+     <div class="db-panel mb-4">
+        <h3 class="db-panel__title">
             Producto {{ index }}
         </h3>
 

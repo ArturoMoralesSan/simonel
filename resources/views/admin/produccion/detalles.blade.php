@@ -114,6 +114,109 @@
 
         </section>
 
+        <section class="db-panel mt-8">
+
+            <h3 class="db-panel__title">
+                Despiece del combo
+            </h3>
+
+            @php
+                $pesoCombo = $order->combo_weight;
+
+                $totalKg = $order->yields
+                    ->where('unit', 'kg')
+                    ->sum('quantity');
+
+                $desjugue = $order->yields
+                    ->firstWhere('type', 'desjugue');
+            @endphp
+
+            <div class="row">
+
+                <div class="md:col-1/4">
+                    <strong>Peso del combo</strong>
+                    <p>{{ number_format($pesoCombo,3) }} kg</p>
+                </div>
+
+                <div class="md:col-1/4">
+                    <strong>Total despiece</strong>
+                    <p>{{ number_format($totalKg,3) }} kg</p>
+                </div>
+
+                <div class="md:col-1/4">
+                    <strong>Diferencia</strong>
+                    <p>{{ number_format($pesoCombo - $totalKg,3) }} kg</p>
+                </div>
+
+                <div class="md:col-1/4">
+                    <strong>Desjugue</strong>
+                    <p>
+                        {{ $desjugue ? number_format($desjugue->quantity,2) : '0.00' }} %
+                    </p>
+                </div>
+
+            </div>
+
+            <table class="table mt-4">
+
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">% del combo</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach($order->yields->where('unit','kg') as $yield)
+
+                        <tr>
+
+                            <td>{{ ucfirst($yield->type) }}</td>
+
+                            <td class="text-center">
+                                {{ number_format($yield->quantity,3) }} {{ $yield->unit }}
+                            </td>
+
+                            <td class="text-center">
+                                {{ $pesoCombo > 0
+                                    ? number_format(($yield->quantity / $pesoCombo) * 100,2)
+                                    : '0.00'
+                                }} %
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+                <tfoot>
+
+                    <tr>
+
+                        <th>Total</th>
+
+                        <th class="text-center">
+                            {{ number_format($totalKg,3) }} kg
+                        </th>
+
+                        <th class="text-center">
+                            {{ $pesoCombo > 0
+                                ? number_format(($totalKg / $pesoCombo) * 100,2)
+                                : '0.00'
+                            }} %
+                        </th>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </section>
+
         {{-- Productos --}}
         <section class="db-panel mt-8">
 
