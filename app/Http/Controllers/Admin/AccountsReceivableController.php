@@ -18,6 +18,8 @@ class AccountsReceivableController extends Controller
 
     public function index(Request $request)
     {
+        abort_unless(Gate::allows('view.accountsreceivable'), 403);
+
         $query = AccountReceivable::with(['customer', 'sale', 'seller']);
 
         if ($request->filled('status')) {
@@ -82,6 +84,8 @@ class AccountsReceivableController extends Controller
 
     public function payment($id)
     {
+        abort_unless(Gate::allows('create.accountsreceivable'), 403);
+
         $account = AccountReceivable::with('customer')->findOrFail($id);
 
         $payments = Payment::where('key_name', '!=', 'credito-simonel')->pluck('name','id');
@@ -93,6 +97,8 @@ class AccountsReceivableController extends Controller
 
     public function save(StoreAccountReceivablePaymentRequest $request, $id)
     {
+        abort_unless(Gate::allows('create.accountsreceivable'), 403);
+
         DB::beginTransaction();
 
         try {

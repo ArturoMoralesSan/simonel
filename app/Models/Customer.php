@@ -16,6 +16,11 @@ class Customer extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function accountsReceivable()
+    {
+        return $this->hasMany(AccountReceivable::class, 'customer_id');
+    }
+
     public function creditSetting()
     {
         return $this->hasOne(CustomerCreditSetting::class);
@@ -24,5 +29,13 @@ class Customer extends Model
     public function creditAuthorizations()
     {
         return $this->hasMany(CustomerCreditAuthorization::class);
+    }
+
+    public function seller()
+    {
+        return $this->belongsTo(
+            User::class,
+            'seller_id'
+        );
     }
 }

@@ -33,7 +33,7 @@ use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ManufacturedProductController;
 use App\Http\Controllers\Admin\ExpirationController;
 use App\Http\Controllers\Admin\AccountsReceivableController;
-
+use App\Http\Controllers\Admin\CustomerCreditAuthorizationController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -90,11 +90,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
     // clientes
     Route::get('clientes', [CustomerController::class, 'index']);
+    Route::get('clientes/{id}/detalles',[CustomerController::class, 'details']);
     Route::get('agregar-cliente', [CustomerController::class, 'create']);
     Route::post('clientes/crear', [CustomerController::class, 'save']);
     Route::get('clientes/{id}/editar',[CustomerController::class, 'edit']);
     Route::put('clientes/{id}/actualizar',[CustomerController::class, 'update']);
     Route::delete('clientes/eliminar/{id}',[CustomerController::class, 'destroy']);
+
+    Route::post('clientes/autorizar-credito',[CustomerCreditAuthorizationController::class,'store']);
 
     //permisos
     Route::get('permisos', [PermissionController::class, 'index']);
@@ -194,6 +197,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     
     //Caducidades
     Route::get('caducidades', [ExpirationController::class, 'index'])->name('caducidades.index'); 
+
 
     //Cobranza
     Route::get('cuentas-pendientes', [AccountsReceivableController::class, 'index']); 

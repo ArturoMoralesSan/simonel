@@ -49,6 +49,27 @@ class CustomerController extends Controller
         return view('admin.clientes.index', compact('users'));
     }
 
+    public function details($id)
+    {
+        abort_unless(
+            Gate::allows('view.customers') || Gate::allows('create.customers'),
+            403
+        );
+
+        $customer = Customer::with([
+            'user',
+            'creditAuthorizations.authorizer'
+        ])
+        ->findOrFail($id);
+        
+        $isSuperAdmin = auth()->user()->isSuperAdmin();
+
+        return view(
+            'admin.clientes.detalles',
+            compact('customer', 'isSuperAdmin')
+        );
+    }
+
     public function create()
     {
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);

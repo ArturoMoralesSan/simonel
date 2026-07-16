@@ -308,7 +308,8 @@ class SaleController extends Controller
 
         try {
 
-            // Validar disponibilidad de productos antes de crear la venta
+            $this->validateCustomerCredit($validated);
+
             $this->validateProductsStock($validated);
 
 
@@ -671,6 +672,76 @@ class SaleController extends Controller
         $account->save();
     }
 
+    private function validateCustomerCredit($data)
+    {
+        $user = User::findOrFail($data['client_id']);
+
+        $customer = $user->customer;
+
+
+        if (!$customer) {
+            return;
+        }
+
+
+        // Solo minoristas
+        if ($customer->customer_type !== 'minorista') {
+            return;
+        }
+
+
+        // Revisar Crédito Simonel
+        $isCreditSimonel = false;
+
+
+        for ($i = 1; $i <= $data['payments_count']; $i++) {
+
+            if (($data["payment{$i}_pago"] ?? null) == 9) {
+
+                $isCreditSimonel = true;
+                break;
+            }
+
+        }
+
+
+        if (!$isCreditSimonel) {
+            return;
+        }
+
+
+        $debt = AccountReceivable::where('customer_id', $customer->id)
+            ->where('balance', '>', 0)
+            ->sum('balance');
+
+
+        if ($debt > 0) {
+            
+            $authorization = $customer
+                ->creditAuthorizations()
+                ->where(function($q){
+
+                    $q->whereNull('expires_at')
+                    ->orWhere('expires_at','>=',now());
+
+                })
+                ->latest()
+                ->first();
+
+
+            if (!$authorization) {
+
+                throw new \Exception(
+                    'El cliente tiene una deuda pendiente de $'
+                    .number_format($debt,2)
+                    .' y no cuenta con autorización de crédito.'
+                );
+
+            }
+
+        }
+
+    }
     
 
     public function orderupdate(OrderRequest $request, $id)
