@@ -220,7 +220,6 @@
             <h3 class="db-panel__title">
                 Crédito
             </h3>
-            
             <div class="md:row mb-2" >
                 <div class="col">
                     <div class="form-control">
@@ -232,18 +231,18 @@
                                 1: 'Sí',
                                 0: 'No'
                             }"
-                            :initial="user.credit || 'si'"
+                            :initial="user.creditSetting?.enabled || 0"
                         >
                         </select-field>
                         <field-errors name="credit"></field-errors>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="isCredit">
                 <div class="md:col-1/2">
                     <div class="form-control">
-                        <label for="credit_limit">Límite de crédito</label>
-                        <text-field name="credit_limit" v-model="fields.credit_limit" maxlength="10" :initial="user.credit_limit || ''">
+                        <label for="credit_limit">Límite de crédito<span class="description">$</span></label>
+                        <text-field name="credit_limit" v-model="fields.credit_limit" maxlength="10" :initial="String(user.credit_setting?.credit_limit ?? '')">
                         </text-field>
                         <field-errors name="credit_limit"></field-errors>
                     </div>
@@ -251,8 +250,8 @@
             
                 <div class="md:col-1/2">
                     <div class="form-control">
-                        <label for="credit_days">Días de crédito</label>
-                        <text-field name="credit_days" v-model="fields.credit_days" maxlength="5" :initial="user.credit_days || ''">
+                        <label for="credit_days">Periodo en días del crédito</label>
+                        <text-field name="credit_days" v-model="fields.credit_days" maxlength="5" :initial="String(user.credit_setting?.credit_days ?? '')">
                         </text-field>
                         <field-errors name="credit_days"></field-errors>
                     </div>
@@ -329,6 +328,11 @@ export default {
             if (newPostalCode.length === 5) {
                 this.fetchAddress(newPostalCode);
             }
+        }
+    },
+    computed: {
+        isCredit() {
+            return this.fields.credit == 1 || this.fields.credit === '1';
         }
     },
     methods: {

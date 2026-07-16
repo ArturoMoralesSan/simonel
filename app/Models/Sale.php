@@ -77,5 +77,10 @@ class Sale extends Model
         ->withPivot('cost')
         ->withTimestamps();
     }
+
+    public function accountReceivable()
+    {
+        return $this->hasOne(AccountReceivable::class);
+    }
     
 }

@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ManufacturedProductController;
 use App\Http\Controllers\Admin\ExpirationController;
+use App\Http\Controllers\Admin\AccountsReceivableController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -119,6 +120,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('proveedores/{id}/actualizar', [SupplierController::class, 'update']);
     Route::delete('proveedores/eliminar/{id}', [SupplierController::class, 'delete']);
 
+    //compras
     Route::get('compras', [PurchaseController::class, 'index']);
     Route::get('compras/{id}/detalle', [PurchaseController::class, 'details']);
     Route::get('agregar-compras', [PurchaseController::class, 'create']);
@@ -159,7 +161,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('catalogo/{id}/actualizar', [ManufacturedProductController::class, 'update']);
     Route::delete('catalogo/eliminar/{id}', [ManufacturedProductController::class, 'delete']);
 
-
     //Lotes
     Route::get('lotes', [LotController::class, 'index']);
     Route::get('agregar-lotes', [LotController::class, 'create']);
@@ -192,7 +193,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('lotes-producto/{id}/etiqueta',[ProductLotController::class, 'label']);
     
     //Caducidades
-    Route::get('caducidades', [ExpirationController::class, 'index'])->name('caducidades.index');    
+    Route::get('caducidades', [ExpirationController::class, 'index'])->name('caducidades.index'); 
+
+    //Cobranza
+    Route::get('cuentas-pendientes', [AccountsReceivableController::class, 'index']); 
+    Route::get('cuentas-pendientes/{id}', [AccountsReceivableController::class, 'details']); 
+    Route::get('cuentas-pendientes/{id}/pago',[AccountsReceivableController::class, 'payment']);
+    Route::post('cuentas-pendientes/{id}/pago',[AccountsReceivableController::class, 'save']);
+
     //Medidas
     Route::get('medidas', [MeasureController::class, 'index']);
     Route::view('agregar-medidas', 'admin.medidas.crear');

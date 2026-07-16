@@ -18,6 +18,7 @@ use App\Models\ProductLot;
 use App\Models\SaleProductLot;
 use App\Models\Inventory;
 use App\Models\InventoryMovement;
+use App\Models\AccountReceivable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -347,6 +348,7 @@ class SaleController extends Controller
 
             $sale->save();
 
+            $this->syncAccountReceivable($sale);
 
             $this->handleSale($sale);
 
@@ -560,6 +562,113 @@ class SaleController extends Controller
                 $remaining -= $consume;
             }
         }
+    }
+
+    private function syncAccountReceivable(Sale $sale)
+    {
+        $account = $sale->accountReceivable;
+
+        /*
+        |--------------------------------------------------------------------------
+        | SI LA VENTA YA NO ES A CRÉDITO
+        |--------------------------------------------------------------------------
+        */
+
+        if ($sale->status != 'credit') {
+
+            if ($account) {
+                $account->delete();
+            }
+
+            return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | OBTENER CLIENTE
+        |--------------------------------------------------------------------------
+        */
+
+        $customer = Customer::with('creditSetting')
+            ->where('user_id', $sale->user_id)
+            ->first();
+
+        if (!$customer) {
+            throw new \Exception('No existe el cliente.');
+        }
+
+        if (!$customer->creditSetting) {
+            throw new \Exception(
+                'El cliente no tiene configuración de crédito.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CREAR O ACTUALIZAR
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$account) {
+            $account = new AccountReceivable;
+            $account->sale_id = $sale->id;
+        }
+
+        $account->customer_id = $customer->id;
+        $account->seller_id = $customer->seller_id;
+
+        $issueDate = $sale->created_at ?? now();
+
+        $account->issue_date = $issueDate->format('Y-m-d');
+
+        $account->due_date = $issueDate
+            ->copy()
+            ->addDays($customer->creditSetting->credit_days)
+            ->format('Y-m-d');
+
+        $account->original_amount = $sale->total_with_iva;
+
+        /*
+        |--------------------------------------------------------------------------
+        | SI ES NUEVA
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$account->exists) {
+
+            $account->paid_amount = 0;
+
+            $account->balance = $sale->total_with_iva;
+
+            $account->status = 'Pendiente';
+        }
+        /*
+        |--------------------------------------------------------------------------
+        | SI YA EXISTE
+        |--------------------------------------------------------------------------
+        */
+        else {
+
+            $account->balance =
+                $sale->total_with_iva - $account->paid_amount;
+
+            if ($account->balance <= 0) {
+
+                $account->balance = 0;
+                $account->status = 'Pagada';
+
+            } elseif ($account->paid_amount > 0) {
+
+                $account->status = 'Parcial';
+
+            } else {
+
+                $account->status = 'Pendiente';
+
+            }
+        }
+
+        $account->save();
     }
 
     

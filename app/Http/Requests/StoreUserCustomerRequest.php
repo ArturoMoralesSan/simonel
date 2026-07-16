@@ -33,7 +33,7 @@ class StoreUserCustomerRequest extends FormRequest
             'postal_code'     => 'nullable|string|max:10',
 
             // Crédito
-            'enabled'          => 'required|boolean',
+            'credit'          => 'required|boolean',
             'credit_limit'    => 'nullable|numeric|min:0',
             'credit_days'     => 'nullable|integer|min:1|max:365',
         ];

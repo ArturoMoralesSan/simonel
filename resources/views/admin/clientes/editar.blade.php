@@ -25,6 +25,8 @@
             <customer-form
                 action="{{ url('admin/clientes/crear') }}"
                 :user="{{ $user }}"
+                :is-admin="{{ $isSuperAdmin ? 'true' : 'false' }}"
+                :sellers='@json($sellers)'
             >
             </customer-form>
         </div>
