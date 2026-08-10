@@ -8,6 +8,7 @@
     export default {
         props: {
             branchid: {
+              
                 type:Number,
                 required: true
             },

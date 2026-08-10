@@ -231,9 +231,10 @@
                                 1: 'Sí',
                                 0: 'No'
                             }"
-                            :initial="user.creditSetting?.enabled || 0"
+                            :initial="user.credit_setting?.enabled || 0"
                         >
                         </select-field>
+                        
                         <field-errors name="credit"></field-errors>
                     </div>
                 </div>

@@ -72,7 +72,7 @@
 
             <div class="db-panel text-center">
 
-                <h4>Documentos abiertos</h4>
+                <h4>Cuentas abiertas</h4>
 
                 <h2>
                     {{ $summary['documents'] }}

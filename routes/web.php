@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\ManufacturedProductController;
 use App\Http\Controllers\Admin\ExpirationController;
 use App\Http\Controllers\Admin\AccountsReceivableController;
 use App\Http\Controllers\Admin\CustomerCreditAuthorizationController;
+use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -66,12 +67,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
     Route::get('pdf-cliente/{id}', [PdfController::class, 'customers']);
-
     Route::get('pdf-egreso/{id}', [PdfController::class, 'pdfEgreso']);
     Route::get('pdf-gasto/{id}', [PdfController::class, 'pdfGasto']);
         
-    Route::post('ultimo_rx/{id}', [ServiceController::class, 'getrx']);
-
     //perfil
     Route::view('perfil/editar','admin.editar-perfil');
     Route::put('perfil/editar', [ProfileController::class, 'update']);
@@ -198,7 +196,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     //Caducidades
     Route::get('caducidades', [ExpirationController::class, 'index'])->name('caducidades.index'); 
 
-
     //Cobranza
     Route::get('cuentas-pendientes', [AccountsReceivableController::class, 'index']); 
     Route::get('cuentas-pendientes/{id}', [AccountsReceivableController::class, 'details']); 
@@ -294,6 +291,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     //Usuarios
     Route::get('usuarios', [UserController::class, 'index']);
 
+    //reportes
+    Route::get('reportes', [ReportsController::class, 'index']);
+    Route::get('reportes/vendedor/{id}', [ReportsController::class, 'printSeller']);
+    Route::get('reportes/producto/{id}', [ReportsController::class, 'printProduct']);
+    Route::get('reportes/cliente/{id}', [ReportsController::class, 'printCustomer']);
+    Route::get('reportes/pago/{id}', [ReportsController::class, 'printPayment']);
+    Route::get('/reportes/vendedores/pdf', [ReportsController::class, 'printSellers']);
+    Route::get('/reportes/productos/pdf',[ReportsController::class, 'printProducts']);
+    Route::get('/reportes/clientes/pdf', [ReportsController::class, 'printCustomers']);
+    Route::get('/reportes/pagos/pdf', [ReportsController::class, 'printPayments']);
+    
     //Password
     Route::view('cambiar-contrasena', 'principal.cambiar-contrasena');
     Route::post('cambiar-contrasena', 'Auth\PasswordController@update');

@@ -82,5 +82,13 @@ class Sale extends Model
     {
         return $this->hasOne(AccountReceivable::class);
     }
+
+    public function seller()
+    {
+        return $this->belongsTo(
+            User::class,
+            'seller_id'
+        );
+    }
     
 }
