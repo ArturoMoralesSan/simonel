@@ -321,6 +321,7 @@ class SaleController extends Controller
 
             $sale->user_id = $validated['client_id'];
             $sale->comment = $validated['comment'] ?? null;
+            $sale->seller_id = Auth::id();
             $sale->save();
 
 
