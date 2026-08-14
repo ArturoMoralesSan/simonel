@@ -114,55 +114,22 @@
         {{ \Carbon\Carbon::parse($lot->expiration_date)->format('d/m/Y') }}
     </div>
 
-    <div class="field">
-        <strong>Cantidad:</strong>
-        {{ $lot->initial_quantity }}
-    </div>
-
-    <div class="field">
-        <strong>Disponible:</strong>
-        {{ $lot->available_quantity }}
-    </div>
-
     <div class="barcode">
 
-        <img
-        src="data:image/png;base64,{{ DNS1D::getBarcodePNG(
-            $lot->lot_number,
-            'C128',
-            2,
-            60
-        ) }}"
-        alt="Código de barras"
-        style="
-            max-width:100%;
-            height:auto;
-        "
-    >
+        <br><br><br><br><br><br><br><br><br><br>
 
-    <div style="
-        margin-top:10px;
-        font-size:14px;
-        font-weight:bold;
-        letter-spacing:2px;
-    ">
-        {{ $lot->lot_number }}
-    </div>
+        <div style="
+            margin-top:10px;
+            font-size:14px;
+            font-weight:bold;
+            letter-spacing:2px;
+        ">
+            {{ $lot->lot_number }}
+        </div>
 
 
     </div>
 
-    <div class="qr">
-
-        {!! QrCode::size(140)->generate(
-            url('admin/lotes-producto/'.$lot->id.'/detalle')
-        ) !!}
-
-    </div>
-
-    <div class="footer">
-        Escanee el QR para consultar el detalle del lote.
-    </div>
 
 </div>
 

@@ -47,6 +47,7 @@
                                 <th>RFC</th>
                                 <th>Correo Electrónico</th>
                                 <th>Télefono</th>
+                                <th>Vendedor</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -69,7 +70,16 @@
                                 <td data-label="Télefono:">
                                     @{{ userItem.phone }}
                                 </td>
+                                <td data-label="Vendedor:">
+                                    @{{ userItem.seller.name }} @{{ userItem.seller.last_name }}
+                                </td>
                                 <td class="table-resource__actions" data-label="Acciones:">
+                                    <a 
+                                    class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"
+                                    :href="$root.path + '/admin/clientes/' + userItem.id + '/detalles' "
+                                    >
+                                    Ver cliente
+                                    </a>
                                     <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/clientes/' + userItem.id + '/editar' ">
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
@@ -78,8 +88,9 @@
                                     <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/clientes/eliminar/' + userItem.id"
                                         :resource-id="userItem.id"
                                         :options="{ onDelete: onResourceDelete }"
-                                        :disabled="userItem.user.sales_count > 0"
+                                        
                                     >
+                                    <!-- :disabled="userItem.user.sales_count > 0" -->
                                         <img style="width: 15px;" class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
                                         Eliminar
                                     </delete-button>

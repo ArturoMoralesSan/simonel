@@ -12,7 +12,7 @@
             Eliminar
         </button>
         <div class="row mb-4">
-            <div class="md:col-1/2 sm:col">
+            <div class="md:col-1/2 col">
                 <div class="form-control">
                     <label :for="'payment' + index + '-pago'">Pago</label>
                     <select-field
@@ -25,7 +25,7 @@
                     <field-errors :name="'payment' + index + '_pago'"></field-errors>
                 </div>
             </div>
-            <div class="md:col-1/2 sm:col">
+            <div class="md:col-1/2 col">
                 <div class="form-control">
                     <label for="cost">Monto<span class="description">($)</span></label>
                     <text-field 

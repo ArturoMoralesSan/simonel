@@ -83,8 +83,12 @@
                 <span v-else> Puedes registrar únicamente un elemento.</span>
             </p>
         </div>
-
-        <div class="db-panel mb-4">
+        <div class="db-panel mb-4"  v-if="
+        orderData &&
+        (
+            ['Producción', 'Finalizada'].includes(fields.status) ||
+            ['Autorizada','Producción', 'Finalizada'].includes(orderData.status)
+        )">
             <h3 class="db-panel__title">
                 Despiece del combo
             </h3>
@@ -101,7 +105,10 @@
                             step="0.0001"
                             v-model="fields.combo_weight"
                             :initial="orderData.combo_weight || ''"
-                            :disabled="isAuthorized"
+                            :disabled="
+                                ['Finalizada', 'Cancelada'].includes(fields.status) ||
+                                ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                            "
                         />
 
                         <field-errors name="combo_weight"/>
@@ -135,7 +142,10 @@
                                 :name="'yields['+index+'][quantity]'"
                                 v-model="yieldItem.quantity"
                                 :initial="getYieldQuantity(yieldItem.type)"
-                                :disabled="isAuthorized"                            
+                                :disabled="
+                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
+                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                "    
                                 />
                             <field-errors :name="'yields['+index+'][quantity]'"></field-errors>
 
@@ -143,14 +153,20 @@
                                 type="hidden"
                                 :name="'yields['+index+'][type]'"
                                 :value="yieldItem.type"
-                                :disabled="isAuthorized"
+                                :disabled="
+                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
+                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                "
                             />
 
                             <input
                                 type="hidden"
                                 :name="'yields['+index+'][unit]'"
                                 :value="yieldItem.unit"
-                                :disabled="isAuthorized"
+                                :disabled="
+                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
+                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                "
                             />
 
                         </div>

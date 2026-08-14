@@ -23,7 +23,7 @@
             + Añadir producto
             </button>
 
-        <table class="table size-caption mx-auto md:table--responsive">
+            <table class="table size-caption mx-auto md:table--responsive products-table">
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -38,7 +38,7 @@
             <tbody>
                 <tr v-for="(product, index) in fields.products" :key="index">
                     <!-- Selección de producto -->
-                    <td>
+                    <td data-label="Producto:">
                         <search-select-field
                         :value="product.id"
                         :options="productsOptions"
@@ -56,7 +56,7 @@
                     </td>
 
                     <!-- Cantidad -->
-                    <td>
+                    <td data-label="Cantidad:">
                         <text-field
                         type="number"
                         class="form-field"
@@ -75,7 +75,7 @@
                     </td>
 
                     <!-- Precio unitario -->
-                    <td>
+                    <td data-label="Precio unitario:">
                         {{ Number(product.unit_price).toFixed(2) }}
                         <text-field
                         type="hidden"
@@ -94,7 +94,7 @@
                     </td>
 
                     <!-- Descuento -->
-                    <td>
+                    <td data-label="Descuento:">
                         <text-field
                         type="number"
                         v-model.number="product.discount"
@@ -133,7 +133,7 @@
                     </td>
 
                     <!-- Quitar fila -->
-                    <td>
+                    <td data-label="Acciones:">
                         <button
                             type="button"
                             class="btn btn--danger btn--sm"
@@ -538,4 +538,130 @@
     .table input {
         width: 100%;
     }
+
+/* ==========================================
+   RESPONSIVE DE LA TABLA DE PRODUCTOS
+   Solo afecta .products-table
+   ========================================== */
+
+@media (max-width: 767px) {
+
+    /* Ocultar encabezados */
+    .products-table thead {
+        display: none;
+    }
+
+    /* Cada producto como tarjeta */
+    .products-table tbody tr {
+        display: block;
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    /* Celdas */
+    .products-table tbody td {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 10px 0;
+        border: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .products-table tbody td:last-child {
+        border-bottom: 0;
+    }
+
+    /* Etiquetas usando data-label */
+    .products-table tbody td[data-label]::before {
+        content: attr(data-label);
+
+        margin-bottom: 6px;
+
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    /* Inputs */
+    .products-table tbody td input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Precio unitario */
+    .products-table tbody td[data-label="Precio unitario:"] {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .products-table tbody td[data-label="Precio unitario:"]::before {
+        margin-bottom: 0;
+    }
+
+    /* Subtotal */
+    .products-table tbody td[data-label="Subtotal:"] {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .products-table tbody td[data-label="Subtotal:"]::before {
+        margin-bottom: 0;
+    }
+
+    /* Botón quitar */
+    .products-table tbody td[data-label="Acciones:"] button {
+        width: 100%;
+    }
+
+    /* ==========================================
+       RESUMEN
+       ========================================== */
+
+    .products-table tfoot {
+        display: block;
+        margin-top: 16px;
+    }
+
+    .products-table tfoot tr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 12px 14px;
+
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+    .products-table tfoot td {
+        display: block;
+        width: auto !important;
+        padding: 0;
+        border: 0;
+    }
+
+    .products-table tfoot td:first-child {
+        text-align: left !important;
+    }
+
+    .products-table tfoot td:last-child {
+        text-align: right !important;
+    }
+
+    /* Total general */
+    .products-table tfoot tr:last-child {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background: #f8f9fa;
+        font-size: 16px;
+    }
+}
 </style>

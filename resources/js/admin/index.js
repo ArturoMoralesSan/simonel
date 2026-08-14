@@ -39,6 +39,7 @@ import InventoryForm from './components/InventoryForm.vue';
 import InventoryProductForm from './components/InventoryProductForm.vue';
 import AddProductsForm from './components/AddProductsForm.vue';
 import RoleSelect from './components/RoleSelect.vue';
+import InventoryWarehouse from './components/InventoryWarehouse.vue';
 
 
 (function() {
@@ -83,6 +84,7 @@ import RoleSelect from './components/RoleSelect.vue';
     Vue.component('tag-calculator', TagCalculator);
     Vue.component('add-products-form', AddProductsForm);
     Vue.component('inventory-form', InventoryForm);
+    Vue.component('inventory-warehouse', InventoryWarehouse);
     Vue.component('inventory-product-form', InventoryProductForm);
     Vue.component('product-recipe-form', ProductRecipeForm);
     Vue.component('material-purchase-form', MaterialPurchaseForm);
@@ -105,9 +107,12 @@ import RoleSelect from './components/RoleSelect.vue';
         },
         mounted() {
             this.mq = window.matchMedia('(min-width:1100px)');
-            this.menuIsVisible = this.mq.matches;
+            //this.menuIsVisible = this.mq.matches;
+            //this.mq.addListener(e => this.menuIsVisible = e.matches);
+            
+            this.menuIsVisible = false;
 
-            this.mq.addListener(e => this.menuIsVisible = e.matches);
+            this.mq.addListener(e => { this.menuIsVisible = false; });
 
             Vue.nextTick(() => this.isLoading = false);
         },

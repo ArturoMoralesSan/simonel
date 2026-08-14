@@ -28,6 +28,18 @@ class WarehouseController extends Controller
         return view('admin.almacenes.index', compact('warehouses'));   
     }
 
+    public function inventory()
+    {
+        abort_unless(Gate::allows('view.inventory'), 403);
+
+        $warehouses = Warehouse::orderBy('name')
+            ->pluck('name', 'id');
+
+        return view('admin.inventory.index', compact(
+            'warehouses'
+        ));
+    }
+
     public function create()
     {
         abort_unless(Gate::allows('view.warehouses') || Gate::allows('create.warehouses'), 403);

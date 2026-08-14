@@ -22,7 +22,7 @@ Route::post('/notifications/read', [NotificationController::class, 'markAsRead']
 
 Route::get('/inventory', [InventoryController::class, 'getByProduct']);
 Route::get('/inventory-clients', [InventoryController::class, 'getByClient']);
-
+Route::get('/inventory-warehouse', [InventoryController::class, 'inventoryWarehouse']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

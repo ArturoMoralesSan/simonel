@@ -187,6 +187,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('produccion/{id}/actualizar', [ProductionOrderController::class, 'update']);
     Route::delete('produccion/eliminar/{id}', [ProductionOrderController::class, 'delete']);
     Route::get('produccion/{id}/detalle',[ProductionOrderController::class, 'details']);
+    Route::get('produccion/{id}/pdf',[ProductionOrderController::class, 'pdf'])->name('admin.produccion.pdf');
 
     // Lote de producto terminado
     Route::get('lotes-producto', [ProductLotController::class, 'index']);
@@ -219,9 +220,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('productos/{id}/actualizar', [ProductController::class, 'update']);
     Route::delete('productos/eliminar/{id}', [ProductController::class, 'delete']);
 
-    //inventario
-    Route::get('inventario', [InventoryProductController::class, 'index']);
-    Route::get('agregar-inventario', [InventoryProductController::class, 'create']);
+    //inventario por tipo de almacén
+    Route::get('inventario-almacen', [InventoryProductController::class, 'index']);
+    Route::get('agregar-inventario-almacen', [InventoryController::class, 'inventory']);
+    
     Route::post('inventario/crear', [InventoryProductController::class, 'save']);
     Route::get('inventario/{id}/detalle', [InventoryProductController::class, 'details']);
     Route::post('inventario-movimiento/{id}/actualizar', [InventoryProductController::class, 'updateMovement']);
@@ -229,7 +231,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::post('inventario/{id}/actualizar', [InventoryProductController::class, 'update']);
     Route::delete('inventario/eliminar/{id}', [InventoryProductController::class, 'delete']);
 
-     //inventario clientes
+     //inventario por sucursales de autoservicio
     Route::get('inventario-clientes', [InventoryController::class, 'index']);
     Route::get('agregar-inventario-clientes', [InventoryController::class, 'create']);
     Route::post('inventario-clientes/crear', [InventoryController::class, 'storeMovement']);

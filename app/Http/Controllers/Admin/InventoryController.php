@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Customer;
+use App\Models\Warehouse;
 use App\Models\InventoryMovement;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -86,7 +87,7 @@ class InventoryController extends Controller
     }
 
 
-   public function storeMovement(InventoryRequest $request)
+    public function storeMovement(InventoryRequest $request)
     {
         DB::transaction(function () use ($request) {
 
@@ -331,5 +332,237 @@ class InventoryController extends Controller
         
         return response('', 204);
 
+    }
+
+
+    public function inventory()
+    {
+        abort_unless(Gate::allows('view.inventory'),403);
+
+        $warehouseTypes = Warehouse::where('active', 1)
+            ->select('warehouse_type')
+            ->distinct()
+            ->orderBy('warehouse_type')
+            ->pluck('warehouse_type', 'warehouse_type');
+
+        return view('admin.inventarioalmacen.crear', compact(
+            'warehouseTypes'
+        ));
+    }
+
+    public function inventoryWarehouse(Request $request)
+    {
+        $request->validate([
+            'warehouse_type' => ['required'],
+        ]);
+
+        $warehouses = Warehouse::where('active', 1)
+            ->where('warehouse_type', $request->warehouse_type)
+            ->with([
+                'productLots.product.manufactured',
+                'lots.material',
+            ])
+            ->get();
+
+        $inventory = collect();
+
+        foreach ($warehouses as $warehouse) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | PRODUCTOS TERMINADOS
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($warehouse->productLots as $lot) {
+
+                if (
+                    !$lot->product ||
+                    $lot->status !== 'Disponible' ||
+                    (float) $lot->available_quantity <= 0
+                ) {
+                    continue;
+                }
+
+                $itemId = $lot->product_id;
+                $key = 'product_' . $itemId;
+
+                if (!$inventory->has($key)) {
+
+                    $inventory->put($key, [
+                        'item_id' => $itemId,
+                        'type' => 'product',
+
+                        'name' => optional(
+                            $lot->product->manufactured
+                        )->name ?? 'Producto eliminado',
+
+                        'description' => optional(
+                            $lot->product->manufactured
+                        )->description ?? '',
+
+                        'quantity' => 0,
+
+                        'warehouses' => [],
+                    ]);
+                }
+
+                $item = $inventory->get($key);
+
+                $quantity = (float) $lot->available_quantity;
+
+                $item['quantity'] += $quantity;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Buscar almacén
+                |--------------------------------------------------------------------------
+                */
+
+                $warehouseIndex = collect($item['warehouses'])
+                    ->search(function ($itemWarehouse) use ($warehouse) {
+                        return $itemWarehouse['id'] == $warehouse->id;
+                    });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Datos del lote
+                |--------------------------------------------------------------------------
+                */
+
+                $lotData = [
+                    'id' => $lot->id,
+                    'lot_number' => $lot->lot_number,
+                    'quantity' => $quantity,
+                    'expiration_date' => $lot->expiration_date,
+
+                    'is_expired' => $lot->expiration_date
+                        ? $lot->expiration_date < now()->toDateString()
+                        : false,
+                ];
+
+                if ($warehouseIndex !== false) {
+
+                    $item['warehouses'][$warehouseIndex]['quantity']
+                        += $quantity;
+
+                    $item['warehouses'][$warehouseIndex]['lots'][] = $lotData;
+
+                } else {
+
+                    $item['warehouses'][] = [
+                        'id' => $warehouse->id,
+                        'name' => $warehouse->name,
+                        'quantity' => $quantity,
+
+                        'lots' => [
+                            $lotData
+                        ],
+                    ];
+                }
+
+                $inventory->put($key, $item);
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | MATERIAS PRIMAS
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($warehouse->lots as $lot) {
+
+                if (
+                    !$lot->material ||
+                    $lot->status !== 'Disponible' ||
+                    (float) $lot->available_quantity <= 0
+                ) {
+                    continue;
+                }
+
+                $itemId = $lot->raw_material_id;
+                $key = 'raw_' . $itemId;
+
+                if (!$inventory->has($key)) {
+
+                    $inventory->put($key, [
+                        'item_id' => $itemId,
+                        'type' => 'raw_material',
+
+                        'name' => $lot->material->name,
+
+                        'description' =>
+                            $lot->material->description ?? '',
+
+                        'quantity' => 0,
+
+                        'warehouses' => [],
+                    ]);
+                }
+
+                $item = $inventory->get($key);
+
+                $quantity = (float) $lot->available_quantity;
+
+                $item['quantity'] += $quantity;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Buscar almacén
+                |--------------------------------------------------------------------------
+                */
+
+                $warehouseIndex = collect($item['warehouses'])
+                    ->search(function ($itemWarehouse) use ($warehouse) {
+                        return $itemWarehouse['id'] == $warehouse->id;
+                    });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Datos del lote
+                |--------------------------------------------------------------------------
+                */
+
+                $lotData = [
+                    'id' => $lot->id,
+                    'lot_number' => $lot->lot_number,
+                    'quantity' => $quantity,
+                    'expiration_date' => $lot->expiration_date,
+
+                    'is_expired' => $lot->expiration_date
+                        ? $lot->expiration_date < now()->toDateString()
+                        : false,
+                ];
+
+                if ($warehouseIndex !== false) {
+
+                    $item['warehouses'][$warehouseIndex]['quantity']
+                        += $quantity;
+
+                    $item['warehouses'][$warehouseIndex]['lots'][] = $lotData;
+
+                } else {
+
+                    $item['warehouses'][] = [
+                        'id' => $warehouse->id,
+                        'name' => $warehouse->name,
+                        'quantity' => $quantity,
+
+                        'lots' => [
+                            $lotData
+                        ],
+                    ];
+                }
+
+                $inventory->put($key, $item);
+            }
+        }
+
+        return response()->json([
+            'inventory' => $inventory
+                ->sortBy('name')
+                ->values(),
+        ]);
     }
 }

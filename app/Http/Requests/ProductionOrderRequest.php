@@ -25,14 +25,6 @@ class ProductionOrderRequest extends FormRequest
 
             /*
             |--------------------------------------------------------------------------
-            | PESO DEL COMBO
-            |--------------------------------------------------------------------------
-            */
-
-            'combo_weight' => ['required','numeric','min:0'],
-
-            /*
-            |--------------------------------------------------------------------------
             | DESPIECE / YIELDS
             |--------------------------------------------------------------------------
             */
@@ -55,6 +47,20 @@ class ProductionOrderRequest extends FormRequest
             $rules['item' . $i . '_quantity'] = ['required','numeric','min:0.001'];
         }
 
+        if ($this->route('id') && $this->input('status') === 'Producción') {
+            $rules['combo_weight'] = [
+                'required',
+                'numeric',
+                'min:0',
+            ];
+        } else {
+            $rules['combo_weight'] = [
+                'nullable',
+                'numeric',
+                'min:0',
+            ];
+        }
+
         return $rules;
     }
 
@@ -75,6 +81,30 @@ class ProductionOrderRequest extends FormRequest
             'yields.*.quantity.numeric' => 'La cantidad del despiece debe ser numérica.',
             'yields.*.unit.in' => 'La unidad del despiece no es válida.',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+
+            $comboWeight = (float) $this->input('combo_weight', 0);
+            $yields = $this->input('yields', []);
+
+            $totalYields = collect($yields)
+                ->filter(function ($yield) {
+                    return ($yield['type'] ?? null) !== 'desjugue';
+                })
+                ->sum(function ($yield) {
+                    return (float) ($yield['quantity'] ?? 0);
+                });
+
+            if ($totalYields > $comboWeight) {
+                $validator->errors()->add(
+                    'combo_weight',
+                    "La cantidad total del despiece ({$totalYields}) no puede superar el peso del combo ({$comboWeight})."
+                );
+            }
+        });
     }
 
 }

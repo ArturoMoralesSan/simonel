@@ -17,7 +17,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ProductionOrderRequest;
-use DB; 
+use DB;
+use PDF; 
 
 
 class ProductionOrderController extends Controller
@@ -139,6 +140,28 @@ class ProductionOrderController extends Controller
         ])->findOrFail($id);
 
         return view('admin.produccion.detalles', compact('order'));
+    }
+
+    public function pdf($id)
+    {
+        abort_unless(
+            Gate::allows('view.productionorders') ||
+            Gate::allows('create.productionorders'),
+            403
+        );
+
+        $order = ProductionOrder::with([
+            'products.manufactured',
+            'items.rawMaterial',
+            'authorizer',
+            'yields',
+        ])->findOrFail($id);
+
+        $pdf = PDF::loadView('admin.pdf.orderproduction', compact('order'));
+
+        return $pdf->stream(
+            'orden-produccion-' . $order->order_number . '.pdf'
+        );
     }
 
 

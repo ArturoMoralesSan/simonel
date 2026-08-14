@@ -19,32 +19,32 @@ class CustomerController extends Controller
     public function index()
     {
         abort_unless(
-            Gate::allows('view.customers') || Gate::allows('create.customers'),
+            Gate::allows('view.customers') ||
+            Gate::allows('create.customers'),
             403
         );
 
         $search = request('search');
 
         $users = Customer::with([
-                'user' => function ($query) {
-                    $query->withCount('sales');
-                }
-            ])
-            ->when(!Auth::user()->isSuperAdmin(), function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('seller_id', Auth::id());
-                });
-            })
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('business_name', 'LIKE', "%{$search}%")
-                        ->orWhere('rfc', 'LIKE', "%{$search}%")
-                        ->orWhere('trade_name', 'LIKE', "%{$search}%")
-                        ->orWhere('phone', 'LIKE', "%{$search}%")
-                        ->orWhere('email', 'LIKE', "%{$search}%");
-                });
-            })
-            ->get();
+            'user' => function ($query) {
+                $query->withCount('sales');
+            },
+            'seller',
+        ])
+        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+            $query->where('seller_id', Auth::id());
+        })
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('business_name', 'LIKE', "%{$search}%")
+                    ->orWhere('rfc', 'LIKE', "%{$search}%")
+                    ->orWhere('trade_name', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        })
+        ->get();
 
         return view('admin.clientes.index', compact('users'));
     }
