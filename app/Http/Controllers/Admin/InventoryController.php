@@ -175,7 +175,7 @@ class InventoryController extends Controller
         $search = request('search');
 
         $query = User::whereHas('inventories')
-        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
             $query->whereHas('customer', function ($q) {
                 $q->whereHas('user', function ($u) {
                     $u->where('seller_id', Auth::id());
@@ -254,7 +254,7 @@ class InventoryController extends Controller
             403
         );
 
-        $users = Customer::when(!Auth::user()->isSuperAdmin(), function ($query) {
+        $users = Customer::when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
             $query->whereHas('user', function ($q) {
                 $q->where('seller_id', Auth::id());
             });

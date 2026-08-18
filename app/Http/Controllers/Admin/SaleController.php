@@ -78,7 +78,7 @@ class SaleController extends Controller
         ->whereYear('created_at', $year)
         ->latest()
 
-        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
 
             if (Auth::user()->isCustomer()) {
 
@@ -134,7 +134,7 @@ class SaleController extends Controller
                 ")
                 ->pluck('full_name', 'user_id');
 
-        } elseif (Auth::user()->isSuperAdmin()) {
+        } elseif (Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
 
             $users = Customer::selectRaw("
                     CONCAT(trade_name,' (',business_name,')') as full_name,

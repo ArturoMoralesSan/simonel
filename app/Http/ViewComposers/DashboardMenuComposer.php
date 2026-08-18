@@ -85,7 +85,7 @@ class DashboardMenuComposer
                         return Gate::allows($link->permission->key_name);
                     }
 
-                    return Auth::user()->isSuperAdmin();
+                    return Auth::user()->isSuperAdmin() || Auth::user()->isAdmin();
                 });
 
                 $submenu->setRelation('links', $authLinks);

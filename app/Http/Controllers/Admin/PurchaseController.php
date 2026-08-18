@@ -12,10 +12,12 @@ use App\Models\RawMaterialLot;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
 
 
 class PurchaseController extends Controller
 {
+
     public function index()
     {
         abort_unless(
@@ -25,26 +27,39 @@ class PurchaseController extends Controller
 
         $search = request('search');
 
+        // Fechas por defecto: hoy
+        $dateNow    = Carbon::now();
+        $dateFormat = $dateNow->format('Y-m-d');
+
+        $start_date = request('start_date') ?? $dateFormat;
+        $end_date   = request('end_date') ?? $dateFormat;
+
         $purchases = Purchase::with('supplier')
-        ->withCount([
-            'items',
-            'lots'
-        ])
-        ->when($search, function ($query) use ($search) {
-            $query->whereHas('supplier', function ($q) use ($search) {
-                $q->where('business_name', 'like', "%{$search}%")
-                ->orWhere('trade_name', 'like', "%{$search}%");
+            ->withCount([
+                'items',
+                'lots'
+            ])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('supplier', function ($supplier) use ($search) {
+                        $supplier->where('business_name', 'like', "%{$search}%")
+                            ->orWhere('trade_name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('invoice_number', 'like', "%{$search}%");
+                });
             })
-            ->orWhere('invoice_number', 'like', "%{$search}%");
-        })
-        ->orderByDesc('purchase_date')
-        ->paginate(20);
+            ->whereBetween('purchase_date', [
+                $start_date,
+                $end_date
+            ])
+            ->orderByDesc('purchase_date')
+            ->paginate(20);
 
         $purchaseItems = collect($purchases->items())->map(function ($purchase) {
 
-            $purchase->purchase_date_formatted =
-                \Carbon\Carbon::parse($purchase->purchase_date)
-                    ->format('d/m/Y');
+            $purchase->purchase_date_formatted = Carbon::parse(
+                $purchase->purchase_date
+            )->format('d/m/Y');
 
             return $purchase;
         });
@@ -55,7 +70,9 @@ class PurchaseController extends Controller
 
         return view('admin.compras.index', compact(
             'purchaseItems',
-            'links'
+            'links',
+            'start_date',
+            'end_date'
         ));
     }
 

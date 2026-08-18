@@ -93,6 +93,10 @@ class User extends Authenticatable
         return $this->hasRole('superadmin');
     }
 
+    public function isAdmin() {
+        return $this->hasRole('admin');
+    }
+
     public function isCustomer() {
         return $this->hasRole('customer');
     }

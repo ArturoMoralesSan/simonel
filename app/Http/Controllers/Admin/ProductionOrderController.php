@@ -58,7 +58,7 @@ class ProductionOrderController extends Controller
         $statusLabels = [
             'creada'      => 'Pre ordenadas',
             'autorizada'  => 'Autorizadas',
-            'produccion'  => 'En producción',
+            'produccion'  => 'Producción',
             'finalizada'  => 'Finalizadas',
             'cancelada'   => 'Canceladas',
         ];

@@ -51,7 +51,7 @@ class StatisticsController extends Controller
         $branch   = \Request('branch');
         $payment  = \Request('payment');
 
-        if (!Auth::user()->isSuperAdmin()) {
+        if (!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');
@@ -178,7 +178,7 @@ class StatisticsController extends Controller
         $year     = \Request('year');
         $branch   = \Request('branch');
 
-        if (!Auth::user()->isSuperAdmin()) {
+        if (!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');

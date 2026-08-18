@@ -55,7 +55,7 @@ class ServiceController extends Controller
         ->orderBy('date','DESC');
         
 
-        if (!Auth::user()->isSuperAdmin()) {
+        if (!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
             $services = $services->where('branch_id', Auth::user()->branch_id);
         }
         
@@ -78,7 +78,7 @@ class ServiceController extends Controller
     public function create()
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
-        if (!Auth::user()->isSuperAdmin()) {
+        if (!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');
@@ -91,7 +91,7 @@ class ServiceController extends Controller
     public function edit($id)
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
-        if (!Auth::user()->isSuperAdmin()) {
+        if (!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');

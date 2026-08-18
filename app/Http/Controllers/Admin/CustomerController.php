@@ -32,7 +32,7 @@ class CustomerController extends Controller
             },
             'seller',
         ])
-        ->when(!Auth::user()->isSuperAdmin(), function ($query) {
+        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() || Auth::user()->isAdmin() , function ($query) {
             $query->where('seller_id', Auth::id());
         })
         ->when($search, function ($query) use ($search) {
@@ -98,7 +98,7 @@ class CustomerController extends Controller
 
         $seller_id = Auth::id();
 
-        if (Auth::user()->isSuperAdmin() && $request->filled('seller_id')) {
+        if (Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() && $request->filled('seller_id')) {
             $seller_id = $request->seller_id;
         }
 
