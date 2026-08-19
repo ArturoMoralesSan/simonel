@@ -26,11 +26,11 @@
                         </thead>
                         <tbody>
                             <tr v-for="productItem in inventory" class="table-resource__row" :key="productItem.id">
-                                <td>
+                                <td data-label="Producto">
                                     {{ productItem.product.manufactured.name }}
                                     {{ productItem.product.manufactured.description }}
                                 </td>
-                                <td>{{ productItem.quantity }}</td>
+                                <td data-label="Cantidad">{{ productItem.quantity }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -173,12 +173,12 @@
 
                             <tbody>
                                 <tr v-for="productItem in movementsEntradas" :key="productItem.id">
-                                    <td>{{ formatearFecha(productItem.date) }}</td>
-                                    <td>
+                                    <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
+                                    <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
                                         {{ productItem.inventory.product.manufactured.description }}
                                     </td>
-                                    <td>{{ productItem.quantity }}</td>
+                                    <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -203,12 +203,12 @@
 
                             <tbody>
                                 <tr v-for="productItem in movementsSalidas" :key="productItem.id">
-                                    <td>{{ formatearFecha(productItem.date) }}</td>
-                                    <td>
+                                    <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
+                                    <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
                                         {{ productItem.inventory.product.manufactured.description }}
                                     </td>
-                                    <td>{{ productItem.quantity }}</td>
+                                    <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -232,12 +232,12 @@
 
                             <tbody>
                                 <tr v-for="productItem in movementsMermas" :key="productItem.id">
-                                    <td>{{ formatearFecha(productItem.date) }}</td>
-                                    <td>
+                                    <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
+                                    <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
                                         {{ productItem.inventory.product.manufactured.description }}
                                     </td>
-                                    <td>{{ productItem.quantity }}</td>
+                                    <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -264,13 +264,13 @@
 
                             <tbody>
                                 <tr v-for="(producto, nombre) in resumen" :key="nombre">
-                                    <td>{{ nombre }}</td>
-                                    <td>{{ producto.stock }}</td>
-                                    <td>{{ producto.entradas }}</td>
-                                    <td>{{ producto.salidas }}</td>
-                                    <td>{{ producto.mermas }}</td>
-                                    <td>{{ producto.promedio }}</td>
-                                    <td>{{ producto.sugerencia }}</td>
+                                    <td data-label="Fecha">{{ nombre }}</td>
+                                    <td data-label="Stock actual">{{ producto.stock }}</td>
+                                    <td data-label="Total en cámara">{{ producto.entradas }}</td>
+                                    <td data-label="Total en piso">{{ producto.salidas }}</td>
+                                    <td data-label="Total merma">{{ producto.mermas }}</td>
+                                    <td data-label="Promedio venta">{{ producto.promedio }}</td>
+                                    <td data-label="Recomendación de compra">{{ producto.sugerencia }}</td>
                                 </tr>
                             </tbody>
                         </table>

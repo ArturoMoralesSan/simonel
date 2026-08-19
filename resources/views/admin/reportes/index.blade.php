@@ -109,7 +109,7 @@
                                     <th>Ventas</th>
                                     <th>Total vendido</th>
                                     <th>Efectivo</th>
-                                    <th>Detalle</th>
+                                    <th>PDF</th>
                                 </tr>
                             </thead>
 
@@ -120,23 +120,23 @@
                                     :key="seller.id"
                                 >
 
-                                    <td>
+                                    <td data-label="Vendedor">
                                         @{{ seller.name }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Ventas">
                                         @{{ seller.sales_count }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Total vendido">
                                         $ @{{ Number(seller.total_sales).toFixed(2) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Efectivo">
                                         $ @{{ Number(seller.cash_total).toFixed(2) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="PDF">
 
                                         <link-pdf
                                             :branchid="seller.id"
@@ -206,23 +206,23 @@
                                     :key="product.id"
                                 >
 
-                                    <td>
+                                    <td data-label="Producto">
                                         @{{ product.name }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Ventas">
                                         @{{ product.sales_count }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Cantidad">
                                         @{{ Number(product.quantity).toFixed(3) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Total">
                                         $ @{{ Number(product.total).toFixed(2) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="PDF">
                                         <link-pdf
                                             :branchid="product.id"
                                             url="/admin/reportes/producto/"
@@ -290,19 +290,19 @@
                                     :key="customer.id"
                                 >
 
-                                    <td>
+                                    <td data-label="Clientes">
                                         @{{ customer.name }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Compras">
                                         @{{ customer.sales_count }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Total">
                                         $ @{{ Number(customer.total).toFixed(2) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="PDF">
                                         <link-pdf
                                             :branchid="customer.id"
                                             url="/admin/reportes/cliente/"
@@ -352,8 +352,8 @@
 
                             <thead>
                                 <tr>
-                                    <th>Método</th>
-                                    <th>Operaciones</th>
+                                    <th>Método de pago</th>
+                                    <th>Cantidad de operaciones</th>
                                     <th>Total</th>
                                     <th>PDF</th>
                                 </tr>
@@ -366,19 +366,19 @@
                                     :key="payment.id"
                                 >
 
-                                    <td>
+                                    <td data-label="Método de pago">
                                         @{{ payment.name }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Cantidad de operaciones">
                                         @{{ payment.operations }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="Total">
                                         $ @{{ Number(payment.total).toFixed(2) }}
                                     </td>
 
-                                    <td>
+                                    <td data-label="PDF">
                                         <link-pdf
                                             :branchid="payment.id"
                                             url="/admin/reportes/pago/"

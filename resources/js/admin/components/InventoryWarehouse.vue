@@ -30,10 +30,8 @@
         >
 
             <h3 class="db-panel__title">
-
                 Inventario de
                 {{ fields.warehouse_type }}
-
             </h3>
 
 
@@ -75,7 +73,7 @@
                         </th>
 
                         <th class="text-center">
-                            Cantidad
+                            Cantidad en lote
                         </th>
 
                         <th class="text-center">
@@ -101,13 +99,23 @@
 
                             <tr
                                 v-for="(lot, lotIndex) in warehouse.lots"
-                                :key="item.type + '-' + item.item_id + '-' + warehouse.id + '-' + lot.id"
+                                :key="
+                                    item.type +
+                                    '-' +
+                                    item.item_id +
+                                    '-' +
+                                    warehouse.id +
+                                    '-' +
+                                    lot.id
+                                "
                                 class="table-resource__row"
                             >
 
                                 <!-- Producto -->
 
-                                <td>
+                                <td
+                                    data-label="Producto / Materia prima:"
+                                >
 
                                     <strong>
                                         {{ item.name }}
@@ -124,9 +132,11 @@
 
                                 <!-- Tipo -->
 
-                                <td>
+                                <td data-label="Tipo">
 
-                                    <span v-if="item.type === 'product'">
+                                    <span
+                                        v-if="item.type === 'product'"
+                                    >
                                         Producto terminado
                                     </span>
 
@@ -139,7 +149,7 @@
 
                                 <!-- Almacén -->
 
-                                <td>
+                                <td data-label="Almacén">
 
                                     {{ warehouse.name }}
 
@@ -148,7 +158,7 @@
 
                                 <!-- Lote -->
 
-                                <td>
+                                <td data-label="Lote:">
 
                                     <strong>
                                         {{ lot.lot_number || '-' }}
@@ -163,7 +173,9 @@
                                         }"
                                     >
 
-                                        <span v-if="lot.is_expired">
+                                        <span
+                                            v-if="lot.is_expired"
+                                        >
                                             ⚠️ Vencido:
                                         </span>
 
@@ -184,19 +196,45 @@
 
                                 <!-- Cantidad del lote -->
 
-                                <td class="text-center">
+                                <td
+                                    class="text-center"
+                                    data-label="Cantidad en lote:"
+                                >
 
                                     {{ Number(lot.quantity).toFixed(2) }}
 
                                 </td>
 
 
-                                <!-- Total del producto -->
+                                <!-- Total desktop -->
 
                                 <td
                                     v-if="lotIndex === 0"
                                     :rowspan="warehouse.lots.length"
-                                    class="text-center"
+                                    class="
+                                        text-center
+                                        inventory-total-cell
+                                        desktop-total
+                                    "
+                                    data-label="Total de producto"
+                                >
+
+                                    <strong>
+                                        {{ Number(item.quantity).toFixed(2) }}
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- Total mobile -->
+
+                                <td
+                                    v-if="lotIndex === warehouse.lots.length - 1"
+                                    class="
+                                        text-center
+                                        mobile-total
+                                    "
+                                    data-label="Total de producto"
                                 >
 
                                     <strong>
@@ -230,33 +268,38 @@
 
                     </tr>
 
-                </tbody>
 
+                    <!-- Total general -->
 
-                <!-- Total general -->
+                    <tr
+                        v-if="inventory.length > 0"
+                        class="inventory-grand-total"
+                    >
 
-                <tfoot
-                    v-if="inventory.length > 0"
-                >
-
-                    <tr>
-
-                        <th
+                        <td
                             colspan="5"
-                            class="text-right"
+                            class="text-right inventory-grand-total-label"
                         >
-                            Total de inventario
-                        </th>
 
-                        <th class="text-center">
+                            <strong>
+                                Total de inventario
+                            </strong>
 
-                            {{ totalInventory }}
+                        </td>
 
-                        </th>
+                        <td
+                            class="text-center inventory-grand-total-value"
+                        >
+
+                            <strong>
+                                {{ totalInventory }}
+                            </strong>
+
+                        </td>
 
                     </tr>
 
-                </tfoot>
+                </tbody>
 
             </table>
 
@@ -413,6 +456,94 @@ export default {
 .text-danger {
     color: #dc3545;
     font-weight: bold;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Total por producto
+|--------------------------------------------------------------------------
+*/
+
+.inventory-total-cell {
+    vertical-align: middle !important;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Total móvil por producto
+|--------------------------------------------------------------------------
+*/
+
+.mobile-total {
+    display: none;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Total general
+|--------------------------------------------------------------------------
+*/
+
+.inventory-grand-total-label,
+.inventory-grand-total-value {
+    vertical-align: middle !important;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Responsive
+|--------------------------------------------------------------------------
+*/
+
+@media (max-width: 767px) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Total por producto
+    |--------------------------------------------------------------------------
+    */
+
+    .desktop-total {
+        display: none !important;
+    }
+
+    .mobile-total {
+        display: table-cell;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Total general
+    |--------------------------------------------------------------------------
+    |
+    | En móvil no usamos colspan porque la tabla responsive
+    | convierte cada celda en un bloque independiente.
+    |
+    */
+
+    .inventory-grand-total {
+        display: block;
+        padding: 15px;
+    }
+
+    .inventory-grand-total-label,
+    .inventory-grand-total-value {
+        display: block;
+        width: 100%;
+        text-align: right !important;
+        padding: 5px 0;
+    }
+
+    .inventory-grand-total-label::before,
+    .inventory-grand-total-value::before {
+        display: none !important;
+    }
+
 }
 
 </style>

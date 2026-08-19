@@ -13,7 +13,7 @@ class PurchaseRequest extends FormRequest
     {
         $rules = [
             'supplier_id'    => 'required|exists:suppliers,id',
-            'purchase_date'  => 'required|date',
+            'purchase_date'  => 'required|date|before_or_equal:today',
             'invoice_number' => 'nullable|string|max:100',
             'notes'          => 'nullable|string|max:1000',
             'item_count'     => 'required|integer|min:1',
@@ -58,5 +58,12 @@ class PurchaseRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function messages()
+    {
+        return [
+            'purchase_date.before_or_equal' => 'La fecha de compra no puede ser posterior a hoy.',
+        ];
     }
 }

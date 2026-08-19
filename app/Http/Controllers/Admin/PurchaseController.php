@@ -27,12 +27,14 @@ class PurchaseController extends Controller
 
         $search = request('search');
 
-        // Fechas por defecto: hoy
-        $dateNow    = Carbon::now();
-        $dateFormat = $dateNow->format('Y-m-d');
+        // Fechas por defecto: último mes hasta hoy
+        $dateNow = Carbon::now();
 
-        $start_date = request('start_date') ?? $dateFormat;
-        $end_date   = request('end_date') ?? $dateFormat;
+        $start_date = request('start_date')
+            ?? $dateNow->copy()->subMonth()->format('Y-m-d');
+
+        $end_date = request('end_date')
+            ?? $dateNow->format('Y-m-d');
 
         $purchases = Purchase::with('supplier')
             ->withCount([
@@ -266,15 +268,14 @@ class PurchaseController extends Controller
             ->with('success', 'Compra actualizada correctamente');
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
         $purchase = Purchase::findOrFail($id);
 
         $purchase->delete();
 
-        return back()->with(
-            'success',
-            'Compra eliminada correctamente'
-        );
+        alert('No se ha podido eliminar un usuario.');
+        return response('', 204);
+
     }
 }

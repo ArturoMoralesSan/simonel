@@ -47,7 +47,7 @@ class ProductionOrderRequest extends FormRequest
             $rules['item' . $i . '_quantity'] = ['required','numeric','min:0.001'];
         }
 
-        if ($this->route('id') && $this->input('status') === 'Producción') {
+        if ($this->route('id') && $this->input('status') === 'Finalizada') {
             $rules['combo_weight'] = [
                 'required',
                 'numeric',

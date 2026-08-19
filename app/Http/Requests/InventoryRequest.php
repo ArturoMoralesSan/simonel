@@ -17,7 +17,7 @@ class InventoryRequest extends FormRequest
         for ($i = 1; $i <= $productCount; $i++) {
             $rules['inventory' . $i . '_product_id'] = ['required', 'numeric'];
             $rules['inventory' . $i . '_quantity'] = ['required', 'numeric', 'min:0.1'];
-            $rules['inventory' . $i . '_date'] = ['required', 'date'];
+            $rules['inventory' . $i . '_date'] = ['required', 'date', 'before_or_equal:today'];
 
             if ($this->input('type') === 'salida') {
                 $rules['inventory' . $i . '_sale_id'] = ['nullable', 'exists:sales,id'];
@@ -41,6 +41,7 @@ class InventoryRequest extends FormRequest
             '*.numeric' => 'Este campo debe ser un número.',
             '*.min' => 'El valor mínimo permitido es 1.',
             '*.date' => 'Debes ingresar una fecha válida.',
+            '*.before_or_equal' => 'La fecha no puede ser posterior a hoy.',
         ];
     }
 }

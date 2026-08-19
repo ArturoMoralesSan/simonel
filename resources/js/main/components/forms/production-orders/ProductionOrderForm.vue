@@ -106,8 +106,8 @@
                             v-model="fields.combo_weight"
                             :initial="orderData.combo_weight || ''"
                             :disabled="
-                                ['Finalizada', 'Cancelada'].includes(fields.status) ||
-                                ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                ['Cancelada'].includes(fields.status) ||
+                                ['Finalizada', 'Cancelada'].includes(orderData?.status)
                             "
                         />
 
@@ -143,8 +143,8 @@
                                 v-model="yieldItem.quantity"
                                 :initial="getYieldQuantity(yieldItem.type)"
                                 :disabled="
-                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
-                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                    ['Cancelada'].includes(fields.status) ||
+                                    ['Finalizada', 'Cancelada'].includes(orderData?.status)
                                 "    
                                 />
                             <field-errors :name="'yields['+index+'][quantity]'"></field-errors>
@@ -154,8 +154,8 @@
                                 :name="'yields['+index+'][type]'"
                                 :value="yieldItem.type"
                                 :disabled="
-                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
-                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                    ['Cancelada'].includes(fields.status) ||
+                                    ['Finalizada', 'Cancelada'].includes(orderData?.status)
                                 "
                             />
 
@@ -164,8 +164,8 @@
                                 :name="'yields['+index+'][unit]'"
                                 :value="yieldItem.unit"
                                 :disabled="
-                                    ['Finalizada', 'Cancelada'].includes(fields.status) ||
-                                    ['Producción', 'Finalizada', 'Cancelada'].includes(orderData?.status)
+                                    ['Cancelada'].includes(fields.status) ||
+                                    ['Finalizada', 'Cancelada'].includes(orderData?.status)
                                 "
                             />
 

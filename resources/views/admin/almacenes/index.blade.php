@@ -69,11 +69,12 @@
                                         class="btn--danger table-resource__button" :url="$root.path + '/admin/almacenes/eliminar/' + warehouseItem.id"
                                         :resource-id="warehouseItem.id"
                                         :options="{ onDelete: onResourceDelete }"
-                                        :disabled="warehouseItem.lots_count != 0"
+                                        
                                     >
                                         <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
                                         Eliminar
                                     </delete-button>
+                                    <!-- :disabled="warehouseItem.lots_count != 0" -->
                                 </td>
                             </tr>
                         </tbody>

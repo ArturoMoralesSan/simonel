@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+
 class StoreUserCustomerRequest extends FormRequest
 {
-    
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -14,12 +15,12 @@ class StoreUserCustomerRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'business_name'   => 'nullable|string|max:255',
+            'business_name'   => 'required|string|max:255',
             'email'           => 'nullable|email',
             'rfc'             => 'nullable|string|max:13|min:12',
             'trade_name'      => 'nullable|string|max:255',
             'tax_regime'      => 'nullable|string|max:255',
-            'phone'           => 'nullable|string|max:20',
+            'phone'           => 'required|string|max:20',
             'street'          => 'nullable|string|max:255',
             'ext_number'      => 'nullable|string|max:20',
             'int_number'      => 'nullable|string|max:20',
@@ -33,11 +34,9 @@ class StoreUserCustomerRequest extends FormRequest
             'postal_code'     => 'nullable|string|max:10',
 
             // Crédito
-            'credit'          => 'required|boolean',
-            'credit_limit'    => 'nullable|numeric|min:0',
-            'credit_days'     => 'nullable|integer|min:1|max:365',
         ];
 
+        // Validación de RFC y correo
         if ($this->customer_id === null) {
             $rules['rfc'] .= '|unique:customers,rfc';
             $rules['email'] .= '|unique:users,email';
@@ -46,8 +45,14 @@ class StoreUserCustomerRequest extends FormRequest
             $rules['email'] .= '|unique:users,email,' . $this->user_id;
         }
 
-        // Si tiene crédito, los datos son obligatorios
-        if ((int)$this->credit === 1) {
+        // Solo Admin y SuperAdmin pueden registrar crédito
+        $canManageCredit =
+            Auth::user()->isSuperAdmin() ||
+            Auth::user()->isAdmin();
+
+        // Si tiene crédito y es Admin/SuperAdmin,
+        // los datos del crédito son obligatorios.
+        if ((int) $this->credit === 1 && $canManageCredit) {
             $rules['credit_limit'] = 'required|numeric|min:1';
             $rules['credit_days']  = 'required|integer|min:1|max:365';
         }

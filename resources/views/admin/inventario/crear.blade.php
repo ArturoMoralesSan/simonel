@@ -1,9 +1,9 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Agregar elemento al inventario')
-@section('tab_title', 'Agregar elemento al inventario | ' . config('app.name'))
-@section('description', 'Agregar elemento al inventario.')
+@section('title', 'Gestionar inventario de tienda de autoservicio')
+@section('tab_title', 'Gestionar inventario de tienda de autoservicio | ' . config('app.name'))
+@section('description', 'Gestionar inventario de tienda de autoservicio.')
 @section('css_classes', 'dashboard')
 
 @section('content')
@@ -11,7 +11,7 @@
     <section class="mb-16">
         <div class="dashboard-heading">
             <h1 class="dashboard-heading__title">
-                Agregar producto al inventario
+                Gestionar inventario de tienda de autoservicio
             </h1>
         </div>
 
@@ -19,7 +19,7 @@
             <p class="mb-12">
                 @include('components.alert')
                 <span class="color-link">«</span>
-                <a href="{{ url('admin/inventario-clientes/') }}">Ver todos los elementos en el inventario</a>
+                <a href="{{ url('admin/inventario-clientes/') }}">Ver todos los inventarios por tiendas de autoservicio</a>
             </p>
 
             <inventory-form

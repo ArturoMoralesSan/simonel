@@ -97,7 +97,7 @@ class InventoryProductController extends Controller
     
     public function index()
     {
-        abort_unless(Gate::allows('view.inventories') || Gate::allows('create.inventories'), 403);
+        abort_unless(Gate::allows('view.warehouses') || Gate::allows('create.warehouses'), 403);
 
         $search = request('search');
         $query = Inventory::with('product.cut')->where('inventory_type', "Interno")->orderBy('created_at', 'desc');

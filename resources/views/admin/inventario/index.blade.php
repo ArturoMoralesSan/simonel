@@ -1,15 +1,15 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Inventario')
-@section('tab_title', 'Inventario | ' . config('app.name'))
-@section('description', 'Inventario.')
+@section('title', 'Inventario en tiendas de autoservicio')
+@section('tab_title', 'Inventario en tiendas de autoservicio | ' . config('app.name'))
+@section('description', 'Inventario en tiendas de autoservicio.')
 @section('css_classes', 'dashboard')
 
 @section('content')
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Inventario
+            Inventario en tiendas de autoservicio
         </h1>
 
         <p class="dashboard-heading__caption">
@@ -29,7 +29,7 @@
         @include('components.alert')
         <section class="db-panel">
             <h3 class="db-panel__title">
-                Inventario
+                Inventario en tiendas de autoservicio
             </h3>
 
             @if (! $inventoriesItems->count())

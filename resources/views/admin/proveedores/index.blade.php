@@ -112,9 +112,10 @@
                                     class="btn--danger table-resource__button"
                                     :url="$root.path + '/admin/proveedores/eliminar/' + supplier.id"
                                     :resource-id="supplier.id"
-                                    :disabled="supplier.lots_count != 0"
+                                    
                                     :options="{ onDelete: onResourceDelete }"
                                 >
+                                <!-- :disabled="supplier.lots_count != 0" -->
                                     <img
                                         class="svg-icon"
                                         src="{{ url('img/svg/trash.svg') }}"

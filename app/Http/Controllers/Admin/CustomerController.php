@@ -32,7 +32,7 @@ class CustomerController extends Controller
             },
             'seller',
         ])
-        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() || Auth::user()->isAdmin() , function ($query) {
+        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() , function ($query) {
             $query->where('seller_id', Auth::id());
         })
         ->when($search, function ($query) use ($search) {
@@ -77,12 +77,32 @@ class CustomerController extends Controller
 
         $isSuperAdmin = auth()->user()->isSuperAdmin();
         $sellers = User::whereHas('role', function ($query) {
-            $query->where('key_name', 'superadmin');
+            $query->where('key_name', 'vendedores');
         })
         ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
         ->orderBy('name')
         ->pluck('full_name', 'id');
-        return view('admin.clientes.crear', compact('isSuperAdmin', 'sellers'));
+
+        $regimenLabel = collect([
+            'resico_pf' => 'RESICO - Persona Física',
+            'sueldos_salarios' => 'Sueldos y Salarios',
+            'actividad_empresarial' => 'Actividad Empresarial y Profesional',
+            'arrendamiento' => 'Arrendamiento',
+            'agricola_ganadera' => 'Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras',
+            'enajenacion_bienes' => 'Enajenación de Bienes',
+            'adquisicion_bienes' => 'Adquisición de Bienes',
+            'demas_ingresos' => 'Demás Ingresos',
+            'dividendos' => 'Ingresos por Dividendos',
+            'intereses' => 'Intereses',
+            'premios' => 'Ingresos por Obtención de Premios',
+            'plataformas_tecnologicas' => 'Plataformas Tecnológicas',
+
+            'resico_pm' => 'RESICO - Persona Moral',
+            'general_pm' => 'Régimen General de Ley - Persona Moral',
+            'fines_no_lucrativos' => 'Personas Morales con Fines No Lucrativos',
+        ]);
+
+        return view('admin.clientes.crear', compact('isSuperAdmin', 'sellers', 'regimenLabel'));
     }
 
 
@@ -172,13 +192,32 @@ class CustomerController extends Controller
         $isSuperAdmin = auth()->user()->isSuperAdmin();
 
         $sellers = User::whereHas('role', function ($query) {
-            $query->where('key_name', 'superadmin');
+            $query->where('key_name', 'vendedores');
         })
         ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
         ->orderBy('name')
         ->pluck('full_name', 'id');
 
-        return view('admin.clientes.editar', compact('user', 'isSuperAdmin', 'sellers'));
+        $regimenLabel = collect([
+            'resico_pf' => 'RESICO - Persona Física',
+            'sueldos_salarios' => 'Sueldos y Salarios',
+            'actividad_empresarial' => 'Actividad Empresarial y Profesional',
+            'arrendamiento' => 'Arrendamiento',
+            'agricola_ganadera' => 'Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras',
+            'enajenacion_bienes' => 'Enajenación de Bienes',
+            'adquisicion_bienes' => 'Adquisición de Bienes',
+            'demas_ingresos' => 'Demás Ingresos',
+            'dividendos' => 'Ingresos por Dividendos',
+            'intereses' => 'Intereses',
+            'premios' => 'Ingresos por Obtención de Premios',
+            'plataformas_tecnologicas' => 'Plataformas Tecnológicas',
+
+            'resico_pm' => 'RESICO - Persona Moral',
+            'general_pm' => 'Régimen General de Ley - Persona Moral',
+            'fines_no_lucrativos' => 'Personas Morales con Fines No Lucrativos',
+        ]);
+
+        return view('admin.clientes.editar', compact('user', 'isSuperAdmin', 'sellers', 'regimenLabel'));
     }
 
     public function destroy($id)

@@ -25,6 +25,7 @@
             <customer-form
                 action="{{ url('admin/clientes/crear') }}"
                 :is-admin="{{ $isSuperAdmin ? 'true' : 'false' }}"
+                :regimen="{{ $regimenLabel }}"
                 :sellers='@json($sellers)'              
                 :user="{}"
             >

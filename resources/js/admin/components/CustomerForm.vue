@@ -37,8 +37,13 @@
                 <div class="md:col-1/2">
                     <div class="form-control">
                         <label for="tax_regime">Regimen fiscal</label>
-                        <text-field name="tax_regime" v-model="fields.tax_regime" maxlength="80" :initial="user.tax_regime || ''">
-                        </text-field>
+                        <select-field
+                            name="tax_regime"
+                            v-model="fields.tax_regime"
+                            :options="regimen"
+                            :initial="user.tax_regime || ''"
+                        >
+                        </select-field>
                         <field-errors name="tax_regime"></field-errors>
                     </div>
                 </div>
@@ -298,6 +303,10 @@ export default {
     extends: BaseForm,
     props: {
         sellers: {
+            required: true,
+            type: [Array, Object]
+        },
+        regimen: {
             required: true,
             type: [Array, Object]
         },

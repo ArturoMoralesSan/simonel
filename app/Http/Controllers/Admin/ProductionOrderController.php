@@ -56,11 +56,10 @@ class ProductionOrderController extends Controller
         ]);
 
         $statusLabels = [
-            'creada'      => 'Pre ordenadas',
+            'creada'      => 'Ordenadas',
             'autorizada'  => 'Autorizadas',
             'produccion'  => 'Producción',
             'finalizada'  => 'Finalizadas',
-            'cancelada'   => 'Canceladas',
         ];
 
         $ordersByStatus = collect([]);
@@ -996,48 +995,177 @@ class ProductionOrderController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | PRODUCCIÓN
+            | VALIDAR INVENTARIO ANTES DE PASAR A PRODUCCIÓN
             |--------------------------------------------------------------------------
             */
+
             if ($oldStatus !== 'Producción' && $request->status === 'Producción') {
 
-                $productionOrder->load('items.rawMaterial');
+                $rawMaterials = [];
+                $missingMaterials = [];
 
-                foreach ($productionOrder->items as $item) {
+                /*
+                |--------------------------------------------------------------------------
+                | OBTENER TODAS LAS MATERIAS PRIMAS DE LAS RECETAS
+                |--------------------------------------------------------------------------
+                */
 
-                    $remaining = $item->quantity;
+                for ($i = 1; $i <= $request->item_count; $i++) {
 
-                    $lots = RawMaterialLot::where('raw_material_id', $item->raw_material_id)
-                        ->where('available_quantity', '>', 0)
-                        ->orderBy('entry_date')
-                        ->get();
+                    $recipeId = $request->input("item{$i}_recipes_id");
+                    $quantity = (float) $request->input("item{$i}_quantity");
 
-                    foreach ($lots as $lot) {
+                    if (!$recipeId || $quantity <= 0) {
+                        continue;
+                    }
 
-                        if ($remaining <= 0) break;
+                    $recipe = ProductRecipe::with([
+                        'manufactured',
+                        'items.rawMaterial'
+                    ])->findOrFail($recipeId);
 
-                        $consume = min($remaining, $lot->available_quantity);
+                    if (!$recipe->yield_quantity || $recipe->yield_quantity <= 0) {
+                        throw new \Exception(
+                            "La receta {$recipe->id} no tiene una cantidad de rendimiento válida."
+                        );
+                    }
 
-                        $lot->available_quantity -= $consume;
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Factor de producción
+                    |--------------------------------------------------------------------------
+                    */
 
-                        if ($lot->available_quantity <= 0) {
-                            $lot->status = 'Consumido';
+                    $factor = $quantity / $recipe->yield_quantity;
+
+
+                    foreach ($recipe->items as $recipeItem) {
+
+                        $requiredQuantity =
+                            (float) $recipeItem->quantity * $factor;
+
+                        $rawMaterialId = $recipeItem->raw_material_id;
+
+                        $materialName =
+                            $recipeItem->rawMaterial->name ?? 'Materia prima';
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Agrupar materias primas repetidas
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if (!isset($rawMaterials[$rawMaterialId])) {
+
+                            $rawMaterials[$rawMaterialId] = [
+                                'raw_material_id' => $rawMaterialId,
+                                'name' => $materialName,
+                                'quantity' => 0,
+                            ];
+
                         }
 
-                        $lot->save();
-
-                        RawMaterialMovement::create([
-                            'raw_material_id' => $item->raw_material_id,
-                            'raw_material_lot_id' => $lot->id,
-                            'movement_type' => 'consumo_produccion',
-                            'quantity' => -$consume,
-                            'reference_type' => 'production_order',
-                            'reference_id' => $productionOrder->id,
-                            'created_by' => auth()->id(),
-                        ]);
-
-                        $remaining -= $consume;
+                        $rawMaterials[$rawMaterialId]['quantity']
+                            += $requiredQuantity;
                     }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | REVISAR TODOS LOS LOTES
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($rawMaterials as $material) {
+
+                    $requiredQuantity =
+                        (float) $material['quantity'];
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Buscar lotes disponibles
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $lots = RawMaterialLot::where(
+                            'raw_material_id',
+                            $material['raw_material_id']
+                        )
+                        ->where('available_quantity', '>', 0)
+                        ->orderBy('entry_date')
+                        ->lockForUpdate()
+                        ->get();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | NO EXISTEN LOTES
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($lots->isEmpty()) {
+
+                        $missingMaterials[] =
+                            "• {$material['name']}: " .
+                            "requiere " .
+                            number_format($requiredQuantity, 2) .
+                            " → SIN LOTES DISPONIBLES";
+
+                        continue;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | SUMAR CANTIDAD DE TODOS LOS LOTES
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $availableQuantity = $lots->sum(function ($lot) {
+
+                        return (float) $lot->available_quantity;
+
+                    });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | NO HAY SUFICIENTE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($availableQuantity < $requiredQuantity) {
+
+                        $missingQuantity =
+                            $requiredQuantity - $availableQuantity;
+
+                        $missingMaterials[] =
+                            "• {$material['name']}: " .
+                            "requiere " .
+                            number_format($requiredQuantity, 2) .
+                            ", disponible " .
+                            number_format($availableQuantity, 2) .
+                            " → FALTAN " .
+                            number_format($missingQuantity, 2);
+                    }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | MOSTRAR TODO LO QUE FALTA
+                |--------------------------------------------------------------------------
+                */
+
+                if (!empty($missingMaterials)) {
+
+                    $message =
+                        "No se puede iniciar la producción:\n\n" .
+                        implode("\n", $missingMaterials);
+
+                    throw new \Exception($message);
                 }
             }
 

@@ -47,7 +47,7 @@ class DashboardController extends Controller
         $this->service->checkStockLow();
         $this->service->checkStockMaterialLow();
 
-        if (Auth::user()->isSuperAdmin()) {
+        if (Auth::user()->isSuperAdmin() || Auth::user()->isAdmin()) {
 
             $dateNow     = Carbon::now();
             $dateFormat  = $dateNow->format('Y-m-d');

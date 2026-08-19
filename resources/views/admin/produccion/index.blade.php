@@ -126,6 +126,13 @@
                                                 class="table-resource__actions"
                                                 data-label="Acciones:"
                                             >
+                                                <a
+                                                    class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"
+                                                    :href="$root.path + '/admin/produccion/' + orderItem.id + '/pdf'"
+                                                    target="_blank"
+                                                >
+                                                    PDF
+                                                </a>
 
                                                 <a
                                                     class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"

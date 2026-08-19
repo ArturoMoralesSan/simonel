@@ -7,21 +7,40 @@
 @section('css_classes', 'dashboard')
 
 @section('content')
-
 <div class="dashboard-heading">
-    <h1 class="dashboard-heading__title">
-        Compras
-    </h1>
+    <div class="md:row justify-between items-center">
+        <div class="md:col-1/2">
+            <h1 class="dashboard-heading__title">
+                Compras
+            </h1>
 
-    <p class="dashboard-heading__caption">
-        Hay {{ $purchaseItems->count() }} compras registradas.
-    </p>
+            <p class="dashboard-heading__caption">
+                Hay {{ $purchaseItems->count() }} compras registradas.
+            </p>
+        </div>
+
+        <div class="md:col-1/2 d-flex items-center justify-end">
+            <form-between-date-search
+                selectedstart="{{ request('start_date') }}"
+                selectedend="{{ request('end_date') }}"
+            >
+                <template slot="svg-search">
+                    <img
+                        class="search-form_icon--55"
+                        src="{{ url('img/svg/search.svg') }}"
+                        alt=""
+                    >
+                </template>
+            </form-between-date-search>
+        </div>
+    </div>
 </div>
 
 <div class="fluid-container mb-16">
 
     <form-search
         selected="{{ request('search') }}"
+        placeholder="Buscar por proveedor o factura"
     >
         <template slot="svg-search">
             <img
@@ -123,11 +142,12 @@
 
                                 <delete-button
                                     class="btn--danger table-resource__button"
-                                    :url="$root.path + '/admin/compras/' + purchase.id"
+                                    :url="$root.path + '/admin/compras/eliminar/' + purchase.id"
                                     :resource-id="purchase.id"
                                     :options="{ onDelete: onResourceDelete }"
-                                    :disabled="purchase.lot_count != 0"
+                                    
                                 >
+                                <!-- :disabled="purchase.lot_count != 0" -->
                                     <img
                                         class="svg-icon"
                                         src="{{ url('img/svg/trash.svg') }}"

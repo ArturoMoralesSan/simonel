@@ -337,7 +337,7 @@ class InventoryController extends Controller
 
     public function inventory()
     {
-        abort_unless(Gate::allows('view.inventory'),403);
+        abort_unless(Gate::allows('view.warehouses'),403);
 
         $warehouseTypes = Warehouse::where('active', 1)
             ->select('warehouse_type')

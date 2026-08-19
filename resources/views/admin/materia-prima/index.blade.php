@@ -83,8 +83,9 @@
                                         class="btn--danger table-resource__button" :url="$root.path + '/admin/materia-prima/eliminar/' + cutItem.id"
                                         :resource-id="cutItem.id"
                                         :options="{ onDelete: onResourceDelete }"
-                                        :disabled="cutItem.lots_count != 0"
+                                        
                                     >
+                                    <!-- :disabled="cutItem.lots_count != 0" -->
                                         <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
                                         Eliminar
                                     </delete-button>
