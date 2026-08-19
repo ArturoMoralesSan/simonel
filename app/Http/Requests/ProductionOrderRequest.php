@@ -18,7 +18,8 @@ class ProductionOrderRequest extends FormRequest
             */
 
             'issue_date'     => ['required', 'date'],
-            'delivery_date'  => ['required','date'],
+            'delivery_date'  => ['required','date', 'after_or_equal:issue_date'],
+            
             'item_count'     => ['required','integer','min:1'],
             'notes' => ['nullable','max:2000'],
 
@@ -72,6 +73,7 @@ class ProductionOrderRequest extends FormRequest
     {
         return [
             'issue_date.required' => 'La fecha de elaboración es requerida.',
+            'issue_date.date' => 'La fecha de elaboración no es válida.',
             'delivery_date.required' => 'La fecha de entrega es requerida.',
             'item_count.required' => 'Debe agregar al menos un producto.',
             'item_count.min' => 'Debe agregar al menos un producto.',
@@ -80,6 +82,9 @@ class ProductionOrderRequest extends FormRequest
             'yields.*.type.in' => 'El tipo de despiece no es válido.',
             'yields.*.quantity.numeric' => 'La cantidad del despiece debe ser numérica.',
             'yields.*.unit.in' => 'La unidad del despiece no es válida.',
+            'delivery_date.date' => 'La fecha de entrega no es válida.',
+            'delivery_date.after_or_equal' => 'La fecha de entrega no puede ser anterior a la fecha de elaboración.',
+            
         ];
     }
 

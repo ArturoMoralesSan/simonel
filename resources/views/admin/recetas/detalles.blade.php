@@ -11,6 +11,11 @@
 </div>
 
 <div class="fluid-container">
+    <p class="mb-12">
+            @include('components.alert')
+            <span class="color-link">«</span>
+            <a href="{{ url('admin/recetas/') }}">Ver todas las recetas</a>
+        </p>
     <section class="db-panel">
         <h3 class="db-panel__title">
             Información general

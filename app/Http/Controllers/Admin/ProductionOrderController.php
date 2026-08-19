@@ -1176,7 +1176,16 @@ class ProductionOrderController extends Controller
             */
             if ($oldStatus !== 'Finalizada' && $request->status === 'Finalizada') {
 
-                $warehouse = Warehouse::where('warehouse_type', 'Productos terminados')->firstOrFail();
+                $warehouse = Warehouse::where(
+                    'warehouse_type',
+                    'Productos terminados'
+                )->first();
+
+                if (!$warehouse) {
+                    throw new \Exception(
+                        'No se puede finalizar la orden de producción porque no existe un tipo de almacén: Productos terminados.'
+                    );
+                }
 
                 $productionOrder->load('products.manufactured');
 
@@ -1195,9 +1204,10 @@ class ProductionOrderController extends Controller
                             "El producto fabricado {$product->manufactured->name} requiere un producto de venta para crear el lote de producto terminado."
                         );
                     }
+
                     $productid = $product->manufactured->product->id;
-                    
-                    
+
+
                     ProductLot::create([
                         'product_id' => $productid,
                         'production_order_id' => $productionOrder->id,
