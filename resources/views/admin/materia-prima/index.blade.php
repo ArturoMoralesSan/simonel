@@ -49,7 +49,6 @@
                                 <th>Tipo de materia</th>
                                 <th>Unidad</th>
                                 <th>Días de expiración</th>
-                                <th>Costo unitario</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -68,10 +67,6 @@
                                 </td>
                                 <td data-label="Días de expiración:">
                                     @{{ cutItem.expiration_days }}
-                                </td>
-                                
-                                <td data-label="Costo:">
-                                    $@{{ cutItem.cost }}
                                 </td>
 
                                 <td class="table-resource__actions" data-label="Acciones:">

@@ -1,10 +1,10 @@
 <template>
+
     <div>
 
         <form>
 
             <div class="form-control">
-
                 <label>
                     Tipo de almacén:
                 </label>
@@ -18,7 +18,6 @@
 
                 <field-errors name="warehouse_type">
                 </field-errors>
-
             </div>
 
         </form>
@@ -26,7 +25,7 @@
 
         <section
             v-if="fields.warehouse_type"
-            class="db-panel"
+            class="db-panel inventory-panel"
         >
 
             <h3 class="db-panel__title">
@@ -45,267 +44,361 @@
             </div>
 
 
-            <!-- Tabla -->
+            <!-- Inventario -->
 
-            <table
+            <div
                 v-else
-                class="table size-caption mx-auto md:table--responsive"
+                class="inventory-container"
             >
 
-                <thead>
+                <!-- Sin inventario -->
 
-                    <tr class="table-resource__headings">
-
-                        <th>
-                            Producto / Materia prima
-                        </th>
-
-                        <th>
-                            Tipo
-                        </th>
-
-                        <th>
-                            Almacén
-                        </th>
-
-                        <th>
-                            Lote
-                        </th>
-
-                        <th class="text-center">
-                            Cantidad en lote
-                        </th>
-
-                        <th class="text-center">
-                            Total
-                        </th>
-
-                    </tr>
-
-                </thead>
+                <div
+                    v-if="inventory.length === 0"
+                    class="inventory-empty"
+                >
+                    No hay inventario disponible
+                    para este tipo de almacén.
+                </div>
 
 
-                <tbody>
+                <!-- Almacenes -->
 
-                    <!-- Productos -->
+                <template
+                    v-for="item in inventory"
+                >
 
                     <template
-                        v-for="item in inventory"
+                        v-for="warehouse in item.warehouses"
                     >
 
-                        <template
-                            v-for="warehouse in item.warehouses"
+                        <!-- Encabezado del almacén -->
+
+                        <div
+                            :key="
+                                'warehouse-' +
+                                item.type +
+                                '-' +
+                                item.item_id +
+                                '-' +
+                                warehouse.id
+                            "
+                            class="warehouse-section"
                         >
 
-                            <tr
-                                v-for="(lot, lotIndex) in warehouse.lots"
-                                :key="
-                                    item.type +
-                                    '-' +
-                                    item.item_id +
-                                    '-' +
-                                    warehouse.id +
-                                    '-' +
-                                    lot.id
-                                "
-                                class="table-resource__row"
-                            >
+                            <div class="warehouse-header">
 
-                                <!-- Producto -->
+                                <div>
+                                    <strong>
+                                        {{ warehouse.name }}
+                                    </strong>
 
-                                <td
-                                    data-label="Producto / Materia prima:"
+                                    <small>
+                                        Almacén
+                                    </small>
+                                </div>
+
+                                <div class="warehouse-total">
+
+                                    <span>
+                                        Total
+                                    </span>
+
+                                    <strong>
+                                        {{ Number(warehouse.quantity).toFixed(2) }}
+                                        kg
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Tabla del almacén -->
+
+                            <div class="table-responsive">
+
+                                <table
+                                    class="table size-caption mx-auto md:table--responsive"
                                 >
 
-                                    <strong>
-                                        {{ item.name }}
-                                    </strong>
+                                    <thead>
 
-                                    <br>
+                                        <tr class="table-resource__headings">
 
-                                    <small v-if="item.description">
-                                        {{ item.description }}
-                                    </small>
+                                            <th>
+                                                Producto / Materia prima
+                                            </th>
 
-                                </td>
+                                            <th>
+                                                Tipo
+                                            </th>
 
+                                            <th>
+                                                Lote
+                                            </th>
 
-                                <!-- Tipo -->
+                                            <th class="text-center">
+                                                Cantidad
+                                            </th>
 
-                                <td data-label="Tipo">
+                                            <th class="text-center">
+                                                Costo
+                                            </th>
 
-                                    <span
-                                        v-if="item.type === 'product'"
-                                    >
-                                        Producto terminado
-                                    </span>
+                                            <th class="text-center">
+                                                Total
+                                            </th>
 
-                                    <span v-else>
-                                        Materia prima
-                                    </span>
+                                        </tr>
 
-                                </td>
-
-
-                                <!-- Almacén -->
-
-                                <td data-label="Almacén">
-
-                                    {{ warehouse.name }}
-
-                                </td>
+                                    </thead>
 
 
-                                <!-- Lote -->
+                                    <tbody>
 
-                                <td data-label="Lote:">
-
-                                    <strong>
-                                        {{ lot.lot_number || '-' }}
-                                    </strong>
-
-                                    <br>
-
-                                    <small
-                                        v-if="lot.expiration_date"
-                                        :class="{
-                                            'text-danger': lot.is_expired
-                                        }"
-                                    >
-
-                                        <span
-                                            v-if="lot.is_expired"
+                                        <tr
+                                            v-for="lot in warehouse.lots"
+                                            :key="
+                                                item.type +
+                                                '-' +
+                                                item.item_id +
+                                                '-' +
+                                                warehouse.id +
+                                                '-' +
+                                                lot.id
+                                            "
+                                            class="table-resource__row"
                                         >
-                                            ⚠️ Vencido:
-                                        </span>
 
-                                        <span v-else>
-                                            Caduca:
-                                        </span>
+                                            <!-- Producto -->
 
-                                        {{ formatDate(lot.expiration_date) }}
+                                            <td
+                                                data-label="Producto / Materia prima:"
+                                            >
 
-                                    </small>
+                                                <strong>
+                                                    {{ item.name }}
+                                                </strong>
 
-                                    <small v-else>
-                                        Sin fecha de caducidad
-                                    </small>
+                                                <br>
 
-                                </td>
+                                                <small
+                                                    v-if="item.description"
+                                                >
+                                                    {{ item.description }}
+                                                </small>
 
-
-                                <!-- Cantidad del lote -->
-
-                                <td
-                                    class="text-center"
-                                    data-label="Cantidad en lote:"
-                                >
-
-                                    {{ Number(lot.quantity).toFixed(2) }}
-
-                                </td>
+                                            </td>
 
 
-                                <!-- Total desktop -->
+                                            <!-- Tipo -->
 
-                                <td
-                                    v-if="lotIndex === 0"
-                                    :rowspan="warehouse.lots.length"
-                                    class="
-                                        text-center
-                                        inventory-total-cell
-                                        desktop-total
-                                    "
-                                    data-label="Total de producto"
-                                >
+                                            <td
+                                                data-label="Tipo:"
+                                            >
 
-                                    <strong>
-                                        {{ Number(item.quantity).toFixed(2) }}
-                                    </strong>
+                                                <span
+                                                    v-if="item.type === 'product'"
+                                                >
+                                                    Producto terminado
+                                                </span>
 
-                                </td>
+                                                <span v-else>
+                                                    Materia prima
+                                                </span>
+
+                                            </td>
 
 
-                                <!-- Total mobile -->
+                                            <!-- Lote -->
 
-                                <td
-                                    v-if="lotIndex === warehouse.lots.length - 1"
-                                    class="
-                                        text-center
-                                        mobile-total
-                                    "
-                                    data-label="Total de producto"
-                                >
+                                            <td
+                                                data-label="Lote:"
+                                            >
 
-                                    <strong>
-                                        {{ Number(item.quantity).toFixed(2) }}
-                                    </strong>
+                                                <strong>
+                                                    {{ lot.lot_number || '-' }}
+                                                </strong>
 
-                                </td>
+                                                <br>
 
-                            </tr>
+                                                <small
+                                                    v-if="lot.expiration_date"
+                                                    :class="{
+                                                        'text-danger':
+                                                            lot.is_expired
+                                                    }"
+                                                >
 
-                        </template>
+                                                    <span
+                                                        v-if="lot.is_expired"
+                                                    >
+                                                        ⚠️ Vencido:
+                                                    </span>
+
+                                                    <span v-else>
+                                                        Caduca:
+                                                    </span>
+
+                                                    {{ formatDate(lot.expiration_date) }}
+
+                                                </small>
+
+                                                <small v-else>
+                                                    Sin fecha de caducidad
+                                                </small>
+
+                                            </td>
+
+
+                                            <!-- Cantidad -->
+
+                                            <td
+                                                class="text-center"
+                                                data-label="Cantidad:"
+                                            >
+
+                                                <strong>
+                                                    {{ Number(lot.quantity).toFixed(2) }}
+                                                    kg
+                                                </strong>
+
+                                            </td>
+
+
+                                            <!-- Costo -->
+
+                                            <td
+                                                class="text-center"
+                                                data-label="Costo:"
+                                            >
+
+                                                ${{ Number(lot.cost || 0).toFixed(2) }}
+
+                                            </td>
+
+
+                                            <!-- Total -->
+
+                                            <td
+                                                class="text-center"
+                                                data-label="Total:"
+                                            >
+
+                                                <strong>
+                                                    ${{ Number(lot.total || 0).toFixed(2) }}
+                                                </strong>
+
+                                            </td>
+
+                                        </tr>
+
+
+                                        <!-- Subtotal del artículo dentro del almacén -->
+
+                                        <tr class="warehouse-item-total">
+
+                                            <td
+                                                colspan="3"
+                                                class="text-right"
+                                            >
+
+                                                <strong>
+                                                    Total {{ item.name }}
+                                                </strong>
+
+                                            </td>
+
+                                            <td
+                                                class="text-center"
+                                            >
+
+                                                <strong>
+                                                    {{ Number(
+                                                        warehouse.lots.reduce(
+                                                            (sum, lot) =>
+                                                                sum +
+                                                                Number(
+                                                                    lot.quantity || 0
+                                                                ),
+                                                            0
+                                                        )
+                                                    ).toFixed(2) }}
+                                                    kg
+                                                </strong>
+
+                                            </td>
+
+                                            <td></td>
+
+                                            <td
+                                                class="text-center"
+                                            >
+
+                                                <strong>
+                                                    ${{
+                                                        Number(
+                                                            warehouse.lots.reduce(
+                                                                (sum, lot) =>
+                                                                    sum +
+                                                                    Number(
+                                                                        lot.total || 0
+                                                                    ),
+                                                                0
+                                                            )
+                                                        ).toFixed(2)
+                                                    }}
+                                                </strong>
+
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
 
                     </template>
 
-
-                    <!-- Sin inventario -->
-
-                    <tr
-                        v-if="inventory.length === 0"
-                    >
-
-                        <td
-                            colspan="6"
-                            class="text-center"
-                        >
-
-                            No hay inventario disponible
-                            para este tipo de almacén.
-
-                        </td>
-
-                    </tr>
+                </template>
 
 
-                    <!-- Total general -->
+                <!-- Total general -->
 
-                    <tr
-                        v-if="inventory.length > 0"
-                        class="inventory-grand-total"
-                    >
+                <div
+                    v-if="inventory.length > 0"
+                    class="inventory-grand-total"
+                >
 
-                        <td
-                            colspan="5"
-                            class="text-right inventory-grand-total-label"
-                        >
+                    <div class="inventory-grand-total-label">
 
-                            <strong>
-                                Total de inventario
-                            </strong>
+                        <strong>
+                            Total de inventario
+                        </strong>
 
-                        </td>
+                    </div>
 
-                        <td
-                            class="text-center inventory-grand-total-value"
-                        >
+                    <div class="inventory-grand-total-value">
 
-                            <strong>
-                                {{ totalInventory }}
-                            </strong>
+                        <strong>
+                            {{ totalInventory }} kg
+                        </strong>
 
-                        </td>
+                    </div>
 
-                    </tr>
+                </div>
 
-                </tbody>
-
-            </table>
+            </div>
 
         </section>
 
     </div>
+
 </template>
 
 
@@ -320,8 +413,11 @@ export default {
     props: {
 
         warehouseTypes: {
+
             required: true,
+
             type: [Array, Object]
+
         }
 
     },
@@ -336,7 +432,9 @@ export default {
             loading: false,
 
             fields: {
+
                 warehouse_type: null
+
             }
 
         };
@@ -349,12 +447,15 @@ export default {
         totalInventory() {
 
             const total = this.inventory.reduce(
+
                 (sum, item) => {
 
                     return sum + Number(item.quantity || 0);
 
                 },
+
                 0
+
             );
 
             return total.toFixed(2);
@@ -383,27 +484,41 @@ export default {
             try {
 
                 const response = await window.axios.get(
+
                     '/api/inventory-warehouse',
+
                     {
+
                         params: {
+
                             warehouse_type: warehouseType
+
                         }
+
                     }
+
                 );
 
 
                 this.inventory = Array.isArray(
+
                     response.data.inventory
+
                 )
+
                     ? response.data.inventory
+
                     : [];
 
 
             } catch (error) {
 
                 console.error(
+
                     'Error cargando inventario:',
+
                     error
+
                 );
 
                 this.inventory = [];
@@ -420,26 +535,38 @@ export default {
         formatDate(date) {
 
             if (!date) {
+
                 return '-';
+
             }
 
 
             const parts = String(date)
+
                 .substring(0, 10)
+
                 .split('-');
 
 
             if (parts.length !== 3) {
+
                 return date;
+
             }
 
 
             return (
+
                 parts[2] +
+
                 '/' +
+
                 parts[1] +
+
                 '/' +
+
                 parts[0]
+
             );
 
         }
@@ -454,30 +581,144 @@ export default {
 <style scoped>
 
 .text-danger {
+
     color: #dc3545;
+
     font-weight: bold;
+
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Total por producto
+| Contenedor de inventario
 |--------------------------------------------------------------------------
 */
 
-.inventory-total-cell {
-    vertical-align: middle !important;
+.inventory-container {
+
+    width: 100%;
+
 }
 
 
 /*
 |--------------------------------------------------------------------------
-| Total móvil por producto
+| Sección de almacén
 |--------------------------------------------------------------------------
 */
 
-.mobile-total {
-    display: none;
+.warehouse-section {
+
+    margin-bottom: 30px;
+
+    border: 1px solid rgba(0, 0, 0, .08);
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Encabezado del almacén
+|--------------------------------------------------------------------------
+*/
+
+.warehouse-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 15px 18px;
+
+    background: rgba(0, 0, 0, .035);
+
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+
+}
+
+
+.warehouse-header strong {
+
+    display: block;
+
+    font-size: 17px;
+
+}
+
+
+.warehouse-header small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    opacity: .65;
+
+}
+
+
+.warehouse-total {
+
+    text-align: right;
+
+}
+
+
+.warehouse-total span {
+
+    display: block;
+
+    font-size: 12px;
+
+    opacity: .65;
+
+}
+
+
+.warehouse-total strong {
+
+    font-size: 18px;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Tabla
+|--------------------------------------------------------------------------
+*/
+
+.warehouse-section .table {
+
+    margin-bottom: 0;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Total por artículo
+|--------------------------------------------------------------------------
+*/
+
+.warehouse-item-total {
+
+    background: rgba(0, 0, 0, .025);
+
+}
+
+
+.warehouse-item-total td {
+
+    border-top: 1px solid rgba(0, 0, 0, .08);
+
 }
 
 
@@ -487,9 +728,53 @@ export default {
 |--------------------------------------------------------------------------
 */
 
-.inventory-grand-total-label,
+.inventory-grand-total {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 30px;
+
+    padding: 18px 20px;
+
+    margin-top: 10px;
+
+    border-top: 2px solid rgba(0, 0, 0, .12);
+
+}
+
+
+.inventory-grand-total-label {
+
+    font-size: 17px;
+
+}
+
+
 .inventory-grand-total-value {
-    vertical-align: middle !important;
+
+    font-size: 20px;
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Sin inventario
+|--------------------------------------------------------------------------
+*/
+
+.inventory-empty {
+
+    text-align: center;
+
+    padding: 30px;
+
+    opacity: .7;
+
 }
 
 
@@ -501,47 +786,41 @@ export default {
 
 @media (max-width: 767px) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Total por producto
-    |--------------------------------------------------------------------------
-    */
+    .warehouse-header {
 
-    .desktop-total {
-        display: none !important;
-    }
+        align-items: flex-start;
 
-    .mobile-total {
-        display: table-cell;
+        gap: 15px;
+
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Total general
-    |--------------------------------------------------------------------------
-    |
-    | En móvil no usamos colspan porque la tabla responsive
-    | convierte cada celda en un bloque independiente.
-    |
-    */
+    .warehouse-total {
+
+        min-width: 100px;
+
+    }
+
 
     .inventory-grand-total {
+
         display: block;
-        padding: 15px;
+
+        text-align: right;
+
     }
+
 
     .inventory-grand-total-label,
-    .inventory-grand-total-value {
-        display: block;
-        width: 100%;
-        text-align: right !important;
-        padding: 5px 0;
-    }
 
-    .inventory-grand-total-label::before,
-    .inventory-grand-total-value::before {
-        display: none !important;
+    .inventory-grand-total-value {
+
+        display: block;
+
+        width: 100%;
+
+        padding: 5px 0;
+
     }
 
 }

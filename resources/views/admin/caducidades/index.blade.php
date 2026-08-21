@@ -1,12 +1,13 @@
 @extends('layout.dashboard-master')
 
 @section('title', 'Caducidades')
+@section('css_classes', 'dashboard')
 
 @section('content')
 
 <div class="dashboard-heading">
     <h1 class="dashboard-heading__title">
-        Control de Caducidades
+        Control de caducidades
     </h1>
 </div>
 
@@ -55,6 +56,7 @@
             <div class="row">
 
                 <div class="md:col-1/2">
+
                     <strong>Tipo</strong>
                     <select name="type" class="form-field" onchange="this.form.submit()">
                         <option value="">Todos</option>

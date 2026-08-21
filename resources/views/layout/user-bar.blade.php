@@ -28,11 +28,17 @@
                         <template v-else>Mostrar menú</template>
                     </span>
                 </button>
-                @if($authUser->isSuperAdmin())
-                    <a class="user-bar__dashboard-link pl-0" href="{{ url('admin') }}" v-if="atDashboard">
-                        « Ver estadística diaria                
-                    </a>
-                @endif
+                <a
+                    class="user-bar__dashboard-link pl-0"
+                    href="{{ url('admin') }}"
+                    v-if="atDashboard"
+                >
+                    @if($authUser->isSuperAdmin())
+                        « Ver estadística
+                    @else
+                        « Inicio
+                    @endif
+                </a>
             </div>
             <div class="d-flex items-center">
                 <role-select

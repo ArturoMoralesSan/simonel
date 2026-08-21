@@ -60,7 +60,13 @@
                                     @{{ ProductLotItem.lot_number }}
                                 </td>
                                 <td data-label="Órden de producción:">
-                                    @{{ ProductLotItem.order.order_number }}
+                                    <span v-if="ProductLotItem.order">
+                                        @{{ ProductLotItem.order.order_number }}
+                                    </span>
+
+                                    <span v-else>
+                                        Sin orden de producción
+                                    </span>
                                 </td>
                                 <td data-label="Producto:">
                                     @{{ ProductLotItem.product.manufactured.name }} <span class="description">@{{ ProductLotItem.product.manufactured.description }}</span>

@@ -38,6 +38,9 @@
 
 <div class="fluid-container mb-16">
 
+    <label>
+        Buscar por proveedor o factura
+    </label>
     <form-search
         selected="{{ request('search') }}"
         placeholder="Buscar por proveedor o factura"
@@ -83,6 +86,7 @@
                             <th>Fecha</th>
                             <th>Proveedor</th>
                             <th>Factura</th>
+                            <th>Lotes de materia prima</th>
                             <th>Total</th>
                             <th>Materias primas</th>
                             <th class="pr-4">Acciones</th>
@@ -106,6 +110,10 @@
 
                             <td data-label="Factura:">
                                 @{{ purchase.invoice_number || 'Sin factura' }}
+                            </td>
+
+                            <td data-label="Lotes de materia prima:">
+                                @{{ purchase.lot_numbers }}
                             </td>
 
                             <td data-label="Total:">

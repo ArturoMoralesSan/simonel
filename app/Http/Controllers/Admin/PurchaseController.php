@@ -36,46 +36,77 @@ class PurchaseController extends Controller
         $end_date = request('end_date')
             ?? $dateNow->format('Y-m-d');
 
-        $purchases = Purchase::with('supplier')
+        $purchases = Purchase::with([
+            'supplier',
+            'items.rawMaterial',
+            'lots:id,purchase_id,lot_number'
+        ])
             ->withCount([
                 'items',
                 'lots'
             ])
             ->when($search, function ($query) use ($search) {
+
                 $query->where(function ($q) use ($search) {
+
                     $q->whereHas('supplier', function ($supplier) use ($search) {
-                        $supplier->where('business_name', 'like', "%{$search}%")
-                            ->orWhere('trade_name', 'like', "%{$search}%");
+
+                        $supplier
+                            ->where(
+                                'business_name',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'trade_name',
+                                'like',
+                                "%{$search}%"
+                            );
+
                     })
-                    ->orWhere('invoice_number', 'like', "%{$search}%");
+                    ->orWhere(
+                        'invoice_number',
+                        'like',
+                        "%{$search}%"
+                    );
                 });
             })
             ->whereBetween('purchase_date', [
                 $start_date,
                 $end_date
             ])
-            ->orderByDesc('purchase_date')
+            ->orderByDesc('id')
             ->paginate(20);
 
-        $purchaseItems = collect($purchases->items())->map(function ($purchase) {
+        $purchaseItems = collect($purchases->items())
+            ->map(function ($purchase) {
 
-            $purchase->purchase_date_formatted = Carbon::parse(
-                $purchase->purchase_date
-            )->format('d/m/Y');
+                $purchase->purchase_date_formatted = Carbon::parse(
+                    $purchase->purchase_date
+                )->format('d/m/Y');
 
-            return $purchase;
-        });
+                // Todos los lot_number de esta compra separados por coma
+                $purchase->lot_numbers = $purchase->lots
+                    ->pluck('lot_number')
+                    ->filter()
+                    ->implode(', ');
+
+                return $purchase;
+            });
 
         $links = $purchases
             ->appends(request()->query())
             ->links('layout.pagination');
 
-        return view('admin.compras.index', compact(
-            'purchaseItems',
-            'links',
-            'start_date',
-            'end_date'
-        ));
+        return view(
+            'admin.compras.index',
+            compact(
+                'purchaseItems',
+                'links',
+                'start_date',
+                'end_date'
+            )
+        );
     }
 
     public function create()
@@ -145,6 +176,21 @@ class PurchaseController extends Controller
                 $quantity = (float) $request->input("item{$i}_quantity");
                 $unitCost = (float) $request->input("item{$i}_unit_cost");
                 $totalCost = $quantity * $unitCost;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ACTUALIZAR COSTO DE MATERIA PRIMA
+                |--------------------------------------------------------------------------
+                */
+
+                $rawMaterial = RawMaterial::find($rawMaterialId);
+
+                if ($rawMaterial) {
+                    $rawMaterial->cost = $unitCost;
+                    $rawMaterial->save();
+
+                }
 
                 /*
                 |--------------------------------------------------------------------------
@@ -236,8 +282,8 @@ class PurchaseController extends Controller
             $item->supplier_lot = $lot->supplier_lot ?? null;
             
             $item->expiration_date_input = optional($lot->expiration_date)
-    ? \Carbon\Carbon::parse($lot->expiration_date)->format('Y-m-d')
-    : null;
+            ? \Carbon\Carbon::parse($lot->expiration_date)->format('Y-m-d')
+            : null;
 
             return $item;
         });

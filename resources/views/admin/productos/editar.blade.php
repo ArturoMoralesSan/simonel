@@ -97,7 +97,7 @@
                             </div>
                             <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="utility_amount">Subtotal <span class="description">$</span></label>
+                                    <label for="utility_amount">Monto de utilidad <span class="description">$</span></label>
                                     <text-field disabled name="utility_amount" v-model="fields.utility_amount" maxlength="80"  initial=""></text-field>
                                     <field-errors name="utility_amount"></field-errors>
                                 </div>

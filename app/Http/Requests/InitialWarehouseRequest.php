@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Http\Requests;
+
+class InitialWarehouseRequest extends FormRequest
+{
+    
+
+    public function rules()
+    {
+        $rules = [
+            'item_count' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+        ];
+
+        for ($i = 1; $i <= (int) $this->input('item_count', 0); $i++) {
+
+            $rules["item{$i}_type"] = [
+                'required',
+                'in:raw_material,product',
+            ];
+
+            $rules["item{$i}_warehouse_id"] = [
+                'required',
+                'exists:warehouses,id',
+            ];
+
+            $rules["item{$i}_quantity"] = [
+                'required',
+                'numeric',
+                'gt:0',
+            ];
+
+            $rules["item{$i}_unit_cost"] = [
+                'required',
+                'numeric',
+                'gte:0',
+            ];
+
+            $rules["item{$i}_expiration_date"] = [
+                'nullable',
+                'date',
+            ];
+
+            $type = $this->input("item{$i}_type");
+
+            if ($type === 'raw_material') {
+
+                $rules["item{$i}_raw_material_id"] = [
+                    'required',
+                    'exists:raw_materials,id',
+                ];
+
+            }
+
+            if ($type === 'product') {
+
+                $rules["item{$i}_product_id"] = [
+                    'required',
+                    'exists:products,id',
+                ];
+            }
+        }
+
+        return $rules;
+    }
+
+    public function messages()
+    {
+        $messages = [
+            'item_count.required' =>
+                'Debes indicar la cantidad de lotes.',
+
+            'item_count.integer' =>
+                'La cantidad de lotes debe ser un número entero.',
+
+            'item_count.min' =>
+                'Debes registrar al menos un lote.',
+        ];
+
+        for ($i = 1; $i <= (int) $this->input('item_count', 0); $i++) {
+
+            $messages["item{$i}_type.required"] =
+                "Debes seleccionar el tipo del lote {$i}.";
+
+            $messages["item{$i}_type.in"] =
+                "El tipo seleccionado en el lote {$i} no es válido.";
+
+            $messages["item{$i}_warehouse_id.required"] =
+                "Debes seleccionar el almacén del lote {$i}.";
+
+            $messages["item{$i}_warehouse_id.exists"] =
+                "El almacén seleccionado en el lote {$i} no existe.";
+
+            $messages["item{$i}_quantity.required"] =
+                "Debes indicar la cantidad del lote {$i}.";
+
+            $messages["item{$i}_quantity.numeric"] =
+                "La cantidad del lote {$i} debe ser numérica.";
+
+            $messages["item{$i}_quantity.gt"] =
+                "La cantidad del lote {$i} debe ser mayor a cero.";
+
+            $messages["item{$i}_unit_cost.required"] =
+                "Debes indicar el costo unitario del lote {$i}.";
+
+            $messages["item{$i}_unit_cost.numeric"] =
+                "El costo unitario del lote {$i} debe ser numérico.";
+
+            $messages["item{$i}_unit_cost.gte"] =
+                "El costo unitario del lote {$i} no puede ser negativo.";
+
+            $messages["item{$i}_expiration_date.date"] =
+                "La fecha de caducidad del lote {$i} no es válida.";
+
+            $messages["item{$i}_raw_material_id.required"] =
+                "Debes seleccionar la materia prima del lote {$i}.";
+
+            $messages["item{$i}_raw_material_id.exists"] =
+                "La materia prima seleccionada en el lote {$i} no existe.";
+
+            $messages["item{$i}_product_id.required"] =
+                "Debes seleccionar el producto del lote {$i}.";
+
+            $messages["item{$i}_product_id.exists"] =
+                "El producto seleccionado en el lote {$i} no existe.";
+        }
+
+        return $messages;
+    }
+}

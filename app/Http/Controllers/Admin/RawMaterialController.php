@@ -58,7 +58,6 @@ class RawMaterialController extends Controller
         $material->raw_material_type = $request->material_types;
         $material->minimum_stock = $request->stock;
         $material->unit = $request->unit;
-        $material->cost = $request->cost;
         $material->expiration_days = $request->expiration_days;
         $material->active = 1;
         $material->save();
@@ -100,7 +99,6 @@ class RawMaterialController extends Controller
         $material->raw_material_type = $request->material_types;
         $material->minimum_stock = $request->stock;
         $material->unit = $request->unit;
-        $material->cost = $request->cost;
         $material->expiration_days = $request->expiration_days;
         $material->active = 1;
         $material->save();

@@ -56,7 +56,7 @@
 
                         </div>
                         <div class="md:row mt-4">
-                            <div class="md:col-1/4">
+                            <div class="md:col-1/3">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="unit">Unidad</label>
@@ -65,21 +65,14 @@
 
                                 </div>
                             </div>
-                            <div class="md:col-1/4">
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="stock">Stock mínimo</label>
                                     <text-field name="stock" type="number" v-model="fields.stock" maxlength="5" initial=""></text-field>
                                     <field-errors name="stock"></field-errors>
                                 </div>
                             </div>
-                            <div class="md:col-1/4">
-                                <div class="form-control">
-                                    <label for="cost">Costo unitario <span class="description"> $</span></label>
-                                    <text-field name="cost" v-model="fields.cost" maxlength="20" initial=""></text-field>
-                                    <field-errors name="cost"></field-errors>
-                                </div>
-                            </div>
-                            <div class="md:col-1/4">
+                            <div class="md:col-1/3">
                                 <div class="form-control">
                                     <label for="expiration_days">Días de expiración <span class="description">(opcional)</span></label>
                                     <text-field name="expiration_days" type="number" v-model="fields.expiration_days" maxlength="5" initial=""></text-field>

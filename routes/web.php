@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\AccountsReceivableController;
 use App\Http\Controllers\Admin\CustomerCreditAuthorizationController;
 use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\InitialWarehouseController;
 
 
 /*
@@ -240,6 +241,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('inventario-clientes/{id}/editar', [InventoryController::class, 'edit']);
     Route::post('inventario-clientes/{id}/actualizar', [InventoryController::class, 'update']);
     Route::delete('inventario-clientes/eliminar/{id}', [InventoryController::class, 'delete']);
+
+    Route::get('inventario-inicial', [InitialWarehouseController::class,'create'])->name('admin.inventario-inicial.create');
+
+    Route::post('inventario-inicial', [InitialWarehouseController::class,'save'])->name('admin.inventario-inicial.save');
+    
+    Route::get('inventario-general',[InventoryController::class, 'inventoryGeneral'])
+    ->name('admin.inventario-general');
+    Route::get('/inventario-general-clientes',[InventoryController::class, 'inventoryByClients'])
+    ->name('inventory.clients');
 
     //Ventas
     Route::get('ventas', [SaleController::class, 'index']);

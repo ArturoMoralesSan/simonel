@@ -28,7 +28,7 @@
                 <tr>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Precio unitario <span class="description">($)</span></th>
+                    <th>Precio al público <span class="description">($)</span></th>
                     <th>Descuento <span class="description">(%)</span></th>
                     <!-- <th>IVA (%)</th> -->
                     <th>Subtotal</th>

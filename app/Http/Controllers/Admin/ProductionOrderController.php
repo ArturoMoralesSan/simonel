@@ -1069,6 +1069,65 @@ class ProductionOrderController extends Controller
                         $rawMaterials[$rawMaterialId]['quantity']
                             += $requiredQuantity;
                     }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DESCONTAR MATERIA PRIMA DE LOS LOTES
+                    |--------------------------------------------------------------------------
+                    */
+
+                    foreach ($rawMaterials as $material) {
+
+                        $requiredQuantity = (float) $material['quantity'];
+
+                        $lots = RawMaterialLot::where(
+                                'raw_material_id',
+                                $material['raw_material_id']
+                            )
+                            ->where('available_quantity', '>', 0)
+                            ->orderBy('entry_date')
+                            ->lockForUpdate()
+                            ->get();
+
+                        foreach ($lots as $lot) {
+
+                            if ($requiredQuantity <= 0) {
+                                break;
+                            }
+
+                            $availableQuantity = (float) $lot->available_quantity;
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | CANTIDAD A DESCONTAR DEL LOTE
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $quantityToDiscount = min(
+                                $requiredQuantity,
+                                $availableQuantity
+                            );
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | ACTUALIZAR LOTE
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $lot->available_quantity =
+                                $availableQuantity - $quantityToDiscount;
+
+                            $lot->save();
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | RESTAR LO DESCONTADO DE LO REQUERIDO
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $requiredQuantity -= $quantityToDiscount;
+                        }
+                    }
                 }
 
 

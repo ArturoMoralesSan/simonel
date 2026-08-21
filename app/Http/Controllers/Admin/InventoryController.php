@@ -388,21 +388,16 @@ class InventoryController extends Controller
                 $key = 'product_' . $itemId;
 
                 if (!$inventory->has($key)) {
-
                     $inventory->put($key, [
                         'item_id' => $itemId,
                         'type' => 'product',
-
                         'name' => optional(
                             $lot->product->manufactured
                         )->name ?? 'Producto eliminado',
-
                         'description' => optional(
                             $lot->product->manufactured
                         )->description ?? '',
-
                         'quantity' => 0,
-
                         'warehouses' => [],
                     ]);
                 }
@@ -435,7 +430,6 @@ class InventoryController extends Controller
                     'lot_number' => $lot->lot_number,
                     'quantity' => $quantity,
                     'expiration_date' => $lot->expiration_date,
-
                     'is_expired' => $lot->expiration_date
                         ? $lot->expiration_date < now()->toDateString()
                         : false,
@@ -454,7 +448,6 @@ class InventoryController extends Controller
                         'id' => $warehouse->id,
                         'name' => $warehouse->name,
                         'quantity' => $quantity,
-
                         'lots' => [
                             $lotData
                         ],
@@ -484,19 +477,24 @@ class InventoryController extends Controller
                 $itemId = $lot->raw_material_id;
                 $key = 'raw_' . $itemId;
 
+                /*
+                |--------------------------------------------------------------------------
+                | Costo de la materia prima
+                |--------------------------------------------------------------------------
+                */
+
+                $cost = (float) $lot->material->cost;
+
                 if (!$inventory->has($key)) {
 
                     $inventory->put($key, [
                         'item_id' => $itemId,
                         'type' => 'raw_material',
-
                         'name' => $lot->material->name,
-
-                        'description' =>
-                            $lot->material->description ?? '',
-
+                        'description' => $lot->material->description ?? '',
+                        'cost' => $cost,
                         'quantity' => 0,
-
+                        'total' => 0,
                         'warehouses' => [],
                     ]);
                 }
@@ -505,7 +503,22 @@ class InventoryController extends Controller
 
                 $quantity = (float) $lot->available_quantity;
 
+                /*
+                |--------------------------------------------------------------------------
+                | Total de este lote
+                |--------------------------------------------------------------------------
+                */
+
+                $lotTotal = $quantity * $cost;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Acumulados de la materia prima
+                |--------------------------------------------------------------------------
+                */
+
                 $item['quantity'] += $quantity;
+                $item['total'] += $lotTotal;
 
                 /*
                 |--------------------------------------------------------------------------
@@ -528,8 +541,9 @@ class InventoryController extends Controller
                     'id' => $lot->id,
                     'lot_number' => $lot->lot_number,
                     'quantity' => $quantity,
+                    'cost' => $cost,
+                    'total' => $lotTotal,
                     'expiration_date' => $lot->expiration_date,
-
                     'is_expired' => $lot->expiration_date
                         ? $lot->expiration_date < now()->toDateString()
                         : false,
@@ -540,6 +554,10 @@ class InventoryController extends Controller
                     $item['warehouses'][$warehouseIndex]['quantity']
                         += $quantity;
 
+                    $item['warehouses'][$warehouseIndex]['total']
+                        = ($item['warehouses'][$warehouseIndex]['total'] ?? 0)
+                        + $lotTotal;
+
                     $item['warehouses'][$warehouseIndex]['lots'][] = $lotData;
 
                 } else {
@@ -548,7 +566,7 @@ class InventoryController extends Controller
                         'id' => $warehouse->id,
                         'name' => $warehouse->name,
                         'quantity' => $quantity,
-
+                        'total' => $lotTotal,
                         'lots' => [
                             $lotData
                         ],
@@ -565,4 +583,456 @@ class InventoryController extends Controller
                 ->values(),
         ]);
     }
+
+
+    public function inventoryGeneral()
+{
+    $warehouses = Warehouse::where('active', 1)
+        ->with([
+            'productLots.product.manufactured',
+            'lots.material',
+        ])
+        ->orderBy('warehouse_type')
+        ->orderBy('name')
+        ->get();
+
+    $inventory = collect();
+
+    foreach ($warehouses as $warehouse) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Crear almacén
+        |--------------------------------------------------------------------------
+        */
+
+        $warehouseData = [
+            'id' => $warehouse->id,
+            'name' => $warehouse->name,
+            'type' => $warehouse->warehouse_type,
+
+            'quantity' => 0,
+            'total' => 0,
+
+            'products' => [],
+            'raw_materials' => [],
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCTOS TERMINADOS
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($warehouse->productLots as $lot) {
+
+            if (
+                !$lot->product ||
+                $lot->status !== 'Disponible' ||
+                (float) $lot->available_quantity <= 0
+            ) {
+                continue;
+            }
+
+            $quantity = (float) $lot->available_quantity;
+            $cost = (float) ($lot->cost_per_unit ?? 0);
+            $lotTotal = $quantity * $cost;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Datos del lote
+            |--------------------------------------------------------------------------
+            */
+
+            $lotData = [
+                'id' => $lot->id,
+                'lot_number' => $lot->lot_number,
+                'quantity' => $quantity,
+                'cost' => $cost,
+                'total' => $lotTotal,
+                'production_date' => $lot->production_date,
+                'expiration_date' => $lot->expiration_date,
+                'is_expired' => $lot->expiration_date
+                    ? $lot->expiration_date < now()->toDateString()
+                    : false,
+                'order_number' => optional($lot->order)->order_number,
+            ];
+
+            /*
+            |--------------------------------------------------------------------------
+            | Buscar producto dentro del almacén
+            |--------------------------------------------------------------------------
+            */
+
+            $productIndex = collect($warehouseData['products'])
+                ->search(function ($product) use ($lot) {
+                    return $product['item_id'] == $lot->product_id;
+                });
+
+            if ($productIndex !== false) {
+
+                $warehouseData['products'][$productIndex]['quantity']
+                    += $quantity;
+
+                $warehouseData['products'][$productIndex]['total']
+                    += $lotTotal;
+
+                $warehouseData['products'][$productIndex]['lots'][]
+                    = $lotData;
+
+            } else {
+
+                $warehouseData['products'][] = [
+
+                    'item_id' => $lot->product_id,
+
+                    'name' => optional(
+                        $lot->product->manufactured
+                    )->name ?? 'Producto eliminado',
+
+                    'description' => optional(
+                        $lot->product->manufactured
+                    )->description ?? '',
+
+                    'quantity' => $quantity,
+
+                    'total' => $lotTotal,
+
+                    'lots' => [
+                        $lotData
+                    ],
+                ];
+            }
+
+            $warehouseData['quantity'] += $quantity;
+            $warehouseData['total'] += $lotTotal;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | MATERIAS PRIMAS
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($warehouse->lots as $lot) {
+
+            if (
+                !$lot->material ||
+                $lot->status !== 'Disponible' ||
+                (float) $lot->available_quantity <= 0
+            ) {
+                continue;
+            }
+
+            $quantity = (float) $lot->available_quantity;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Costo actual de la materia prima
+            |--------------------------------------------------------------------------
+            */
+
+            $cost = (float) $lot->material->cost;
+
+            $lotTotal = $quantity * $cost;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Datos del lote
+            |--------------------------------------------------------------------------
+            */
+
+            $lotData = [
+                'id' => $lot->id,
+                'lot_number' => $lot->lot_number,
+                'quantity' => $quantity,
+                'cost' => $cost,
+                'total' => $lotTotal,
+                'entry_date' => $lot->entry_date,
+                'expiration_date' => $lot->expiration_date,
+                'is_expired' => $lot->expiration_date
+                    ? $lot->expiration_date < now()->toDateString()
+                    : false,
+            ];
+
+            /*
+            |--------------------------------------------------------------------------
+            | Buscar materia prima dentro del almacén
+            |--------------------------------------------------------------------------
+            */
+
+            $materialIndex = collect($warehouseData['raw_materials'])
+                ->search(function ($material) use ($lot) {
+                    return $material['item_id'] == $lot->raw_material_id;
+                });
+
+            if ($materialIndex !== false) {
+
+                $warehouseData['raw_materials'][$materialIndex]['quantity']
+                    += $quantity;
+
+                $warehouseData['raw_materials'][$materialIndex]['total']
+                    += $lotTotal;
+
+                $warehouseData['raw_materials'][$materialIndex]['lots'][]
+                    = $lotData;
+
+            } else {
+
+                $warehouseData['raw_materials'][] = [
+
+                    'item_id' => $lot->raw_material_id,
+
+                    'name' => $lot->material->name,
+
+                    'description' => $lot->material->description ?? '',
+
+                    'cost' => $cost,
+
+                    'quantity' => $quantity,
+
+                    'total' => $lotTotal,
+
+                    'lots' => [
+                        $lotData
+                    ],
+                ];
+            }
+
+            $warehouseData['quantity'] += $quantity;
+            $warehouseData['total'] += $lotTotal;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Guardar almacén
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            count($warehouseData['products']) > 0 ||
+            count($warehouseData['raw_materials']) > 0
+        ) {
+            $inventory->push($warehouseData);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESPUESTA
+    |--------------------------------------------------------------------------
+    */
+
+    return view('admin.inventario.general', [
+        'inventory' => $inventory,
+    ]);
+}
+
+public function inventoryByClients()
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Obtener todos los clientes que tienen inventario
+    |--------------------------------------------------------------------------
+    */
+
+    $clientIds = Inventory::query()
+        ->whereNotNull('user_id')
+        ->distinct()
+        ->pluck('user_id');
+
+    $clients = collect();
+
+    foreach ($clientIds as $clientId) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | INVENTARIO
+        |--------------------------------------------------------------------------
+        */
+
+        $inventory = Inventory::with(
+            'product.manufactured'
+        )
+            ->where('user_id', $clientId)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MOVIMIENTOS
+        |--------------------------------------------------------------------------
+        */
+
+        $movements = InventoryMovement::with(
+            'inventory.product.manufactured'
+        )
+            ->whereHas('inventory', function ($q) use ($clientId) {
+                $q->where('user_id', $clientId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $movementsEntradas = $movements
+            ->where('type', 'entrada')
+            ->values();
+
+        $movementsSalidas = $movements
+            ->where('type', 'salida')
+            ->values();
+
+        $movementsMermas = $movements
+            ->where('type', 'merma')
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCTOS PENDIENTES
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingProducts = SaleProduct::selectRaw("
+            sale_products.id,
+            sale_products.product_id,
+            CONCAT(
+                manufactured_products.name,
+                ' (Venta #',
+                sales.id,
+                ' - ',
+                sale_products.quantity,
+                ')'
+            ) as name
+        ")
+            ->join(
+                'sales',
+                'sales.id',
+                '=',
+                'sale_products.sale_id'
+            )
+            ->join(
+                'products',
+                'products.id',
+                '=',
+                'sale_products.product_id'
+            )
+            ->join(
+                'manufactured_products',
+                'manufactured_products.id',
+                '=',
+                'products.manufactured_product_id'
+            )
+            ->where(
+                'sales.user_id',
+                $clientId
+            )
+            ->whereIn(
+                'sales.status',
+                ['paid', 'credit']
+            )
+            ->orderBy(
+                'manufactured_products.name'
+            )
+            ->pluck(
+                'name',
+                'product_id'
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATOS DE PRODUCTOS PENDIENTES
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingProductsData = SaleProduct::selectRaw("
+            sale_products.sale_id,
+            sale_products.product_id,
+            sale_products.quantity
+        ")
+            ->join(
+                'sales',
+                'sales.id',
+                '=',
+                'sale_products.sale_id'
+            )
+            ->where(
+                'sales.user_id',
+                $clientId
+            )
+            ->whereIn(
+                'sales.status',
+                ['paid', 'credit']
+            )
+            ->get()
+            ->keyBy('product_id');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLIENTE
+        |--------------------------------------------------------------------------
+        */
+
+        $customer = User::with('customer')
+            ->find($clientId);
+
+        if (!$customer) {
+            continue;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AGREGAR CLIENTE
+        |--------------------------------------------------------------------------
+        */
+
+        $clients->push([
+
+            'id' => $customer->id,
+
+            'name' => optional(
+                $customer->customer
+            )->name
+                ?? $customer->name
+                ?? 'Cliente sin nombre',
+
+            'customer_type' => optional(
+                $customer->customer
+            )->customer_type,
+
+            /*
+            | Información EXACTAMENTE igual a getByClient()
+            */
+
+            'inventory' => $inventory,
+
+            'movementsEntradas' => $movementsEntradas,
+
+            'movementsSalidas' => $movementsSalidas,
+
+            'movementsMermas' => $movementsMermas,
+
+            'pendingProducts' => $pendingProducts,
+
+            'pendingProductsData' => $pendingProductsData,
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vista
+    |--------------------------------------------------------------------------
+    */
+
+    return view('admin.inventario.clientes', [
+
+        'clients' => $clients
+            ->sortBy('name')
+            ->values(),
+
+    ]);
+}
 }

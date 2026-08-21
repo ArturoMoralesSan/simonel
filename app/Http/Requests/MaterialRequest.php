@@ -19,7 +19,6 @@ class MaterialRequest extends FormRequest
             'name' => ['required', new NotUppercase, new NotLowercase, 'max:100'],
             'material_types' => ['required','max:20'],
             'unit' => ['required', 'max:100'],
-            'cost' => ['required','max:10'],
             'stock' => ['required', 'max:100'],
             'expiration_days' => ['max:10'],
         ];
