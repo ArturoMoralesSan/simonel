@@ -52,7 +52,7 @@
                                 <th>Costo base</th>
                                 <th>Utilidad</th>
                                 <th>Subtotal</th>
-                                <th>Costo total de venta</th>
+                                <th>Precio al público</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>

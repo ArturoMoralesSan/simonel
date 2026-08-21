@@ -79,6 +79,11 @@
                             <label for="password">Contraseña</label>
                             <text-field name="password" v-model="fields.password"></text-field>
                             <field-errors name="password"></field-errors>
+                            <ul class="description">
+                                <li>
+                                    Mínimo 8 caracteres
+                                </li>
+                            </ul>
                         </div>
                     </section>
                     <div class="text-center">

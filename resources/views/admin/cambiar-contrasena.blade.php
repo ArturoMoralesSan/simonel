@@ -49,7 +49,7 @@
                         <field-errors name="password"></field-errors>
 
                         <p id="password-specs" class="description">
-                            Mínimo 6 caracteres
+                            Mínimo 8 caracteres
                         </p>
                     </div>
 

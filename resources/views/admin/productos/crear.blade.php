@@ -57,49 +57,49 @@
 
                         <div class="md:row mb-2">
                             
-                            <div class="md:col-1/3">
+                            <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="vinil_cost">Costo de fabricación<span class="description">$</span></label>
+                                    <label for="vinil_cost">Costo por fabricación<span class="description">$</span></label>
                                     <text-field name="vinil_cost" v-model="fields.vinil_cost" maxlength="80"></text-field>
                                     <field-errors name="vinil_cost"></field-errors>
                                 </div>
                             </div>
-
-                
-                        
-                            <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="subtotal">Costo base <span class="description">$</span></label>
-                                    <text-field disabled name="subtotal" v-model="fields.subtotal" maxlength="80" type="number"></text-field>
-                                    <field-errors name="subtotal"></field-errors>
-                                </div>
-                            </div>
-                            <div class="md:col-1/3">
-                                <div class="form-control">
-                                    <label for="utility">Utilidad <span class="description">%</span></label>
-                                    <text-field name="utility" v-model="fields.utility" maxlength="80"></text-field>
-                                    <field-errors name="utility"></field-errors>
-                                </div>
-                            </div>
-                        
-                        </div>
-                        <div class="md:row mb-2">
                             <div class="md:col-1/2">
                                 <div class="form-control">
-                                    <label for="costo_total">Subtotal <span class="description">$</span></label>
-                                    <text-field disabled name="costo_total" v-model="fields.costo_total" maxlength="80" type="number"></text-field>
-                                    <field-errors name="costo_total"></field-errors>
-                                </div>
-                            </div>
-                            <div class="md:col-1/2">
-                                <div class="form-control">
-                                    <label for="costo_venta">Costo total de venta <span class="description">$</span></label>
-                                    <text-field disabled name="costo_venta" v-model="fields.costo_venta" maxlength="80"></text-field>
+                                    <label for="costo_venta">Precio al público <span class="description">$</span></label>
+                                    <text-field name="costo_venta" v-model="fields.costo_venta" maxlength="80"></text-field>
                                     <field-errors name="costo_venta"></field-errors>
                                 </div>
                             </div>
-
+                        </div>
+                        <div class="hidden form-control">
+                            <label inppfor="subtotal">Costo base <span class="description">$</span></label>
+                            <text-field disabled name="subtotal" v-model="fields.subtotal" maxlength="80" type="number"></text-field>
+                            <field-errors name="subtotal"></field-errors>
+                        </div>
+                        <div class="hidden md:col-1/3">
+                            <div class="form-control">
+                                <label for="costo_total">Subtotal <span class="description">$</span></label>
+                                <text-field disabled name="costo_total" v-model="fields.costo_total" maxlength="80" type="number"></text-field>
+                                <field-errors name="costo_total"></field-errors>
+                            </div>
+                        </div>  
+                        <div class="md:row mb-2">
+                            <div class="md:col-1/2">
+                                <div class="form-control">
+                                    <label for="utility">Utilidad <span class="description">%</span></label>
+                                    <text-field disabled name="utility" v-model="fields.utility" maxlength="80"></text-field>
+                                    <field-errors name="utility"></field-errors>
+                                </div>
+                            </div>
                             
+                            <div class="md:col-1/2">
+                                <div class="form-control">
+                                    <label for="utility_amount">Monto de utilidad<span class="description">$</span></label>
+                                    <text-field disabled name="utility_amount" v-model="fields.utility_amount" maxlength="80" type="number"></text-field>
+                                    <field-errors name="utility_amount"></field-errors>
+                                </div>
+                            </div>  
                         </div>
                     </section>
 
