@@ -65,7 +65,7 @@
             <div class="md:col-1/2">
 
                 <strong>
-                    Cantidad total
+                    Cantidad total en kilos
                 </strong>
 
                 <p style="font-size: 22px;">

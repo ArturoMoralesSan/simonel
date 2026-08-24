@@ -75,13 +75,15 @@
                                     $@{{ productItem.subtotal }}
                                 </td>
                                 <td data-label="Utilidad:">
-                                    @{{ productItem.utility }}%
+                                    @{{ Number(productItem.utility || 0).toFixed(2) }}%
                                 </td>
+
                                 <td data-label="Subtotal:">
-                                    $@{{ productItem.costo_total }}
+                                    $@{{ Number(productItem.costo_total || 0).toFixed(2) }}
                                 </td>
+
                                 <td data-label="Costo total de venta:">
-                                    $@{{ productItem.costo_venta }}
+                                    $@{{ Number(productItem.costo_venta || 0).toFixed(2) }}
                                 </td>
 
 

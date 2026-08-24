@@ -19,34 +19,39 @@ class ReportsController extends Controller
      */
     public function index(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Fechas
-        |--------------------------------------------------------------------------
-        */
-
         $dateNow = Carbon::now();
         $dateFormat = $dateNow->format('Y-m-d');
 
         $start_date = $request->start_date ?? $dateFormat;
         $end_date   = $request->end_date ?? $dateFormat;
 
-        $sales = $this->sales($start_date, $end_date)->whereIn('status', [
-            'paid',
-            'assortment',
-            'credit',
-        ]);
+        $sales = $this->sales($start_date, $end_date)
+            ->whereIn('status', [
+                'paid',
+                'assortment',
+                'credit',
+            ]);
 
+        $paymentMethods = $sales
+            ->flatMap(function ($sale) {
+                return $sale->payments;
+            })
+            ->pluck('name')
+            ->map(function ($name) {
+                return strtolower(trim($name));
+            })
+            ->unique()
+            ->values();
 
         return view('admin.reportes.index', [
-            'start_date' => $start_date,
-            'end_date'   => $end_date,
-            'summary'  => $this->summary($sales),
-            'sellers'  => $this->sellerResume($sales),
-            'products' => $this->productResume($sales),
-            'customers'=> $this->customerResume($sales),
-            'payments' => $this->paymentResume($sales),
-
+            'start_date'    => $start_date,
+            'end_date'      => $end_date,
+            'summary'       => $this->summary($sales),
+            'sellers'       => $this->sellerResume($sales),
+            'products'      => $this->productResume($sales),
+            'customers'     => $this->customerResume($sales),
+            'payments'      => $this->paymentResume($sales),
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 
@@ -61,8 +66,11 @@ class ReportsController extends Controller
             'salesCount' => $sales->count(),
 
             'customersCount' => $sales
-                ->whereNotNull('customer_id')
-                ->pluck('customer_id')
+                ->filter(function ($sale) {
+                    return $sale->user &&
+                        $sale->user->customer;
+                })
+                ->pluck('user.customer.id')
                 ->unique()
                 ->count(),
 
@@ -73,32 +81,52 @@ class ReportsController extends Controller
     }
 
     private function sellerResume($sales)
-    {
-        return $sales
-            ->groupBy('seller_id')
-            ->map(function ($sellerSales) {
-                $seller = $sellerSales->first()->seller;
-                $cash = 0;
-                foreach ($sellerSales as $sale) {
-                    foreach ($sale->payments as $payment) {
+{
+    return $sales
+        ->groupBy('seller_id')
+        ->map(function ($sellerSales) {
 
-                        if (strtolower($payment->name) == 'efectivo') {
-                            $cash += $payment->pivot->cost;
-                        }
+            $seller = $sellerSales->first()->seller;
+
+            $paymentTotals = [];
+
+            foreach ($sellerSales as $sale) {
+
+                foreach ($sale->payments as $payment) {
+
+                    $key = 'payment_' . \Illuminate\Support\Str::slug(
+                        strtolower($payment->name),
+                        '_'
+                    );
+
+                    if (!isset($paymentTotals[$key])) {
+                        $paymentTotals[$key] = 0;
                     }
-                }
-                return (object)[
-                    'id'            => $seller->id,
-                    'name'          => trim($seller->name . ' ' . $seller->last_name),
-                    'sales_count'   => $sellerSales->count(),
-                    'total_sales'   => $sellerSales->sum('total_with_iva'),
-                    'cash_total'    => $cash,
-                ];
-            })
-            ->sortByDesc('total_sales')
-            ->values();
-    }
 
+                    $paymentTotals[$key] += $payment->pivot->cost;
+                }
+            }
+
+            return (object) array_merge([
+
+                'id' => $seller->id,
+
+                'name' => trim(
+                    $seller->name . ' ' . $seller->last_name
+                ),
+
+                'sales_count' => $sellerSales->count(),
+
+                'total_sales' => $sellerSales->sum('total_with_iva'),
+
+                // Mantener compatibilidad con el PDF actual
+                'cash_total' => $paymentTotals['payment_efectivo'] ?? 0,
+
+            ], $paymentTotals);
+        })
+        ->sortByDesc('total_sales')
+        ->values();
+}
     /**
      * Resumen por productos
      */
@@ -243,8 +271,11 @@ class ReportsController extends Controller
 
     public function printSeller(Request $request, $id)
     {
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
+        $dateNow = Carbon::now();
+        $dateFormat = $dateNow->format('Y-m-d');
+
+        $start_date = $request->start_date ?? $dateFormat;
+        $end_date = $request->end_date ?? $dateFormat;
 
         $sales = $this->sales($start_date, $end_date);
 
@@ -252,12 +283,14 @@ class ReportsController extends Controller
 
         $sellerSales = $sales->where('seller_id', $id);
 
+        $summary = $this->sellerResume($sales)->firstWhere('id', $id);
+
         $pdf = PDF::loadView('admin.pdf.seller', [
-            'seller'      => $seller,
-            'sales'       => $sellerSales,
-            'summary'     => $this->sellerResume($sales)->firstWhere('id', $id),
-            'start_date'  => $start_date,
-            'end_date'    => $end_date,
+            'seller'     => $seller,
+            'sales'      => $sellerSales,
+            'summary'    => $summary,
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
         ]);
 
         return $pdf->stream("vendedor-{$seller->id}.pdf");

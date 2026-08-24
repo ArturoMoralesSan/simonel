@@ -130,7 +130,7 @@
 
                             <td>{{ \Carbon\Carbon::parse($lot['expiration_date'])->format('d/m/Y') }}</td>
 
-                            <td>{{ $lot['quantity'] }}</td>
+                            <td>{{ number_format($lot['quantity'] ?? 0, 2) }}</td>
 
                             <td>
                                 @if($lot['days_remaining'] < 0)

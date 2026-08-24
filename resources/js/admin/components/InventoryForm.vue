@@ -176,7 +176,6 @@
                                     <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
                                     <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
-                                        {{ productItem.inventory.product.manufactured.description }}
                                     </td>
                                     <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
@@ -206,7 +205,6 @@
                                     <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
                                     <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
-                                        {{ productItem.inventory.product.manufactured.description }}
                                     </td>
                                     <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
@@ -235,7 +233,6 @@
                                     <td data-label="Fecha">{{ formatearFecha(productItem.date) }}</td>
                                     <td data-label="Producto">
                                         {{ productItem.inventory.product.manufactured.name }}
-                                        {{ productItem.inventory.product.manufactured.description }}
                                     </td>
                                     <td data-label="Cantidad">{{ productItem.quantity }}</td>
                                 </tr>
@@ -375,7 +372,7 @@ export default {
             const resumen = {};
 
             const productos = Object.values(this.inventory).map(i => ({
-                key: i.product.manufactured.name + ' ' + i.product.manufactured.description,
+                key: i.product.manufactured.name,
                 item: i
             }));
 
@@ -383,7 +380,7 @@ export default {
 
                 const inv = Object.values(this.inventory).find(
                     i =>
-                        (i.product.manufactured.name + ' ' + i.product.manufactured.description)
+                        (i.product.manufactured.name)
                         === p.key
                 );
 
@@ -391,7 +388,7 @@ export default {
 
                 const entradas = Object.values(this.movementsEntradas || {}).reduce(
                     (acc, m) =>
-                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                        (m.inventory.product.manufactured.name) === p.key
                             ? acc + Number(m.quantity || 0)
                             : acc,
                     0
@@ -399,7 +396,7 @@ export default {
 
                 const salidasArray = Object.values(this.movementsSalidas || {}).filter(
                     m =>
-                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                        (m.inventory.product.manufactured.name) === p.key
                 );
 
                 const salidas = salidasArray.reduce(
@@ -409,7 +406,7 @@ export default {
 
                 const mermasArray = Object.values(this.movementsMermas || {}).filter(
                     m =>
-                        (m.inventory.product.manufactured.name + ' ' + m.inventory.product.manufactured.description) === p.key
+                        (m.inventory.product.manufactured.name) === p.key
                 );
 
                 const mermas = mermasArray.reduce(
@@ -514,9 +511,8 @@ export default {
                 if (Number(item.quantity) <= 0) return;
                 
                 this.inventoryOptions[item.product_id] =
-                    item.product.manufactured.name +
-                    ' ' + item.product.manufactured.description +
-                    ' (' + item.quantity + ' disponibles)';
+                item.product.manufactured.name +
+                ' (' + Number(item.quantity).toFixed(2) + ' disponibles)';
                             });
 
             this.movementsEntradas = response.data.movementsEntradas || [];

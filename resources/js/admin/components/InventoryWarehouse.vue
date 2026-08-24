@@ -5,11 +5,12 @@
         <form>
 
             <div class="form-control">
+
                 <label>
                     Tipo de almacén:
                 </label>
 
-                <search-select-field
+                <select-field
                     name="warehouse_type"
                     v-model="fields.warehouse_type"
                     :options="warehouseTypes"
@@ -18,6 +19,7 @@
 
                 <field-errors name="warehouse_type">
                 </field-errors>
+
             </div>
 
         </form>
@@ -29,8 +31,10 @@
         >
 
             <h3 class="db-panel__title">
+
                 Inventario de
                 {{ fields.warehouse_type }}
+
             </h3>
 
 
@@ -40,7 +44,9 @@
                 v-if="loading"
                 class="text-center py-4"
             >
+
                 Cargando inventario...
+
             </div>
 
 
@@ -57,8 +63,10 @@
                     v-if="inventory.length === 0"
                     class="inventory-empty"
                 >
+
                     No hay inventario disponible
                     para este tipo de almacén.
+
                 </div>
 
 
@@ -89,6 +97,7 @@
                             <div class="warehouse-header">
 
                                 <div>
+
                                     <strong>
                                         {{ warehouse.name }}
                                     </strong>
@@ -96,7 +105,9 @@
                                     <small>
                                         Almacén
                                     </small>
+
                                 </div>
+
 
                                 <div class="warehouse-total">
 
@@ -105,7 +116,7 @@
                                     </span>
 
                                     <strong>
-                                        {{ Number(warehouse.quantity).toFixed(2) }}
+                                        {{ Number(warehouse.quantity || 0).toFixed(2) }}
                                         kg
                                     </strong>
 
@@ -260,7 +271,7 @@
                                             >
 
                                                 <strong>
-                                                    {{ Number(lot.quantity).toFixed(2) }}
+                                                    {{ Number(lot.quantity || 0).toFixed(2) }}
                                                     kg
                                                 </strong>
 
@@ -310,11 +321,13 @@
 
                                             </td>
 
+
                                             <td
                                                 class="text-center"
                                             >
 
                                                 <strong>
+
                                                     {{ Number(
                                                         warehouse.lots.reduce(
                                                             (sum, lot) =>
@@ -325,18 +338,24 @@
                                                             0
                                                         )
                                                     ).toFixed(2) }}
+
                                                     kg
+
                                                 </strong>
 
                                             </td>
 
-                                            <td></td>
+
+                                            <td>
+                                            </td>
+
 
                                             <td
                                                 class="text-center"
                                             >
 
                                                 <strong>
+
                                                     ${{
                                                         Number(
                                                             warehouse.lots.reduce(
@@ -349,6 +368,7 @@
                                                             )
                                                         ).toFixed(2)
                                                     }}
+
                                                 </strong>
 
                                             </td>
@@ -383,10 +403,17 @@
 
                     </div>
 
+
                     <div class="inventory-grand-total-value">
 
                         <strong>
                             {{ totalInventory }} kg
+                        </strong>
+
+                        <br>
+
+                        <strong>
+                            ${{ totalInventoryValue }}
                         </strong>
 
                     </div>
@@ -409,6 +436,7 @@ import BaseForm from '../../main/components/forms/base/BaseForm.vue';
 export default {
 
     extends: BaseForm,
+
 
     props: {
 
@@ -444,13 +472,82 @@ export default {
 
     computed: {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Total general de cantidades
+        |--------------------------------------------------------------------------
+        */
+
         totalInventory() {
 
             const total = this.inventory.reduce(
 
                 (sum, item) => {
 
-                    return sum + Number(item.quantity || 0);
+                    return sum + Number(
+                        item.quantity || 0
+                    );
+
+                },
+
+                0
+
+            );
+
+            return total.toFixed(2);
+
+        },
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Total general monetario
+        |--------------------------------------------------------------------------
+        */
+
+        totalInventoryValue() {
+
+            const total = this.inventory.reduce(
+
+                (sum, item) => {
+
+                    if (!item.warehouses) {
+
+                        return sum;
+
+                    }
+
+
+                    return sum + item.warehouses.reduce(
+
+                        (warehouseSum, warehouse) => {
+
+                            if (!warehouse.lots) {
+
+                                return warehouseSum;
+
+                            }
+
+
+                            return warehouseSum + warehouse.lots.reduce(
+
+                                (lotSum, lot) => {
+
+                                    return lotSum + Number(
+                                        lot.total || 0
+                                    );
+
+                                },
+
+                                0
+
+                            );
+
+                        },
+
+                        0
+
+                    );
 
                 },
 
@@ -500,25 +597,43 @@ export default {
                 );
 
 
-                this.inventory = Array.isArray(
+                const inventory =
+                    response.data.inventory || [];
 
-                    response.data.inventory
 
-                )
+                /*
+                |--------------------------------------------------------------------------
+                | La API puede devolver un array:
+                |
+                | [
+                |     {...},
+                |     {...}
+                | ]
+                |
+                | o un objeto:
+                |
+                | {
+                |     raw_2: {...},
+                |     raw_7: {...}
+                | }
+                |
+                | Object.values() convierte el objeto
+                | en un array para Vue.
+                |--------------------------------------------------------------------------
+                */
 
-                    ? response.data.inventory
+                this.inventory = Array.isArray(inventory)
 
-                    : [];
+                    ? inventory
+
+                    : Object.values(inventory);
 
 
             } catch (error) {
 
                 console.error(
-
                     'Error cargando inventario:',
-
                     error
-
                 );
 
                 this.inventory = [];

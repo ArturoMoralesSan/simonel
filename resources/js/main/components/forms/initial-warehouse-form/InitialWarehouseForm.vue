@@ -18,6 +18,7 @@
             >
             </ItemForm>
 
+
             <p class="pt-4">
 
                 <button
@@ -40,13 +41,19 @@
 
                 </button>
 
+
                 <span v-if="item > 1">
+
                     Puedes registrar un máximo de
                     {{ item }} elementos.
+
                 </span>
 
+
                 <span v-else>
+
                     Puedes registrar únicamente un elemento.
+
                 </span>
 
             </p>
@@ -81,7 +88,9 @@
         <div class="text-center pt-8">
 
             <form-button class="btn--primary btn--wide">
+
                 Guardar inventario inicial
+
             </form-button>
 
         </div>
@@ -94,15 +103,21 @@
 <script>
 
 import BaseForm from '../base/BaseForm.vue';
+
 import ItemForm from './ItemForm.vue';
+
 
 export default {
 
     extends: BaseForm,
 
+
     components: {
+
         ItemForm
+
     },
+
 
     props: {
 
@@ -113,9 +128,13 @@ export default {
         */
 
         item: {
+
             required: true,
+
             type: Number
+
         },
+
 
         /*
         |--------------------------------------------------------------------------
@@ -124,9 +143,13 @@ export default {
         */
 
         minItem: {
+
             required: true,
+
             type: Number
+
         },
+
 
         /*
         |--------------------------------------------------------------------------
@@ -135,9 +158,13 @@ export default {
         */
 
         materials: {
+
             required: true,
+
             type: [Array, Object]
+
         },
+
 
         /*
         |--------------------------------------------------------------------------
@@ -146,9 +173,13 @@ export default {
         */
 
         products: {
+
             required: true,
+
             type: [Array, Object]
+
         },
+
 
         /*
         |--------------------------------------------------------------------------
@@ -157,8 +188,11 @@ export default {
         */
 
         warehouses: {
+
             required: true,
+
             type: [Array, Object]
+
         }
 
     },
@@ -178,19 +212,7 @@ export default {
 
     },
 
-
     computed: {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Total general
-        |--------------------------------------------------------------------------
-        |
-        | Suma:
-        |
-        | cantidad × costo unitario
-        |
-        */
 
         totalGeneral() {
 
@@ -208,21 +230,20 @@ export default {
                     ] || 0
                 );
 
-                const unitCost = Number(
+                const publicPrice = Number(
                     this.fields[
-                        'item' + i + '_unit_cost'
+                        'item' + i + '_public_price'
                     ] || 0
                 );
 
-                total += quantity * unitCost;
-
+                total += quantity * publicPrice;
             }
 
             return total;
-
         }
 
     },
+
 
 
     methods: {
@@ -236,24 +257,36 @@ export default {
         copyItemsFields(source, target) {
 
             const regex = new RegExp(
+
                 '^item' + source + '_'
+
             );
 
+
             this.deleteItemsFields(target);
+
 
             for (let field in this.fields) {
 
                 if (regex.test(field)) {
 
                     const newField = field.replace(
+
                         'item' + source + '_',
+
                         'item' + target + '_'
+
                     );
 
+
                     this.$set(
+
                         this.fields,
+
                         newField,
+
                         this.fields[field]
+
                     );
 
                 }
@@ -272,16 +305,22 @@ export default {
         deleteItemsFields(index) {
 
             const regex = new RegExp(
+
                 '^item' + index + '_'
+
             );
+
 
             for (let field in this.fields) {
 
                 if (regex.test(field)) {
 
                     this.$delete(
+
                         this.fields,
+
                         field
+
                     );
 
                 }
@@ -300,37 +339,52 @@ export default {
         removeItems(index) {
 
             /*
+            |--------------------------------------------------------------------------
             | Movemos todos los elementos posteriores
             | una posición hacia arriba.
+            |--------------------------------------------------------------------------
             */
 
             for (
+
                 let i = 0;
+
                 i < this.fields.item_count - index;
+
                 i++
+
             ) {
 
                 this.copyItemsFields(
+
                     index + i + 1,
+
                     index + i
+
                 );
 
             }
 
 
             /*
+            |--------------------------------------------------------------------------
             | Reducimos la cantidad.
+            |--------------------------------------------------------------------------
             */
 
             this.fields.item_count--;
 
 
             /*
+            |--------------------------------------------------------------------------
             | Eliminamos los campos que sobraron.
+            |--------------------------------------------------------------------------
             */
 
             this.deleteItemsFields(
+
                 this.fields.item_count + 1
+
             );
 
         }
@@ -358,6 +412,7 @@ export default {
 
 }
 
+
 .inventory-summary__row {
 
     display: flex;
@@ -369,6 +424,7 @@ export default {
     font-size: 18px;
 
 }
+
 
 .inventory-summary__row strong {
 

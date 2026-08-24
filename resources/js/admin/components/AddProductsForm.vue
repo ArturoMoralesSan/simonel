@@ -129,7 +129,7 @@
 
                     <!-- Subtotal -->
                     <td>
-                        ${{ calculateSubtotal(product).toFixed(4) }}
+                        ${{ calculateSubtotal(product).toFixed(2) }}
                     </td>
 
                     <!-- Quitar fila -->
@@ -148,20 +148,20 @@
                 <tfoot v-if="fields.products.length">
                     <tr>
                         <td colspan="5" class="text-right font-bold">Subtotal:</td>
-                        <td colspan="2">${{ subtotalGeneral.toFixed(4) }}</td>
+                        <td colspan="2">${{ subtotalGeneral.toFixed(2) }}</td>
                     </tr>
                     <tr>
                         <td colspan="5" class="text-right font-bold">Descuentos:</td>
-                        <td colspan="2">- ${{ totalDescuentos.toFixed(4) }}</td>
+                        <td colspan="2">- ${{ totalDescuentos.toFixed(2) }}</td>
                     </tr>
                     <!-- <tr>
                         <td colspan="5" class="text-right font-bold">IVA:</td>
-                        <td colspan="2">+ ${{ totalIva.toFixed(4) }}</td>
+                        <td colspan="2">+ ${{ totalIva.toFixed(2) }}</td>
                     </tr> -->
                     <tr>
                         <td colspan="5" class="text-right font-bold">Total general:</td>
                         <td colspan="2" class="font-bold">
-                            ${{ totalGeneral.toFixed(4) }}
+                            ${{ totalGeneral.toFixed(2) }}
                         </td>
                     </tr>
                 </tfoot>

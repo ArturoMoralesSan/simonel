@@ -23,7 +23,7 @@ class UserAdminRequest extends FormRequest
             'username' => ['required', 'max:180'],
             'email'     => ['required','email', 'max:60'],
             'role_id'     => ['required', 'max:60'],
-            'password'  => ['required_at_create','max:80'],
+            'password'  => ['required_at_create','min:8','max:80'],
         ];
     }
 

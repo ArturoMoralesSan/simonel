@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InitialWarehouseRequest;
+use App\Models\ManufacturedProduct;
 use App\Models\Product;
 use App\Models\RawMaterial;
 use App\Models\Warehouse;
@@ -26,26 +27,24 @@ class InitialWarehouseController extends Controller
             403
         );
 
-        $materials = RawMaterial::orderBy('name')->pluck('name', 'id');
+        $materials = RawMaterial::orderBy('name')
+            ->pluck('name', 'id');
 
-        $products = Product::with('manufactured')
-            ->get()
-            ->mapWithKeys(function ($product) {
-                return [
-                    $product->id => optional($product->manufactured)->name
-                        ?? 'Producto #' . $product->id
-                ];
-            });
+        $products = ManufacturedProduct::orderBy('name')
+            ->pluck('name', 'id');
 
         $warehouses = Warehouse::where('active', 1)
             ->orderBy('name')
             ->pluck('name', 'id');
 
-        return view('admin.inventarioinicial.crear', compact(
-            'materials',
-            'products',
-            'warehouses'
-        ));
+        return view(
+            'admin.inventarioinicial.crear',
+            compact(
+                'materials',
+                'products',
+                'warehouses'
+            )
+        );
     }
 
     public function save(InitialWarehouseRequest $request)
@@ -71,11 +70,18 @@ class InitialWarehouseController extends Controller
                 );
 
                 /*
-                * Este es el costo unitario que el usuario
-                * está asignando al inventario inicial.
+                |--------------------------------------------------------------------------
+                | COSTO UNITARIO
+                |--------------------------------------------------------------------------
+                |
+                | Para materia prima se mantiene el valor actual.
+                | Para producto terminado utilizaremos manufacturing_cost
+                | directamente más adelante.
+                |
                 */
+
                 $unitCost = (float) $request->input(
-                    "item{$i}_unit_cost"
+                    "item{$i}_public_price"
                 );
 
                 if (
@@ -88,17 +94,17 @@ class InitialWarehouseController extends Controller
                 }
 
                 /*
-                * ==========================================================
-                * COSTO TOTAL DEL LOTE
-                * ==========================================================
+                |--------------------------------------------------------------------------
+                | COSTO TOTAL DEL LOTE
+                |--------------------------------------------------------------------------
                 */
 
                 $totalCost = $quantity * $unitCost;
 
                 /*
-                * ==========================================================
-                * NÚMERO DE LOTE
-                * ==========================================================
+                |--------------------------------------------------------------------------
+                | NÚMERO DE LOTE
+                |--------------------------------------------------------------------------
                 */
 
                 $lotNumber =
@@ -108,9 +114,9 @@ class InitialWarehouseController extends Controller
                     $i;
 
                 /*
-                * ==========================================================
-                * MATERIA PRIMA
-                * ==========================================================
+                |--------------------------------------------------------------------------
+                | MATERIA PRIMA
+                |--------------------------------------------------------------------------
                 */
 
                 if ($type === 'raw_material') {
@@ -124,30 +130,28 @@ class InitialWarehouseController extends Controller
                     }
 
                     /*
-                    * Buscar materia prima
+                    |--------------------------------------------------------------------------
+                    | Buscar materia prima
+                    |--------------------------------------------------------------------------
                     */
+
                     $rawMaterial = RawMaterial::findOrFail(
                         $rawMaterialId
                     );
 
                     /*
-                    * ======================================================
-                    * ACTUALIZAR COSTO DE LA MATERIA PRIMA
-                    * ======================================================
-                    *
-                    * Como es inventario inicial y no existe una compra
-                    * que determine el costo, el costo introducido por
-                    * el usuario se convierte en el costo actual de
-                    * la materia prima.
+                    |--------------------------------------------------------------------------
+                    | ACTUALIZAR COSTO DE LA MATERIA PRIMA
+                    |--------------------------------------------------------------------------
                     */
 
                     $rawMaterial->cost = $unitCost;
                     $rawMaterial->save();
 
                     /*
-                    * ======================================================
-                    * CREAR LOTE DE MATERIA PRIMA
-                    * ======================================================
+                    |--------------------------------------------------------------------------
+                    | CREAR LOTE DE MATERIA PRIMA
+                    |--------------------------------------------------------------------------
                     */
 
                     $lot = new RawMaterialLot();
@@ -156,8 +160,9 @@ class InitialWarehouseController extends Controller
                     $lot->warehouse_id = $warehouseId;
 
                     /*
-                    * El inventario inicial no proviene de una compra.
+                    | El inventario inicial no proviene de una compra.
                     */
+
                     $lot->purchase_id = null;
                     $lot->supplier_id = null;
                     $lot->supplier_lot = null;
@@ -174,12 +179,10 @@ class InitialWarehouseController extends Controller
                     $lot->available_quantity = $quantity;
 
                     /*
-                    * raw_material_lots.cost almacena
-                    * el COSTO TOTAL del lote.
-                    *
-                    * Ejemplo:
-                    * 100 kg × $25 = $2,500
+                    | raw_material_lots.cost almacena
+                    | el COSTO TOTAL del lote.
                     */
+
                     $lot->cost = $totalCost;
 
                     $lot->status = 'Disponible';
@@ -190,33 +193,88 @@ class InitialWarehouseController extends Controller
                 }
 
                 /*
-                * ==========================================================
-                * PRODUCTO TERMINADO
-                * ==========================================================
+                |--------------------------------------------------------------------------
+                | PRODUCTO TERMINADO
+                |--------------------------------------------------------------------------
                 */
 
                 if ($type === 'product') {
 
-                    $productId = $request->input(
+                    /*
+                    |--------------------------------------------------------------------------
+                    | MANUFACTURED PRODUCT
+                    |--------------------------------------------------------------------------
+                    |
+                    | El ID viene del request.
+                    |
+                    */
+
+                    $manufacturedProductId = $request->input(
                         "item{$i}_product_id"
                     );
 
-                    if (!$productId) {
+                    if (!$manufacturedProductId) {
                         continue;
                     }
 
                     /*
-                    * Crear lote de producto terminado
+                    |--------------------------------------------------------------------------
+                    | COSTOS Y PRECIO VIENEN DEL REQUEST
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $manufacturingCost = (float) $request->input(
+                        "item{$i}_manufacturing_cost"
+                    );
+
+                    $publicPrice = (float) $request->input(
+                        "item{$i}_public_price"
+                    );
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | UTILITY
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $utility = $publicPrice > 0
+                        ? round((($publicPrice - $manufacturingCost) / $publicPrice) * 100, 1)
+                        : 0;
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CREAR PRODUCT
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $product = new Product();
+                    $product->manufactured_product_id = $manufacturedProductId;
+                    $product->vinil_cost = $manufacturingCost;
+                    $product->costo_total = $manufacturingCost;
+                    $product->subtotal = $manufacturingCost;
+                    $product->costo_venta = $publicPrice;
+                    $product->utility = $utility;
+                    $product->save();
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CREAR LOTE DE PRODUCTO TERMINADO
+                    |--------------------------------------------------------------------------
                     */
 
                     $lot = new ProductLot();
 
-                    $lot->product_id = $productId;
+                    /*
+                    | Aquí usamos el ID del Product recién creado.
+                    */
+
+                    $lot->product_id = $product->id;
 
                     /*
-                    * El inventario inicial no pertenece
-                    * a una orden de producción.
+                    | El inventario inicial no pertenece
+                    | a una orden de producción.
                     */
+
                     $lot->production_order_id = null;
 
                     $lot->warehouse_id = $warehouseId;
@@ -233,16 +291,21 @@ class InitialWarehouseController extends Controller
                     $lot->available_quantity = $quantity;
 
                     /*
-                    * Costo unitario del producto.
+                    |--------------------------------------------------------------------------
+                    | COSTO DEL PRODUCTO
+                    |--------------------------------------------------------------------------
+                    |
+                    | Para producto terminado el costo real es
+                    | manufacturing_cost, no public_price.
+                    |
                     */
-                    $lot->cost_per_unit = $unitCost;
 
-                    /*
-                    * Costo total del lote.
-                    */
-                    $lot->total_cost = $totalCost;
+                    $lot->cost_per_unit = $manufacturingCost;
+
+                    $lot->total_cost = $quantity * $manufacturingCost;
 
                     $lot->status = 'Disponible';
+
                     $lot->active = 1;
 
                     $lot->save();

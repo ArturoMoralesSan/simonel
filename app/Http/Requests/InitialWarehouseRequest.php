@@ -4,8 +4,6 @@ namespace App\Http\Requests;
 
 class InitialWarehouseRequest extends FormRequest
 {
-    
-
     public function rules()
     {
         $rules = [
@@ -34,7 +32,21 @@ class InitialWarehouseRequest extends FormRequest
                 'gt:0',
             ];
 
-            $rules["item{$i}_unit_cost"] = [
+            /*
+             * Costo de fabricación.
+             * Este valor viene directamente del request.
+             */
+            $rules["item{$i}_manufacturing_cost"] = [
+                'required_if:item' . $i . '_type,product',
+                'numeric',
+                'gte:0',
+            ];
+
+            /*
+             * Precio público.
+             * Este valor viene directamente del request.
+             */
+            $rules["item{$i}_public_price"] = [
                 'required',
                 'numeric',
                 'gte:0',
@@ -45,6 +57,9 @@ class InitialWarehouseRequest extends FormRequest
                 'date',
             ];
 
+            /*
+             * MATERIA PRIMA
+             */
             $type = $this->input("item{$i}_type");
 
             if ($type === 'raw_material') {
@@ -53,14 +68,22 @@ class InitialWarehouseRequest extends FormRequest
                     'required',
                     'exists:raw_materials,id',
                 ];
-
             }
 
+            /*
+             * PRODUCTO
+             *
+             * IMPORTANTE:
+             * item_product_id contiene el ID de manufactured_products.
+             *
+             * Después de encontrarlo se crea un registro en products
+             * y ese nuevo products.id se utiliza para product_lots.
+             */
             if ($type === 'product') {
 
                 $rules["item{$i}_product_id"] = [
                     'required',
-                    'exists:products,id',
+                    'exists:manufactured_products,id',
                 ];
             }
         }
@@ -71,6 +94,7 @@ class InitialWarehouseRequest extends FormRequest
     public function messages()
     {
         $messages = [
+
             'item_count.required' =>
                 'Debes indicar la cantidad de lotes.',
 
@@ -104,29 +128,50 @@ class InitialWarehouseRequest extends FormRequest
             $messages["item{$i}_quantity.gt"] =
                 "La cantidad del lote {$i} debe ser mayor a cero.";
 
-            $messages["item{$i}_unit_cost.required"] =
-                "Debes indicar el costo unitario del lote {$i}.";
+            /*
+             * Manufacturing cost
+             */
+            $messages["item{$i}_manufacturing_cost.required_if"] =
+                "Debes indicar el costo de fabricación del lote {$i}.";
 
-            $messages["item{$i}_unit_cost.numeric"] =
-                "El costo unitario del lote {$i} debe ser numérico.";
+            $messages["item{$i}_manufacturing_cost.numeric"] =
+                "El costo de fabricación del lote {$i} debe ser numérico.";
 
-            $messages["item{$i}_unit_cost.gte"] =
-                "El costo unitario del lote {$i} no puede ser negativo.";
+            $messages["item{$i}_manufacturing_cost.gte"] =
+                "El costo de fabricación del lote {$i} no puede ser negativo.";
+
+            /*
+             * Public price
+             */
+            $messages["item{$i}_public_price.required"] =
+                "Debes indicar el precio público del lote {$i}.";
+
+            $messages["item{$i}_public_price.numeric"] =
+                "El precio público del lote {$i} debe ser numérico.";
+
+            $messages["item{$i}_public_price.gte"] =
+                "El precio público del lote {$i} no puede ser negativo.";
 
             $messages["item{$i}_expiration_date.date"] =
                 "La fecha de caducidad del lote {$i} no es válida.";
 
+            /*
+             * Raw material
+             */
             $messages["item{$i}_raw_material_id.required"] =
                 "Debes seleccionar la materia prima del lote {$i}.";
 
             $messages["item{$i}_raw_material_id.exists"] =
                 "La materia prima seleccionada en el lote {$i} no existe.";
 
+            /*
+             * Manufactured product
+             */
             $messages["item{$i}_product_id.required"] =
                 "Debes seleccionar el producto del lote {$i}.";
 
             $messages["item{$i}_product_id.exists"] =
-                "El producto seleccionado en el lote {$i} no existe.";
+                "El producto seleccionado del lote {$i} no existe.";
         }
 
         return $messages;

@@ -22,7 +22,7 @@ class RoleController extends Controller
     public function create()
     {
         abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
-        $permissions = Permission::all();
+        $permissions = Permission::orderBy('name', 'asc')->get();
         return view('admin.roles.crear', compact('permissions'));   
     }
 
@@ -55,7 +55,7 @@ class RoleController extends Controller
     public function edit($id)
     {
         abort_unless(Gate::allows('view.roles') || Gate::allows('edit.roles'), 403);
-        $permissions = Permission::all();
+        $permissions = Permission::orderBy('name', 'asc')->get();
         $role = Role::find($id);
 
         return view('admin.roles.editar', compact('role', 'permissions'));

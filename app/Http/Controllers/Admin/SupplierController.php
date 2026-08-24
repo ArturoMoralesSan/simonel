@@ -41,7 +41,11 @@ class SupplierController extends Controller
     {
         abort_unless(Gate::allows('create.suppliers'), 403);
 
-        Supplier::create($request->validated());
+        $data = $request->validated();
+
+        $data['rfc'] = isset($data['rfc']) ? strtoupper($data['rfc']) : null;
+
+        Supplier::create($data);
 
         alert('Se ha creado un proveedor.');
 
@@ -59,13 +63,19 @@ class SupplierController extends Controller
         return view('admin.proveedores.editar', compact('supplier'));
     }
 
-    public function update(SupplierRequest $request, $id) 
+    public function update(SupplierRequest $request, $id)
     {
-        abort_unless(Gate::allows('create.suppliers'),403);
+        abort_unless(Gate::allows('create.suppliers'), 403);
 
         $supplier = Supplier::findOrFail($id);
 
-        $supplier->update($request->validated());
+        $data = $request->validated();
+
+        $data['rfc'] = isset($data['rfc'])
+            ? strtoupper($data['rfc'])
+            : null;
+
+        $supplier->update($data);
 
         alert('Se ha actualizado el proveedor.');
 

@@ -17,6 +17,7 @@
 
 
         <!-- TIPO -->
+
         <div class="row mb-4">
 
             <div class="md:col sm:col">
@@ -45,6 +46,7 @@
 
 
         <!-- MATERIAL / PRODUCTO -->
+
         <div class="row mb-4">
 
             <!-- MATERIA PRIMA -->
@@ -134,7 +136,7 @@
         </div>
 
 
-        <!-- CANTIDAD / COSTO / TOTAL -->
+        <!-- CANTIDAD / COSTOS -->
 
         <div class="row mb-4">
 
@@ -165,26 +167,30 @@
             </div>
 
 
-            <!-- COSTO UNITARIO -->
+            <!-- COSTO DE FABRICACIÓN -->
+            <!-- SOLO PRODUCTO TERMINADO -->
 
-            <div class="md:col-1/3 sm:col">
+            <div
+                v-if="fields['item' + index + '_type'] === 'product'"
+                class="md:col-1/3 sm:col"
+            >
 
                 <div class="form-control">
 
                     <label>
-                        Costo unitario
+                        Costo de fabricación
                     </label>
 
                     <text-field
-                        :name="'item' + index + '_unit_cost'"
-                        v-model="fields['item' + index + '_unit_cost']"
+                        :name="'item' + index + '_manufacturing_cost'"
+                        v-model="fields['item' + index + '_manufacturing_cost']"
                         type="number"
                         step="0.0001"
                         min="0"
                     />
 
                     <field-errors
-                        :name="'item' + index + '_unit_cost'"
+                        :name="'item' + index + '_manufacturing_cost'"
                     />
 
                 </div>
@@ -192,27 +198,75 @@
             </div>
 
 
-            <!-- TOTAL -->
+            <!-- PRECIO -->
 
-            <div class="md:col-1/3 sm:col">
+            <div
+                :class="
+                    fields['item' + index + '_type'] === 'product'
+                        ? 'md:col-1/3 sm:col'
+                        : 'md:col-1/3 sm:col'
+                "
+            >
 
                 <div class="form-control">
 
                     <label>
-                        Total
+
+                        {{
+                            fields['item' + index + '_type'] === 'raw_material'
+                                ? 'Precio unitario'
+                                : 'Precio público'
+                        }}
+
+                    </label>
+
+                    <text-field
+                        :name="'item' + index + '_public_price'"
+                        v-model="fields['item' + index + '_public_price']"
+                        type="number"
+                        step="0.0001"
+                        min="0"
+                    />
+
+                    <field-errors
+                        :name="'item' + index + '_public_price'"
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="row mb-4">
+
+            <div class="md:col sm:col">
+
+                <div class="form-control">
+
+                    <label>
+                        Total del inventario
                     </label>
 
                     <div class="inventory-total">
 
                         $
+
                         {{
                             (
                                 Number(
-                                    fields['item' + index + '_quantity'] || 0
+                                    fields[
+                                        'item' + index + '_quantity'
+                                    ] || 0
                                 )
                                 *
                                 Number(
-                                    fields['item' + index + '_unit_cost'] || 0
+                                    fields[
+                                        'item' + index + '_public_price'
+                                    ] || 0
                                 )
                             ).toFixed(2)
                         }}
@@ -239,57 +293,93 @@ import FieldErrors from '../base/FieldErrors.vue';
 export default {
 
     components: {
+
         SelectField,
+
         TextField,
+
         FieldErrors
+
     },
+
 
     props: {
 
         index: {
+
             required: true,
+
             type: Number
+
         },
+
 
         minItem: {
+
             required: true,
+
             type: Number
+
         },
+
 
         materials: {
+
             required: true,
+
             type: [Array, Object]
+
         },
+
 
         products: {
+
             required: true,
+
             type: [Array, Object]
+
         },
+
 
         warehouses: {
+
             required: true,
+
             type: [Array, Object]
+
         },
+
 
         fields: {
+
             required: true,
+
             type: Object
+
         },
 
+
         errors: {
+
             required: true,
+
             type: Object
+
         }
 
     },
+
 
     computed: {
 
         types() {
 
             return {
+
                 raw_material: 'Materia prima',
+
                 product: 'Producto terminado'
+
             };
 
         }
@@ -304,15 +394,25 @@ export default {
 <style scoped>
 
 .inventory-total {
+
     min-height: 42px;
+
     display: flex;
+
     align-items: center;
+
     padding: 8px 12px;
+
     background: #f8fafc;
+
     border: 1px solid #d1d5db;
+
     border-radius: 4px;
+
     font-weight: 700;
+
     font-size: 16px;
+
 }
 
 </style>

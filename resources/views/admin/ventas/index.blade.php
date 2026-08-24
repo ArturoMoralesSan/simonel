@@ -94,7 +94,7 @@
                             <th>Descuento</th>
                             <th>Total</th>
 
-                            @if(auth()->user()->isSuperAdmin() || auth()->user()->isEmployee())
+                            @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin() || auth()->user()->isEmployee())
                                 <th>Orden</th>
                             @endif
 
@@ -109,18 +109,24 @@
                             :key="saleItem.id"
                         >
 
-                            <td>@{{ saleItem.id }}</td>
+                            <td data-label="ID">
+                                @{{ saleItem.id }}
+                            </td>
 
-                            <td>@{{ saleItem.formated_date }}</td>
+                            <td data-label="Fecha">
+                                @{{ saleItem.formated_date }}
+                            </td>
 
-                            <td>@{{ saleItem.hour }}</td>
+                            <td data-label="Hora">
+                                @{{ saleItem.hour }}
+                            </td>
 
-                            <td>
+                            <td data-label="Cliente">
                                 @{{ saleItem.user.name }}
                                 @{{ saleItem.user.last_name }}
                             </td>
 
-                            <td>
+                            <td data-label="Estado">
 
                                 <span
                                     v-if="saleItem.status=='paid'"
@@ -152,44 +158,51 @@
 
                             </td>
 
-                            <td>
-                                $@{{ saleItem.gross_amount }}
+                            <td data-label="Subtotal">
+                                $@{{ Number(saleItem.gross_amount || 0).toFixed(2) }}
                             </td>
 
-                            <td>
-                                $@{{ saleItem.discount }}
+                            <td data-label="Descuento">
+                                $@{{ Number(saleItem.discount || 0).toFixed(2) }}
                             </td>
 
-                            <td>
-                                $@{{ saleItem.total_with_iva }}
+                            <td data-label="Total">
+                                $@{{ Number(saleItem.total_with_iva || 0).toFixed(2) }}
                             </td>
 
-                            @if(auth()->user()->isSuperAdmin() || auth()->user()->isEmployee())
+                            @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin() || auth()->user()->isEmployee())
 
-                                <td>
+                                <td data-label="Orden">
 
                                     <a
                                         class="btn btn--sm btn--blue"
                                         :href="$root.path + '/admin/ventas/orden/' + saleItem.id"
                                     >
-                                        <img class="svg-icon-only" src="{{ url('img/svg/order.svg') }}">
+                                        <img
+                                            class="svg-icon-only"
+                                            src="{{ url('img/svg/order.svg') }}"
+                                        >
                                     </a>
 
                                 </td>
 
                             @endif
 
-                            <td>
+                            <td data-label="Nota">
 
                                 <a
                                     class="btn btn--sm btn--blue"
                                     :href="$root.path + '/notas/' + saleItem.id"
                                     target="_blank"
                                 >
-                                    <img class="svg-icon-only" src="{{ url('img/svg/pdf.svg') }}">
+                                    <img
+                                        class="svg-icon-only"
+                                        src="{{ url('img/svg/pdf.svg') }}"
+                                    >
                                 </a>
 
                             </td>
+
                         </tr>
 
                     </tbody>

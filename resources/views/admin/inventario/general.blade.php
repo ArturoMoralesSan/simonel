@@ -45,7 +45,7 @@
 
             <div class="md:col-1/3">
 
-                <strong>Cantidad total</strong>
+                <strong>Cantidad total en kilos</strong>
 
                 <p style="font-size: 22px;">
                     {{ number_format($totalQuantity, 3) }} kg

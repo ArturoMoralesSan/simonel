@@ -32,9 +32,12 @@ class CustomerController extends Controller
             },
             'seller',
         ])
-        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() , function ($query) {
-            $query->where('seller_id', Auth::id());
-        })
+        ->when(
+            !Auth::user()->isSuperAdmin() && !Auth::user()->isAdmin(),
+            function ($query) {
+                $query->where('seller_id', Auth::id());
+            }
+        )
         ->when($search, function ($query) use ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('business_name', 'LIKE', "%{$search}%")
@@ -62,7 +65,7 @@ class CustomerController extends Controller
         ])
         ->findOrFail($id);
         
-        $isSuperAdmin = auth()->user()->isSuperAdmin();
+        $isSuperAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
 
         return view(
             'admin.clientes.detalles',
@@ -75,7 +78,7 @@ class CustomerController extends Controller
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
 
-        $isSuperAdmin = auth()->user()->isSuperAdmin();
+        $isSuperAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin() || auth()->user()->isAdmin();
         $sellers = User::whereHas('role', function ($query) {
             $query->where('key_name', 'vendedores');
         })
@@ -189,7 +192,7 @@ class CustomerController extends Controller
 
         $user = Customer::with('creditSetting')->findOrFail($id);
     
-        $isSuperAdmin = auth()->user()->isSuperAdmin();
+        $isSuperAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
 
         $sellers = User::whereHas('role', function ($query) {
             $query->where('key_name', 'vendedores');

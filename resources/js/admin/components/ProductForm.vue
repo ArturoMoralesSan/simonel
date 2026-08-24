@@ -121,13 +121,13 @@ export default {
                 */
 
                 this.fields.subtotal =
-                    subtotal.toFixed(4);
+                    subtotal.toFixed(2);
 
                 this.fields.costo_total =
-                    subtotal.toFixed(4);
+                    subtotal.toFixed(2);
 
                 this.fields.utility_amount =
-                    utilityAmount.toFixed(4);
+                    utilityAmount.toFixed(2);
 
                 this.fields.utility =
                     utility.toFixed(2);

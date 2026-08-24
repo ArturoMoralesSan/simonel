@@ -74,6 +74,7 @@ class InventoryController extends Controller
         ->whereIn('sales.status', ['paid', 'credit'])
         ->get()
         ->keyBy('product_id');
+        
         $customer = User::with('customer')->findOrFail($clientId);
         return response()->json([
             'inventory' => $inventory,
@@ -175,7 +176,7 @@ class InventoryController extends Controller
         $search = request('search');
 
         $query = User::whereHas('inventories')
-        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
+        ->when( !Auth::user()->isSuperAdmin() && !Auth::user()->isAdmin(), function ($query) {
             $query->whereHas('customer', function ($q) {
                 $q->whereHas('user', function ($u) {
                     $u->where('seller_id', Auth::id());
@@ -254,7 +255,7 @@ class InventoryController extends Controller
             403
         );
 
-        $users = Customer::when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
+        $users = Customer::when(!Auth::user()->isSuperAdmin() && !Auth::user()->isAdmin(), function ($query) {
             $query->whereHas('user', function ($q) {
                 $q->where('seller_id', Auth::id());
             });
@@ -387,26 +388,69 @@ class InventoryController extends Controller
                 $itemId = $lot->product_id;
                 $key = 'product_' . $itemId;
 
+                /*
+                |--------------------------------------------------------------------------
+                | Costo de venta del producto
+                |--------------------------------------------------------------------------
+                */
+
+                $cost = (float) $lot->product->costo_venta;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Crear producto en inventario
+                |--------------------------------------------------------------------------
+                */
+
                 if (!$inventory->has($key)) {
+
                     $inventory->put($key, [
+
                         'item_id' => $itemId,
+
                         'type' => 'product',
+
                         'name' => optional(
                             $lot->product->manufactured
                         )->name ?? 'Producto eliminado',
+
                         'description' => optional(
                             $lot->product->manufactured
                         )->description ?? '',
+
+                        'cost' => $cost,
+
                         'quantity' => 0,
+
+                        'total' => 0,
+
                         'warehouses' => [],
+
                     ]);
+
                 }
 
                 $item = $inventory->get($key);
 
                 $quantity = (float) $lot->available_quantity;
 
+                /*
+                |--------------------------------------------------------------------------
+                | Total del lote
+                |--------------------------------------------------------------------------
+                */
+
+                $lotTotal = $quantity * $cost;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Acumulados del producto
+                |--------------------------------------------------------------------------
+                */
+
                 $item['quantity'] += $quantity;
+
+                $item['total'] += $lotTotal;
 
                 /*
                 |--------------------------------------------------------------------------
@@ -416,7 +460,9 @@ class InventoryController extends Controller
 
                 $warehouseIndex = collect($item['warehouses'])
                     ->search(function ($itemWarehouse) use ($warehouse) {
+
                         return $itemWarehouse['id'] == $warehouse->id;
+
                     });
 
                 /*
@@ -426,32 +472,62 @@ class InventoryController extends Controller
                 */
 
                 $lotData = [
+
                     'id' => $lot->id,
+
                     'lot_number' => $lot->lot_number,
+
                     'quantity' => $quantity,
+
+                    'cost' => $cost,
+
+                    'total' => $lotTotal,
+
                     'expiration_date' => $lot->expiration_date,
+
                     'is_expired' => $lot->expiration_date
                         ? $lot->expiration_date < now()->toDateString()
                         : false,
+
                 ];
+
+                /*
+                |--------------------------------------------------------------------------
+                | Agregar lote al almacén
+                |--------------------------------------------------------------------------
+                */
 
                 if ($warehouseIndex !== false) {
 
                     $item['warehouses'][$warehouseIndex]['quantity']
                         += $quantity;
 
+                    $item['warehouses'][$warehouseIndex]['total']
+                        = ($item['warehouses'][$warehouseIndex]['total'] ?? 0)
+                        + $lotTotal;
+
                     $item['warehouses'][$warehouseIndex]['lots'][] = $lotData;
 
                 } else {
 
                     $item['warehouses'][] = [
+
                         'id' => $warehouse->id,
+
                         'name' => $warehouse->name,
+
                         'quantity' => $quantity,
+
+                        'total' => $lotTotal,
+
                         'lots' => [
+
                             $lotData
+
                         ],
+
                     ];
+
                 }
 
                 $inventory->put($key, $item);
@@ -485,18 +561,34 @@ class InventoryController extends Controller
 
                 $cost = (float) $lot->material->cost;
 
+                /*
+                |--------------------------------------------------------------------------
+                | Crear materia prima en inventario
+                |--------------------------------------------------------------------------
+                */
+
                 if (!$inventory->has($key)) {
 
                     $inventory->put($key, [
+
                         'item_id' => $itemId,
+
                         'type' => 'raw_material',
+
                         'name' => $lot->material->name,
+
                         'description' => $lot->material->description ?? '',
+
                         'cost' => $cost,
+
                         'quantity' => 0,
+
                         'total' => 0,
+
                         'warehouses' => [],
+
                     ]);
+
                 }
 
                 $item = $inventory->get($key);
@@ -505,7 +597,7 @@ class InventoryController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | Total de este lote
+                | Total del lote
                 |--------------------------------------------------------------------------
                 */
 
@@ -518,6 +610,7 @@ class InventoryController extends Controller
                 */
 
                 $item['quantity'] += $quantity;
+
                 $item['total'] += $lotTotal;
 
                 /*
@@ -528,7 +621,9 @@ class InventoryController extends Controller
 
                 $warehouseIndex = collect($item['warehouses'])
                     ->search(function ($itemWarehouse) use ($warehouse) {
+
                         return $itemWarehouse['id'] == $warehouse->id;
+
                     });
 
                 /*
@@ -538,16 +633,30 @@ class InventoryController extends Controller
                 */
 
                 $lotData = [
+
                     'id' => $lot->id,
+
                     'lot_number' => $lot->lot_number,
+
                     'quantity' => $quantity,
+
                     'cost' => $cost,
+
                     'total' => $lotTotal,
+
                     'expiration_date' => $lot->expiration_date,
+
                     'is_expired' => $lot->expiration_date
                         ? $lot->expiration_date < now()->toDateString()
                         : false,
+
                 ];
+
+                /*
+                |--------------------------------------------------------------------------
+                | Agregar lote al almacén
+                |--------------------------------------------------------------------------
+                */
 
                 if ($warehouseIndex !== false) {
 
@@ -563,14 +672,23 @@ class InventoryController extends Controller
                 } else {
 
                     $item['warehouses'][] = [
+
                         'id' => $warehouse->id,
+
                         'name' => $warehouse->name,
+
                         'quantity' => $quantity,
+
                         'total' => $lotTotal,
+
                         'lots' => [
+
                             $lotData
+
                         ],
+
                     ];
+
                 }
 
                 $inventory->put($key, $item);
@@ -578,9 +696,11 @@ class InventoryController extends Controller
         }
 
         return response()->json([
+
             'inventory' => $inventory
                 ->sortBy('name')
                 ->values(),
+
         ]);
     }
 

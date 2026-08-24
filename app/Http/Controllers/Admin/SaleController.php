@@ -78,7 +78,7 @@ class SaleController extends Controller
         ->whereYear('created_at', $year)
         ->latest()
 
-        ->when(!Auth::user()->isSuperAdmin() || Auth::user()->isAdmin(), function ($query) {
+        ->when(!Auth::user()->isSuperAdmin() && !Auth::user()->isAdmin(), function ($query) {
 
             if (Auth::user()->isCustomer()) {
 

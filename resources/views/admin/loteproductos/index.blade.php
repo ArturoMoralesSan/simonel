@@ -75,11 +75,12 @@
                                     @{{ ProductLotItem.warehouse.name }}
                                 </td>
                                 
-                                 <td data-label="Cantidad inicial:">
-                                    @{{ ProductLotItem.initial_quantity }}
+                                <td data-label="Cantidad inicial:">
+                                    @{{ Number(ProductLotItem.initial_quantity || 0).toFixed(2) }}
                                 </td>
+
                                 <td data-label="Cantidad disponible:">
-                                    @{{ ProductLotItem.available_quantity }}
+                                    @{{ Number(ProductLotItem.available_quantity || 0).toFixed(2) }}
                                 </td>
                                 <td data-label="Estado:">
                                     @{{ ProductLotItem.status }}
