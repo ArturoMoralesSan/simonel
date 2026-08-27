@@ -17,10 +17,10 @@
                     :key="i"
                     @click="activeSection = section.slug"
                 >
-                    <a style="text-decoration: none; color:#fff;" :href="$root.path + '/admin/' + section.route">
-                        <img class="dashboard-menu__tile" :src="$root.path + '/archivos/dashboard/tiles/' + section.tile" alt="">
+                    
+                    <img class="dashboard-menu__tile" :src="$root.path + '/archivos/dashboard/tiles/' + section.tile" alt="">
                         {{ section.name }}
-                    </a>
+
                     
                 </li>
             </ul>

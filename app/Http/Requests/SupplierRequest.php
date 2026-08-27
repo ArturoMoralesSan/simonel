@@ -17,12 +17,12 @@ class SupplierRequest extends FormRequest
     public function rules()
     {
         return [
-            'business_name' => 'required|string|max:255',
-            'trade_name'    => 'required|string|max:255',
-            'contact_name'  => 'required|string|max:255',
+            'business_name' => 'required|string|max:100',
+            'trade_name'    => 'required|string|max:100',
+            'contact_name'  => 'required|string|max:100',
             'rfc'           => 'nullable|string|max:20',
-            'phone'         => 'required|string|max:50',
-            'email'         => 'required|email|max:255',
+            'phone'         => 'required|digits:10',
+            'email'         => 'nullable|max:100',
             'address'       => 'nullable|string|max:1000',
             'notes'         => 'nullable|string|max:2000',
         ];

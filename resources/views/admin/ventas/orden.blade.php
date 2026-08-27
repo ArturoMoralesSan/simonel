@@ -33,7 +33,7 @@
                     <section class="db-panel text-center">
                         <h5>Cantidad Vendida</h5>
                         <h2>
-                            {{ number_format($sale->products->sum('quantity'),3) }}
+                            {{ number_format($sale->products->sum('quantity'),2) }}
                         </h2>
                     </section>
                 </div>
@@ -46,6 +46,45 @@
                     </section>
                 </div>
             </div>
+            <base-form
+                action="{{ url('admin/ventas/orden/' . $sale->id . '/factura') }}"
+                inline-template
+                v-cloak
+            >
+                <form>
+                    <section class="db-panel mb-8">
+                        <h3 class="db-panel__title">
+                            Factura
+                        </h3>
+
+                        <div class="md:row mb-4">
+                            <div class="md:col">
+                                <div class="form-control">
+                                    <label for="factura">
+                                        Número de factura
+                                    </label>
+
+                                    <text-field
+                                        name="factura"
+                                        v-model="fields.factura"
+                                        maxlength="30"
+                                        initial="{{ $sale->factura ?? '' }}"
+                                    >
+                                    </text-field>
+
+                                    <field-errors name="factura"></field-errors>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <form-button class="btn--success btn--wide">
+                                Guardar
+                            </form-button>
+                        </div>
+                    </section>
+                </form>
+            </base-form>
             <section class="db-panel mb-8">
                 <h3 class="db-panel__title">
                     Datos Generales
@@ -92,7 +131,7 @@
                                 Subtotal:
                             </th>
                             <td class="order-table__cell">
-                                $ {{ number_format($sale->gross_amount,4) }}
+                                $ {{ number_format($sale->gross_amount,2) }}
                             </td>
                         </tr>
                         <tr class="order-table__row">
@@ -100,7 +139,7 @@
                                 Descuento:
                             </th>
                             <td class="order-table__cell">
-                                $ {{ number_format($sale->discount,4) }}
+                                $ {{ number_format($sale->discount,2) }}
                             </td>
                         </tr>
                         <tr class="order-table__row">
@@ -109,7 +148,7 @@
                             </th>
                             <td class="order-table__cell">
                                 <strong>
-                                    $ {{ number_format($sale->total_with_iva,4) }}
+                                    $ {{ number_format($sale->total_with_iva,2) }}
                                 </strong>
                             </td>
                         </tr>
@@ -141,17 +180,17 @@
                                     {{ $saleProduct->product->type->name ?? 'Sin categoría' }}
                                 </td>
                                 <td>
-                                    {{ number_format($saleProduct->quantity,3) }}
+                                    {{ number_format($saleProduct->quantity,2) }}
                                 </td>
                                 <td>
-                                    $ {{ number_format($saleProduct->base_price,4) }}
+                                    $ {{ number_format($saleProduct->base_price,2) }}
                                 </td>
                                 <td>
                                     {{ number_format($saleProduct->discount,2) }} %
                                 </td>
                                 <td>
                                     <strong>
-                                        $ {{ number_format($saleProduct->total_with_iva,4) }}
+                                        $ {{ number_format($saleProduct->total_with_iva,2) }}
                                     </strong>
                                 </td>
                             </tr>

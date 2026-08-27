@@ -64,6 +64,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::post('cambiar-rol', [DashboardController::class, 'switchRole'])->name('admin.switch-role');
 
     Route::get('/', [DashboardController::class, 'index']);
+    Route::get('estadistica-diaria', [DashboardController::class, 'statistics']);
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
@@ -262,6 +263,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('ventas/{id}/editar', [SaleController::class, 'edit']);
     Route::put('ventas/{id}/actualizar', [SaleController::class, 'update']);
     Route::delete('ventas/eliminar/{id}', [SaleController::class, 'delete']);
+
+    Route::post('ventas/orden/{id}/factura', [SaleController::class, 'factura']);
+
 
     //Acabados
     Route::get('acabados', [CutController::class, 'index']);

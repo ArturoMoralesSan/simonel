@@ -20,7 +20,7 @@ class StoreUserCustomerRequest extends FormRequest
             'rfc'             => 'nullable|string|max:13|min:12',
             'trade_name'      => 'nullable|string|max:255',
             'tax_regime'      => 'nullable|string|max:255',
-            'phone'           => 'required|string|max:20',
+            'phone'           => 'required|digits:10',
             'street'          => 'nullable|string|max:255',
             'ext_number'      => 'nullable|string|max:20',
             'int_number'      => 'nullable|string|max:20',
@@ -36,12 +36,15 @@ class StoreUserCustomerRequest extends FormRequest
             // Crédito
         ];
 
-        // Validación de RFC y correo
+        // Validación de RFC, nombre comercial y correo
         if ($this->customer_id === null) {
-            $rules['rfc'] .= '|unique:customers,rfc';
+
+            $rules['trade_name'] .= '|unique:customers,trade_name';
             $rules['email'] .= '|unique:users,email';
+
         } else {
-            $rules['rfc'] .= '|unique:customers,rfc,' . $this->customer_id;
+
+            $rules['trade_name'] .= '|unique:customers,trade_name,' . $this->customer_id;
             $rules['email'] .= '|unique:users,email,' . $this->user_id;
         }
 

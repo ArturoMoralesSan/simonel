@@ -33,11 +33,7 @@
                     href="{{ url('admin') }}"
                     v-if="atDashboard"
                 >
-                    @if($authUser->isSuperAdmin())
-                        « Ver estadística
-                    @else
-                        « Inicio
-                    @endif
+                    « Inicio
                 </a>
             </div>
             <div class="d-flex items-center">

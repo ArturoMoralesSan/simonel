@@ -36,7 +36,7 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Nombre completo</th>
-                                <th>Correo Electrónico</th>
+                                <th>Nombre de usuario</th>
                                 <th>Rol</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
@@ -50,7 +50,7 @@
                                     </a>
                                 </td>
                                 <td data-label="Correo electrónico:">
-                                    @{{ userItem.email }}
+                                    @{{ userItem.username }}
                                 </td>
                                 <td data-label="Roles:">
                                     @{{ userItem.role.name }}

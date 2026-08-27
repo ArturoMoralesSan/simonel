@@ -159,15 +159,24 @@
                             </td>
 
                             <td data-label="Subtotal">
-                                $@{{ Number(saleItem.gross_amount || 0).toFixed(2) }}
+                                $@{{ Number(saleItem.gross_amount || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
                             </td>
 
                             <td data-label="Descuento">
-                                $@{{ Number(saleItem.discount || 0).toFixed(2) }}
+                                $@{{ Number(saleItem.discount || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
                             </td>
 
                             <td data-label="Total">
-                                $@{{ Number(saleItem.total_with_iva || 0).toFixed(2) }}
+                                $@{{ Number(saleItem.total_with_iva || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
                             </td>
 
                             @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin() || auth()->user()->isEmployee())

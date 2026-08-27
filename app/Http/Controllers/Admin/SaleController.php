@@ -295,6 +295,22 @@ class SaleController extends Controller
         }
     } */
 
+    public function factura(Request $request, $id)
+    {
+        $request->validate([
+            'factura' => 'nullable|string|max:30',
+        ]);
+
+        $sale = Sale::findOrFail($id);
+
+        $sale->factura = $request->factura;
+        $sale->save();
+
+        return response('', 204, [
+            'Redirect-To' => url('admin/ventas/orden/' . $sale->id)
+        ]);
+    }
+
     public function save(SaleRequest $request)
     {
         abort_unless(

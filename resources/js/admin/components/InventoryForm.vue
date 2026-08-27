@@ -3,7 +3,7 @@
         <form>
             <div class="form-control">
                 <label>Cliente:</label>
-                <search-select-field
+                <select-field
                     name="client_id"
                     v-model="fields.client_id"
                     :options="clients"

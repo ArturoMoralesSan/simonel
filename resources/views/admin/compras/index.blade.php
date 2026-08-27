@@ -117,7 +117,10 @@
                             </td>
 
                             <td data-label="Total:">
-                                $ @{{ purchase.total }}
+                                $ @{{ Number(purchase.total).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
                             </td>
 
                             <td data-label="Materias primas:">

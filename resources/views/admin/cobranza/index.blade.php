@@ -184,20 +184,28 @@
                             </td>
 
                             <td data-label="Total">
-
-                                $@{{ account.original_amount }}
+                                $@{{ Number(account.original_amount || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
 
                             </td>
 
                             <td data-label="Pagado">
 
-                                $@{{ account.paid_amount }}
+                                $@{{ Number(account.paid_amount || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
 
                             </td>
 
                             <td data-label="Saldo">
 
-                                $@{{ account.balance }}
+                                $@{{ Number(account.balance || 0).toLocaleString('es-MX', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }) }}
 
                             </td>
 

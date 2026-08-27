@@ -24,6 +24,13 @@
         <p class="text-center db-panel__advice">
             No olvides <strong>cerrar la sesión</strong> (en la parte superior derecha de esta pantalla) antes de cerrar la pestaña o si vas a estar alejado de tu computadora o dispositivo.
         </p>
+        <p class="text-center db-panel__advice">
+            @if (Auth::user()->isSuperAdmin() || Auth::user()->isAdmin())
+                <a href="{{ url('admin/estadistica-diaria') }}">
+                    Ver estadística diaria
+                </a>
+            @endif
+        </p>
 
         <img style="width:350px;display:block; margin:0 auto;" src="{{ asset('img/simonel.png') }}" alt="Simonel">
     </div>

@@ -87,7 +87,10 @@
                                     @{{ lotItem.available_quantity }}
                                 </td>
                                 <td data-label="Costo:">
-                                    $@{{ lotItem.cost }}
+                                    $@{{ Number(lotItem.cost).toLocaleString('es-MX', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }) }}
                                 </td>
                                 <td data-label="Estado:">
                                     @{{ lotItem.status }}

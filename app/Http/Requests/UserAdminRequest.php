@@ -21,7 +21,7 @@ class UserAdminRequest extends FormRequest
             'name' => ['required', new NotUppercase, new NotLowercase, 'max:180'],
             'last_name' => ['required', new NotUppercase, new NotLowercase, 'max:180'],
             'username' => ['required', 'max:180'],
-            'email'     => ['required','email', 'max:60'],
+            'email'     => ['max:60'],
             'role_id'     => ['required', 'max:60'],
             'password'  => ['required_at_create','min:8','max:80'],
         ];

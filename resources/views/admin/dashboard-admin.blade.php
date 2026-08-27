@@ -32,10 +32,10 @@
 </div>
 
 <div class="fluid-container mb-16">
-
     @include('components.alert')
 
     {{-- RESUMEN DEL DÍA --}}
+
     <section class="db-panel">
         <div class="row">
 
@@ -59,6 +59,7 @@
 
         </div>
     </section>
+    
 
     {{-- KPI PRINCIPALES --}}
     <section class="db-panel">
@@ -268,6 +269,7 @@
     </div>
 
 </div>
+
 @endsection
 
 

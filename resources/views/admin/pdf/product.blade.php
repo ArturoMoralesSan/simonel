@@ -1,101 +1,111 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<style>
+    <style>
 
-    @page {
-        margin: 12mm;
-    }
+        @page {
+            margin: 12mm;
+        }
 
-    body {
-        font-family: DejaVu Sans, sans-serif;
-        font-size: 11px;
-        color: #222;
-        margin: 0;
-        padding: 0;
-    }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
 
-    .page {
-        width: 94%;
-        margin: 0 auto;
-    }
+        .page {
+            width: 94%;
+            margin: 0 auto;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    td,
-    th {
-        padding: 5px;
-        vertical-align: top;
-    }
+        td,
+        th {
+            padding: 5px;
+            vertical-align: top;
+        }
 
-    .border {
-        border: 1px solid #000;
-    }
+        .border {
+            border: 1px solid #000;
+        }
 
-    .text-center {
-        text-align: center;
-    }
+        .text-center {
+            text-align: center;
+        }
 
-    .text-right {
-        text-align: right;
-    }
+        .text-right {
+            text-align: right;
+        }
 
-    .title {
-        font-size: 22px;
-        font-weight: bold;
-    }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-    .subtitle {
-        font-size: 13px;
-        font-weight: bold;
-    }
+        .subtitle {
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-    .section {
-        margin-top: 18px;
-    }
+        .section {
+            margin-top: 18px;
+        }
 
-    .section-title {
-        background: #efefef;
-        border: 1px solid #000;
-        padding: 7px;
-        font-weight: bold;
-    }
+        .section-title {
+            background: #efefef;
+            border: 1px solid #000;
+            padding: 7px;
+            font-weight: bold;
+        }
 
-    .grid th {
-        background: #efefef;
-        border: 1px solid #000;
-    }
+        .grid {
+            margin-top: 10px;
+        }
 
-    .grid td {
-        border: 1px solid #000;
-    }
+        .grid th {
+            background: #efefef;
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
 
-    .resume td {
-        border: 1px solid #000;
-        text-align: center;
-        padding: 8px;
-    }
+        .grid td {
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
 
-    .resume strong {
-        font-size: 17px;
-    }
+        .resume {
+            margin-top: 10px;
+        }
 
-    .footer {
-        margin-top: 25px;
-        text-align: center;
-        font-size: 9px;
-        color: #666;
-    }
+        .resume td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 8px;
+        }
 
-</style>
+        .resume strong {
+            font-size: 17px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 9px;
+            color: #666;
+            line-height: 14px;
+        }
+
+    </style>
 
 </head>
 
@@ -103,338 +113,534 @@
 
 <div class="page">
 
-{{-- =====================================================
-ENCABEZADO
-===================================================== --}}
+    {{-- =====================================================
+    VARIABLES
+    ====================================================== --}}
 
-<table>
+    @php
 
-<tr>
+        /*
+        |--------------------------------------------------------------------------
+        | Producto
+        |--------------------------------------------------------------------------
+        */
 
-    <td width="18%" class="border text-center">
+        $productId = $product['id'] ?? $product->id;
 
-        <img
-            style="width: 150px; margin: 20px auto;"
-            src="{{ url('img/simonel.png') }}"
-            alt=""
-        >
+        $productName = $product['name'] ?? $product->name;
 
-    </td>
 
-    <td width="57%" class="border text-center">
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen REAL basado en las ventas filtradas
+        |--------------------------------------------------------------------------
+        */
 
-        <div class="title">
-            SIMONEL
+        $salesCount = $sales->count();
+
+        $quantity = 0;
+
+        $total = 0;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calcular cantidad y total directamente desde el detalle
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($sales as $sale) {
+
+            $item = $sale->products
+                ->firstWhere('product_id', $productId);
+
+            if ($item) {
+
+                $quantity += (float) ($item->quantity ?? 0);
+
+                $total += (float) ($item->total_with_iva ?? 0);
+
+            }
+
+        }
+
+    @endphp
+
+
+    {{-- =====================================================
+    ENCABEZADO
+    ====================================================== --}}
+
+    <table>
+
+        <tr>
+
+            {{-- LOGO --}}
+
+            <td width="18%" class="border text-center">
+
+                <img
+                    style="
+                        width: 150px;
+                        margin: 20px auto;
+                    "
+                    src="{{ url('img/simonel.png') }}"
+                    alt=""
+                >
+
+            </td>
+
+
+            {{-- INFORMACIÓN --}}
+
+            <td width="57%" class="border text-center">
+
+                <div class="title">
+                    SIMONEL
+                </div>
+
+                <div class="subtitle">
+                    REPORTE DE PRODUCTO
+                </div>
+
+                <br>
+
+                <strong>
+                    {{ $productName }}
+                </strong>
+
+                <br><br>
+
+                Periodo:
+
+                <strong>
+                    {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
+                </strong>
+
+                al
+
+                <strong>
+                    {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+                </strong>
+
+            </td>
+
+
+            {{-- INFORMACIÓN DEL PRODUCTO --}}
+
+            <td width="25%">
+
+                <table class="border">
+
+                    <tr>
+
+                        <td class="text-center">
+
+                            <strong>
+                                PRODUCTO
+                            </strong>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="text-center">
+
+                            #{{ $productId }}
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="text-center">
+
+                            {{ now()->format('d/m/Y H:i') }}
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+
+    {{-- =====================================================
+    RESUMEN
+    ====================================================== --}}
+
+    <div class="section">
+
+        <div class="section-title">
+
+            RESUMEN DEL PRODUCTO
+
         </div>
 
-        <div class="subtitle">
-            REPORTE DE PRODUCTO
-        </div>
 
-        <br>
-
-        <strong>
-            {{ $product['name'] ?? $product->name }}
-        </strong>
-
-        <br><br>
-
-        Periodo:
-
-        <strong>
-            {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
-        </strong>
-
-        al
-
-        <strong>
-            {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
-        </strong>
-
-    </td>
-
-    <td width="25%">
-
-        <table class="border">
+        <table class="resume">
 
             <tr>
-                <td class="text-center">
-                    <strong>PRODUCTO</strong>
-                </td>
-            </tr>
 
-            <tr>
-                <td class="text-center">
-                    #{{ $product['id'] ?? $product->id }}
-                </td>
-            </tr>
+                {{-- VENTAS --}}
 
-            <tr>
-                <td class="text-center">
-                    {{ now()->format('d/m/Y H:i') }}
+                <td width="33%">
+
+                    <strong>
+                        {{ $salesCount }}
+                    </strong>
+
+                    <br>
+
+                    Ventas
+
                 </td>
+
+
+                {{-- CANTIDAD --}}
+
+                <td width="33%">
+
+                    <strong>
+                        {{ number_format($quantity, 2) }}
+                    </strong>
+
+                    <br>
+
+                    Cantidad vendida
+
+                </td>
+
+
+                {{-- TOTAL --}}
+
+                <td width="34%">
+
+                    <strong>
+                        $ {{ number_format($total, 2) }}
+                    </strong>
+
+                    <br>
+
+                    Total vendido
+
+                </td>
+
             </tr>
 
         </table>
 
-    </td>
+    </div>
 
-</tr>
 
-</table>
-
-{{-- =====================================================
-RESUMEN
-===================================================== --}}
-
-@php
-
-$productName = $product['name'] ?? $product->name;
-
-$salesCount = $product['sales_count'] ?? $product->sales_count;
-
-$quantity = $product['quantity'] ?? $product->quantity;
-
-$total = $product['total'] ?? $product->total;
-
-@endphp
-
-<div class="section">
-
-<div class="section-title">
-    RESUMEN DEL PRODUCTO
-</div>
-
-<table class="resume">
-
-    <tr>
-
-        <td width="33%">
-
-            <strong>
-                {{ $salesCount }}
-            </strong>
-
-            <br>
-
-            Ventas
-
-        </td>
-
-        <td width="33%">
-
-            <strong>
-                {{ number_format($quantity, 2) }}
-            </strong>
-
-            <br>
-
-            Cantidad vendida
-
-        </td>
-
-        <td width="34%">
-
-            <strong>
-                $ {{ number_format($total, 2) }}
-            </strong>
-
-            <br>
-
-            Total vendido
-
-        </td>
-
-    </tr>
-
-</table>
-
-</div>
-
-{{-- =====================================================
-DETALLE
-===================================================== --}}
-
-<div class="section">
-
-<div class="section-title">
+    {{-- =====================================================
     DETALLE DE VENTAS
-</div>
+    ====================================================== --}}
 
-<table class="grid">
+    <div class="section">
 
-    <thead>
+        <div class="section-title">
 
-        <tr>
+            DETALLE DE VENTAS
 
-            <th width="12%">
-                Fecha
-            </th>
+        </div>
 
-            <th width="10%">
-                Folio
-            </th>
 
-            <th width="23%">
-                Cliente
-            </th>
+        <table class="grid">
 
-            <th width="15%">
-                Vendedor
-            </th>
+            <thead>
 
-            <th width="12%">
-                Cantidad
-            </th>
+                <tr>
 
-            <th width="13%">
-                Precio
-            </th>
+                    <th width="10%">
+                        Fecha
+                    </th>
 
-            <th width="15%">
-                Importe
-            </th>
+                    <th width="8%">
+                        Folio
+                    </th>
 
-        </tr>
+                    <th width="18%">
+                        Cliente
+                    </th>
 
-    </thead>
+                    <th width="15%">
+                        Vendedor
+                    </th>
 
-    <tbody>
+                    <th width="9%">
+                        Cantidad
+                    </th>
 
-    @forelse($sales as $sale)
+                    <th width="12%">
+                        Precio
+                    </th>
 
-        @php
+                    <th width="13%">
+                        Importe
+                    </th>
 
-            $item = $sale->products
-                ->firstWhere('product_id', $product['id'] ?? $product->id);
+                    <th width="15%">
+                        Tipo de pago
+                    </th>
 
-        @endphp
+                </tr>
 
-        @if($item)
+            </thead>
 
-        <tr>
 
-            <td class="text-center">
+            <tbody>
 
-                {{ $sale->created_at->format('d/m/Y') }}
+            @forelse($sales as $sale)
 
-            </td>
+                @php
 
-            <td class="text-center">
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Producto vendido
+                    |--------------------------------------------------------------------------
+                    */
 
-                #{{ $sale->id }}
+                    $item = $sale->products
+                        ->firstWhere('product_id', $productId);
 
-            </td>
 
-            <td>
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Tipo de pago
+                    |--------------------------------------------------------------------------
+                    |
+                    | Sale
+                    |   ↓
+                    | payment_sale
+                    |   ↓
+                    | payment
+                    |
+                    */
 
-                {{ optional($sale->user->customer)->business_name
-                    ?? optional($sale->customer)->name
-                    ?? 'Público General' }}
+                    $paymentType = 'No especificado';
 
-            </td>
+                    if ($sale->payments && $sale->payments->count()) {
 
-            <td>
+                        $payment = $sale->payments->first();
 
-                {{ optional($sale->seller)->name }}
+                        $paymentType =
+                            $payment->name
+                            ?? $payment->type
+                            ?? $payment->description
+                            ?? 'No especificado';
 
-                {{ optional($sale->seller)->last_name }}
+                    }
 
-            </td>
+                @endphp
 
-            <td class="text-right">
 
-                {{ number_format($item->quantity, 2) }}
+                @if($item)
 
-            </td>
+                    <tr>
 
-            <td class="text-right">
+                        {{-- FECHA --}}
 
-                $ {{ number_format($item->base_price, 2) }}
+                        <td class="text-center">
 
-            </td>
+                            {{ optional($sale->created_at)->format('d/m/Y') }}
 
-            <td class="text-right">
+                        </td>
 
-                $ {{ number_format($item->total_with_iva, 2) }}
 
-            </td>
+                        {{-- FOLIO --}}
 
-        </tr>
+                        <td class="text-center">
 
-        @endif
+                            #{{ $sale->id }}
 
-    @empty
+                        </td>
 
-        <tr>
 
-            <td colspan="7" class="text-center">
+                        {{-- CLIENTE --}}
 
-                No existen ventas para este producto.
+                        <td>
 
-            </td>
+                            {{ optional(optional($sale->user)->customer)->business_name
+                                ?? optional($sale->customer)->name
+                                ?? 'Público General' }}
 
-        </tr>
+                        </td>
 
-    @endforelse
 
-    </tbody>
+                        {{-- VENDEDOR --}}
 
-    <tfoot>
+                        <td>
 
-        <tr>
+                            {{ optional($sale->seller)->name }}
 
-            <th colspan="4" class="text-right">
-                TOTAL
-            </th>
+                            {{ optional($sale->seller)->last_name }}
 
-            <th class="text-right">
+                        </td>
 
-                {{ number_format($quantity, 2) }}
 
-            </th>
+                        {{-- CANTIDAD --}}
 
-            <th></th>
+                        <td class="text-right">
 
-            <th class="text-right">
+                            {{ number_format(
+                                (float) ($item->quantity ?? 0),
+                                2
+                            ) }}
 
-                $ {{ number_format($total, 2) }}
+                        </td>
 
-            </th>
 
-        </tr>
+                        {{-- PRECIO --}}
 
-    </tfoot>
+                        <td class="text-right">
 
-</table>
+                            $
 
-</div>
+                            {{ number_format(
+                                (float) ($item->base_price ?? 0),
+                                2
+                            ) }}
 
-{{-- =====================================================
-PIE
-===================================================== --}}
+                        </td>
 
-<div class="footer">
 
-Documento generado automáticamente por el ERP SIMONEL.
+                        {{-- IMPORTE --}}
 
-<br>
+                        <td class="text-right">
 
-Producto:
-{{ $productName }}
+                            $
 
-<br>
+                            {{ number_format(
+                                (float) ($item->total_with_iva ?? 0),
+                                2
+                            ) }}
 
-Periodo:
-{{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
--
-{{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+                        </td>
 
-<br>
 
-Generado el {{ now()->format('d/m/Y H:i:s') }}
+                        {{-- TIPO DE PAGO --}}
 
-</div>
+                        <td class="text-center">
+
+                            {{ $paymentType }}
+
+                        </td>
+
+                    </tr>
+
+                @endif
+
+            @empty
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="text-center"
+                    >
+
+                        No existen ventas para este producto.
+
+                    </td>
+
+                </tr>
+
+            @endforelse
+
+            </tbody>
+
+
+            {{-- =================================================
+            TOTAL
+            ================================================== --}}
+
+            <tfoot>
+
+                <tr>
+
+                    <th
+                        colspan="4"
+                        class="text-right"
+                    >
+
+                        TOTAL
+
+                    </th>
+
+
+                    {{-- TOTAL CANTIDAD --}}
+
+                    <th class="text-right">
+
+                        {{ number_format($quantity, 2) }}
+
+                    </th>
+
+
+                    {{-- PRECIO --}}
+
+                    <th></th>
+
+
+                    {{-- TOTAL IMPORTE --}}
+
+                    <th class="text-right">
+
+                        $
+
+                        {{ number_format($total, 2) }}
+
+                    </th>
+
+
+                    {{-- PAGO --}}
+
+                    <th></th>
+
+                </tr>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+    {{-- =====================================================
+    PIE
+    ====================================================== --}}
+
+    <div class="footer">
+
+        Documento generado automáticamente por el ERP SIMONEL.
+
+        <br>
+
+        Producto:
+        {{ $productName }}
+
+        <br>
+
+        Periodo:
+        {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
+        -
+        {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+
+        <br>
+
+        Generado el
+        {{ now()->format('d/m/Y H:i:s') }}
+
+    </div>
 
 </div>
 

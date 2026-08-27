@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sale;
 use App\Models\SaleProduct;
 use App\Models\Payment;
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -324,79 +325,231 @@ class ReportsController extends Controller
 
     public function printProduct(Request $request, $id)
     {
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
+        $start_date = $request->start_date ?? now()->format('Y-m-d');
+        $end_date = $request->end_date ?? now()->format('Y-m-d');
+
+        $product = Product::findOrFail($id);
 
         $sales = $this->sales($start_date, $end_date);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ventas donde aparece el producto
+        |--------------------------------------------------------------------------
+        */
 
         $detail = $sales->filter(function ($sale) use ($id) {
             return $sale->products->contains('product_id', $id);
         });
 
-        $summary = $this->productResume($sales)->firstWhere('id', $id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen del producto
+        |--------------------------------------------------------------------------
+        */
+
+        $salesCount = 0;
+        $quantity = 0;
+        $total = 0;
+
+
+        foreach ($detail as $sale) {
+
+            $item = $sale->products->firstWhere(
+                'product_id',
+                $id
+            );
+
+            if (!$item) {
+                continue;
+            }
+
+
+            $itemQuantity = (float) ($item->quantity ?? 0);
+
+
+            $itemTotal = (float) (
+                $item->total_with_iva
+                ?? 0
+            );
+
+
+            $salesCount++;
+
+            $quantity += $itemQuantity;
+
+            $total += $itemTotal;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen
+        |--------------------------------------------------------------------------
+        */
+
+        $summary = (object) [
+
+            'sales_count' => $salesCount,
+
+            'quantity' => $quantity,
+
+            'total' => $total,
+
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PDF
+        |--------------------------------------------------------------------------
+        */
 
         $pdf = PDF::loadView('admin.pdf.product', [
-            'product'     => $summary,
-            'sales'       => $detail,
-            'start_date'  => $start_date,
-            'end_date'    => $end_date,
+
+            'product' => $product,
+
+            'summary' => $summary,
+
+            'sales' => $detail,
+
+            'start_date' => $start_date,
+
+            'end_date' => $end_date,
+
         ]);
 
-        return $pdf->stream("producto-{$id}.pdf");
-    }
 
+        return $pdf->stream(
+            "producto-{$id}.pdf"
+        );
+    }
     /**
      * PDF - Todos los clientes
      */
+
     public function printCustomers(Request $request)
     {
         $dateNow = Carbon::now();
+
         $dateFormat = $dateNow->format('Y-m-d');
 
         $start_date = $request->start_date ?: $dateFormat;
-        $end_date   = $request->end_date ?: $dateFormat;
+
+        $end_date = $request->end_date ?: $dateFormat;
 
         $sales = $this->sales($start_date, $end_date);
 
         $customers = $this->customerResume($sales);
 
+        $totalSales = $sales->count();
+
+        $totalAmount = $sales->sum('total_with_iva');
+
         $pdf = PDF::loadView('admin.pdf.customers', [
-            'customers'  => $customers,
+
+            'customers' => $customers,
+
             'start_date' => $start_date,
-            'end_date'   => $end_date,
+
+            'end_date' => $end_date,
+
+            'totalSales' => $totalSales,
+
+            'totalAmount' => $totalAmount,
+
         ]);
 
-        return $pdf->stream("clientes-{$start_date}-{$end_date}.pdf");
+        return $pdf->stream(
+            "clientes-{$start_date}-{$end_date}.pdf"
+        );
     }
 
-    /**
-     * PDF - Cliente individual
-     */
     public function printCustomer(Request $request, $id)
     {
         $dateNow = Carbon::now();
+
         $dateFormat = $dateNow->format('Y-m-d');
 
         $start_date = $request->start_date ?: $dateFormat;
         $end_date   = $request->end_date ?: $dateFormat;
 
-        $sales = $this->sales($start_date, $end_date);
 
-        $customerSales = $sales->where('user_id', $id);
-        
-        $summary = $this->customerResume($sales)->firstWhere('id', $id);
-        $customer = Customer::where('user_id', $id)->first();
+        /*
+        |--------------------------------------------------------------------------
+        | Obtener todas las ventas del periodo
+        |--------------------------------------------------------------------------
+        */
+
+        $allSales = $this->sales($start_date, $end_date);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filtrar las ventas del cliente
+        |--------------------------------------------------------------------------
+        */
+
+        $sales = $allSales
+            ->filter(function ($sale) use ($id) {
+                return (string) $sale->user_id === (string) $id;
+            })
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Obtener cliente
+        |--------------------------------------------------------------------------
+        */
+
+        $customer = optional(
+            optional($sales->first())->user
+        )->customer;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen del cliente
+        |--------------------------------------------------------------------------
+        */
+
+        $summary = (object) [
+
+            'sales_count' => $sales->count(),
+
+            'total' => $sales->sum('total_with_iva'),
+
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generar PDF
+        |--------------------------------------------------------------------------
+        */
 
         $pdf = PDF::loadView('admin.pdf.customer', [
+
+            'sales'      => $sales,
+
             'customer'   => $customer,
+
             'summary'    => $summary,
-            'sales'      => $customerSales,
+
             'start_date' => $start_date,
+
             'end_date'   => $end_date,
+
         ]);
 
-        return $pdf->stream("cliente-{$customer->id}.pdf");
+
+        return $pdf->stream(
+            "cliente-{$id}-{$start_date}-{$end_date}.pdf"
+        );
     }
+
 
 
     public function printPayments(Request $request)

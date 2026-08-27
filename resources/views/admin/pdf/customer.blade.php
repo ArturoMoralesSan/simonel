@@ -1,118 +1,141 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<style>
+    <style>
 
-    @page {
-        margin: 12mm;
-    }
+        @page {
+            margin: 12mm;
+        }
 
-    body {
-        font-family: DejaVu Sans, sans-serif;
-        font-size: 11px;
-        color: #222;
-        margin: 0;
-        padding: 0;
-    }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
 
-    .page {
-        width: 94%;
-        margin: 0 auto;
-    }
+        .page {
+            width: 94%;
+            margin: 0 auto;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    td,
-    th {
-        padding: 5px;
-        vertical-align: top;
-    }
+        td,
+        th {
+            padding: 5px;
+            vertical-align: top;
+        }
 
-    .border {
-        border: 1px solid #000;
-    }
+        .border {
+            border: 1px solid #000;
+        }
 
-    .text-center {
-        text-align: center;
-    }
+        .text-center {
+            text-align: center;
+        }
 
-    .text-right {
-        text-align: right;
-    }
+        .text-right {
+            text-align: right;
+        }
 
-    .title {
-        font-size: 22px;
-        font-weight: bold;
-    }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-    .subtitle {
-        font-size: 13px;
-        font-weight: bold;
-    }
+        .subtitle {
+            font-size: 13px;
+            font-weight: bold;
+        }
 
-    .small {
-        font-size: 10px;
-        line-height: 14px;
-    }
+        .header-table {
+            margin-bottom: 15px;
+        }
 
-    .header {
-        margin-bottom: 15px;
-    }
+        .logo-cell {
+            width: 20%;
+            vertical-align: middle;
+        }
 
-    .section {
-        margin-top: 15px;
-    }
+        .info-cell {
+            width: 50%;
+            vertical-align: middle;
+        }
 
-    .section-title {
-        background: #efefef;
-        border: 1px solid #000;
-        padding: 6px;
-        font-weight: bold;
-    }
+        .generated-cell {
+            width: 30%;
+            vertical-align: top;
+        }
 
-    .resume {
-        margin-top: 10px;
-    }
+        .generated-title {
+            font-weight: bold;
+            background: #efefef;
+            text-align: center;
+        }
 
-    .resume td {
-        border: 1px solid #000;
-        text-align: center;
-        padding: 8px;
-    }
+        .period {
+            margin-top: 8px;
+            font-size: 12px;
+        }
 
-    .resume strong {
-        font-size: 16px;
-    }
+        .section {
+            margin-top: 15px;
+        }
 
-    .sales {
-        margin-top: 10px;
-    }
+        .section-title {
+            background: #efefef;
+            border: 1px solid #000;
+            padding: 6px;
+            font-weight: bold;
+        }
 
-    .sales th {
-        background: #efefef;
-        border: 1px solid #000;
-    }
+        .resume {
+            margin-top: 10px;
+        }
 
-    .sales td {
-        border: 1px solid #000;
-    }
+        .resume td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 8px;
+        }
 
-    .footer {
-        margin-top: 25px;
-        text-align: center;
-        font-size: 9px;
-        color: #666;
-    }
+        .resume strong {
+            font-size: 16px;
+        }
 
-</style>
+        .sales {
+            margin-top: 10px;
+        }
+
+        .sales th {
+            background: #efefef;
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
+
+        .sales td {
+            border: 1px solid #000;
+            vertical-align: middle;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 9px;
+            color: #666;
+            line-height: 14px;
+        }
+
+    </style>
 
 </head>
 
@@ -120,324 +143,753 @@
 
 <div class="page">
 
-{{-- =====================================================
-ENCABEZADO
-===================================================== --}}
+
+    {{-- =====================================================
+    VARIABLES
+    ====================================================== --}}
+
+    @php
+
+        /*
+        |--------------------------------------------------------------------------
+        | Resumen
+        |--------------------------------------------------------------------------
+        */
+
+        $salesCount = $summary->sales_count ?? 0;
+
+        $total = $summary->total ?? 0;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cliente
+        |--------------------------------------------------------------------------
+        */
+
+        $customerName = optional($customer)->business_name
+            ?? 'Público General';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Acumulados del detalle
+        |--------------------------------------------------------------------------
+        */
+
+        $detailQuantity = 0;
+
+        $detailTotal = 0;
+
+    @endphp
 
 
 
-{{-- =====================================================
-RESUMEN
-===================================================== --}}
+    {{-- =====================================================
+    RESUMEN / ENCABEZADO
+    ====================================================== --}}
 
-@php
+    <table class="header-table">
 
-$salesCount = $summary->sales_count ?? 0;
+        <tr>
 
-$total = $summary->total ?? 0;
 
-@endphp
+            {{-- =================================================
+            LOGO
+            ================================================== --}}
 
-<table class="resume">
+            <td class="border logo-cell text-center">
 
-<tr>
+                <img
+                    src="{{ url('img/simonel.png') }}"
+                    style="
+                        width:150px;
+                        margin:15px auto;
+                        display:block;
+                    "
+                >
 
-    <td width="50%">
+            </td>
 
-        <strong>
-            {{ $salesCount }}
-        </strong>
 
-        <br>
 
-        Compras
+            {{-- =================================================
+            INFORMACIÓN
+            ================================================== --}}
 
-    </td>
+            <td class="border info-cell text-center">
 
-    <td width="50%">
+                <div class="title">
 
-        <strong>
-            $ {{ number_format($total, 2) }}
-        </strong>
+                    SIMONEL
 
-        <br>
+                </div>
 
-        Total comprado
 
-    </td>
+                <div class="subtitle">
 
-</tr>
+                    REPORTE DE COMPRAS
 
-</table>
+                </div>
 
-{{-- =====================================================
-DATOS DEL CLIENTE
-===================================================== --}}
 
-<div class="section">
+                <div class="period">
 
-<div class="section-title">
+                    Periodo
+
+                    <strong>
+
+                        {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
+
+                    </strong>
+
+                    al
+
+                    <strong>
+
+                        {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+
+                    </strong>
+
+                </div>
+
+            </td>
+
+
+
+            {{-- =================================================
+            GENERADO / RESUMEN
+            ================================================== --}}
+
+            <td class="generated-cell">
+
+                <table class="border">
+
+                    <tr>
+
+                        <td class="generated-title">
+
+                            Generado
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="text-center">
+
+                            {{ now()->format('d/m/Y H:i') }}
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+
+                <table class="resume">
+
+                    <tr>
+
+
+                        {{-- COMPRAS --}}
+
+                        <td width="50%">
+
+                            <strong>
+
+                                {{ $salesCount }}
+
+                            </strong>
+
+                            <br>
+
+                            Compras
+
+                        </td>
+
+
+
+                        {{-- TOTAL --}}
+
+                        <td width="50%">
+
+                            <strong>
+
+                                $
+
+                                {{ number_format($total, 2) }}
+
+                            </strong>
+
+                            <br>
+
+                            Total comprado
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </td>
+
+        </tr>
+
+    </table>
+
+
+
+    {{-- =====================================================
     DATOS DEL CLIENTE
-</div>
+    ====================================================== --}}
 
-<table style="margin-top:10px;">
+    <div class="section">
 
-    <tr>
 
-        <td width="20%" class="border">
+        <div class="section-title">
 
-            <strong>
-                NOMBRE
-            </strong>
+            DATOS DEL CLIENTE
 
-        </td>
+        </div>
 
-        <td width="80%" class="border">
 
-            {{ $customer->business_name ?? 'Público General' }}
 
-        </td>
+        <table style="margin-top:10px;">
 
-    </tr>
 
-    @if($customer->street || $customer->ext_number)
+            {{-- =================================================
+            NOMBRE
+            ================================================== --}}
 
-    <tr>
+            <tr>
 
-        <td class="border">
+                <td
+                    width="20%"
+                    class="border"
+                >
 
-            <strong>
-                DIRECCIÓN
-            </strong>
+                    <strong>
 
-        </td>
+                        NOMBRE
 
-        <td class="border">
+                    </strong>
 
-            {{ $customer->street }}
-            #{{ $customer->ext_number }}
+                </td>
 
-            @if($customer->population)
-                , {{ $customer->population }}
+
+                <td
+                    width="80%"
+                    class="border"
+                >
+
+                    {{ $customerName }}
+
+                </td>
+
+            </tr>
+
+
+
+            {{-- =================================================
+            DIRECCIÓN
+            ================================================== --}}
+
+            @if(
+                !empty(optional($customer)->street) ||
+                !empty(optional($customer)->ext_number)
+            )
+
+                <tr>
+
+                    <td class="border">
+
+                        <strong>
+
+                            DIRECCIÓN
+
+                        </strong>
+
+                    </td>
+
+
+                    <td class="border">
+
+                        {{ optional($customer)->street }}
+
+
+                        @if(optional($customer)->ext_number)
+
+                            #{{ optional($customer)->ext_number }}
+
+                        @endif
+
+
+                        @if(optional($customer)->population)
+
+                            , {{ optional($customer)->population }}
+
+                        @endif
+
+
+                        @if(optional($customer)->postal_code)
+
+                            , C.P.
+                            {{ optional($customer)->postal_code }}
+
+                        @endif
+
+                    </td>
+
+                </tr>
+
             @endif
 
-            @if($customer->postal_code)
-                {{ $customer->postal_code }}
+
+
+            {{-- =================================================
+            CIUDAD / ESTADO
+            ================================================== --}}
+
+            @if(optional($customer)->state)
+
+                <tr>
+
+                    <td class="border">
+
+                        <strong>
+
+                            CIUDAD / ESTADO
+
+                        </strong>
+
+                    </td>
+
+
+                    <td class="border">
+
+                        {{ optional($customer)->state }}
+
+                    </td>
+
+                </tr>
+
             @endif
 
-        </td>
+        </table>
 
-    </tr>
+    </div>
 
-    @endif
 
-    @if($customer->state)
 
-    <tr>
-
-        <td class="border">
-
-            <strong>
-                CIUDAD / ESTADO
-            </strong>
-
-        </td>
-
-        <td class="border">
-
-            {{ $customer->state }}
-
-        </td>
-
-    </tr>
-
-    @endif
-
-</table>
-
-</div>
-
-{{-- =====================================================
-DETALLE
-===================================================== --}}
-
-<div class="section">
-
-<div class="section-title">
+    {{-- =====================================================
     DETALLE DE COMPRAS
-</div>
+    ====================================================== --}}
 
-<table class="sales">
+    <div class="section">
 
-    <thead>
 
-        <tr>
+        <div class="section-title">
 
-            <th width="11%">
-                Fecha
-            </th>
+            DETALLE DE COMPRAS
 
-            <th width="9%">
-                Folio
-            </th>
+        </div>
 
-            <th width="17%">
-                Vendedor
-            </th>
 
-            <th width="38%">
-                Productos
-            </th>
 
-            <th width="12%">
-                Pago
-            </th>
+        <table class="sales">
 
-            <th width="13%">
-                Total
-            </th>
 
-        </tr>
+            <thead>
 
-    </thead>
+                <tr>
 
-    <tbody>
 
-    @forelse($sales as $sale)
+                    <th width="9%">
 
-        <tr>
+                        Fecha
 
-            <td class="text-center">
+                    </th>
 
-                {{ $sale->created_at->format('d/m/Y') }}
 
-            </td>
+                    <th width="7%">
 
-            <td class="text-center">
+                        Folio
 
-                #{{ $sale->id }}
+                    </th>
 
-            </td>
 
-            <td>
+                    <th width="14%">
 
-                {{ optional($sale->seller)->name }}
-                {{ optional($sale->seller)->last_name }}
+                        Vendedor
 
-            </td>
+                    </th>
 
-            <td>
 
-                @foreach($sale->products as $item)
+                    <th width="24%">
 
-                    {{ optional(optional($item->product)->manufactured)->name }}
+                        Producto
 
-                    &nbsp;
+                    </th>
 
-                    ({{ number_format($item->quantity, 2) }})
 
-                    @if(!$loop->last)
-                        <br>
-                    @endif
+                    <th width="9%">
 
-                @endforeach
+                        Cantidad
 
-            </td>
+                    </th>
 
-            <td>
 
-                @foreach($sale->payments as $payment)
+                    <th width="11%">
 
-                    {{ $payment->name }}
+                        Precio
 
-                    ${{ number_format($payment->pivot->cost, 2) }}
+                    </th>
 
-                    @if(!$loop->last)
-                        <br>
-                    @endif
 
-                @endforeach
+                    <th width="12%">
 
-            </td>
+                        Subtotal
 
-            <td class="text-right">
+                    </th>
 
-                $ {{ number_format($sale->total_with_iva, 2) }}
 
-            </td>
+                    <th width="14%">
 
-        </tr>
+                        Tipo de pago
 
-    @empty
+                    </th>
 
-        <tr>
+                </tr>
 
-            <td colspan="6" class="text-center">
+            </thead>
 
-                No existen compras para este cliente
-                durante el periodo seleccionado.
 
-            </td>
 
-        </tr>
+            <tbody>
 
-    @endforelse
 
-    </tbody>
+                @forelse($sales as $sale)
 
-    <tfoot>
 
-        <tr>
+                    {{-- =================================================
+                    TIPO DE PAGO DE LA VENTA
+                    ================================================== --}}
 
-            <th colspan="5" class="text-right">
+                    @php
 
-                TOTAL
+                        $payments = $sale->payments ?? collect();
 
-            </th>
 
-            <th class="text-right">
+                        $paymentNames = $payments
+                            ->map(function ($payment) {
 
-                $ {{ number_format($total, 2) }}
+                                return $payment->name
+                                    ?? $payment->description
+                                    ?? $payment->type
+                                    ?? 'No especificado';
 
-            </th>
+                            })
+                            ->filter()
+                            ->unique()
+                            ->implode(', ');
 
-        </tr>
 
-    </tfoot>
+                        if (empty($paymentNames)) {
 
-</table>
+                            $paymentNames = 'No especificado';
 
-</div>
+                        }
 
-{{-- =====================================================
-PIE
-===================================================== --}}
+                    @endphp
 
-<div class="footer">
 
-Documento generado automáticamente por el ERP SIMONEL.
 
-<br>
+                    @foreach($sale->products as $item)
 
-Cliente:
 
-{{ $customer->business_name ?? 'Público General' }}
+                        @php
 
-<br>
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Cantidad
+                            |--------------------------------------------------------------------------
+                            */
 
-Periodo:
+                            $quantity = (float) (
+                                $item->quantity ?? 0
+                            );
 
-{{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
 
--
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Precio de venta
+                            |--------------------------------------------------------------------------
+                            */
 
-{{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+                            $price = (float) (
+                                optional($item->product)->costo_venta ?? 0
+                            );
 
-<br>
 
-Generado el {{ now()->format('d/m/Y H:i:s') }}
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Subtotal
+                            |--------------------------------------------------------------------------
+                            */
 
-</div>
+                            $subtotal = $quantity * $price;
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Acumulados
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $detailQuantity += $quantity;
+
+                            $detailTotal += $subtotal;
+
+                        @endphp
+
+
+
+                        <tr>
+
+
+                            {{-- =================================================
+                            FECHA
+                            ================================================== --}}
+
+                            <td class="text-center">
+
+                                {{ optional($sale->created_at)->format('d/m/Y') }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            FOLIO
+                            ================================================== --}}
+
+                            <td class="text-center">
+
+                                #{{ $sale->id }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            VENDEDOR
+                            ================================================== --}}
+
+                            <td>
+
+                                {{ optional($sale->seller)->name }}
+
+                                {{ optional($sale->seller)->last_name }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            PRODUCTO
+                            ================================================== --}}
+
+                            <td>
+
+                                {{ optional(optional($item->product)->manufactured)->name }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            CANTIDAD
+                            ================================================== --}}
+
+                            <td class="text-center">
+
+                                {{ number_format($quantity, 2) }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            PRECIO
+                            ================================================== --}}
+
+                            <td class="text-right">
+
+                                $
+
+                                {{ number_format($price, 2) }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            SUBTOTAL
+                            ================================================== --}}
+
+                            <td class="text-right">
+
+                                $
+
+                                {{ number_format($subtotal, 2) }}
+
+                            </td>
+
+
+
+                            {{-- =================================================
+                            TIPO DE PAGO
+                            ================================================== --}}
+
+                            <td class="text-center">
+
+                                {{ $paymentNames }}
+
+                            </td>
+
+                        </tr>
+
+
+                    @endforeach
+
+
+                @empty
+
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="text-center"
+                        >
+
+                            No existen compras para este cliente
+                            durante el periodo seleccionado.
+
+                        </td>
+
+                    </tr>
+
+
+                @endforelse
+
+            </tbody>
+
+
+
+            {{-- =================================================
+            TOTALES
+            ================================================== --}}
+
+            <tfoot>
+
+
+                {{-- TOTAL DE CANTIDADES --}}
+
+                <tr>
+
+                    <th
+                        colspan="4"
+                        class="text-right"
+                    >
+
+                        TOTAL CANTIDAD
+
+                    </th>
+
+
+                    <th class="text-center">
+
+                        {{ number_format($detailQuantity, 2) }}
+
+                    </th>
+
+
+                    <th colspan="3">
+
+                    </th>
+
+                </tr>
+
+
+
+                {{-- TOTAL MONETARIO --}}
+
+                <tr>
+
+                    <th
+                        colspan="7"
+                        class="text-right"
+                    >
+
+                        TOTAL
+
+                    </th>
+
+
+                    <th class="text-right">
+
+                        $
+
+                        {{ number_format($total, 2) }}
+
+                    </th>
+
+                </tr>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+
+
+    {{-- =====================================================
+    PIE
+    ====================================================== --}}
+
+    <div class="footer">
+
+        Documento generado automáticamente por el ERP SIMONEL.
+
+        <br>
+
+        Cliente:
+
+        {{ $customerName }}
+
+        <br>
+
+        Periodo:
+
+        {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }}
+
+        -
+
+        {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+
+        <br>
+
+        Generado el
+
+        {{ now()->format('d/m/Y H:i:s') }}
+
+    </div>
+
 
 </div>
 

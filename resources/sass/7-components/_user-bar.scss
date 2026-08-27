@@ -78,16 +78,16 @@ User bar
     padding-right: 15px;
     position: relative;
 
-    &::after {
-        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='496 497.5 8 5'><path fill='%23fff' d='M497.048 497.972c-.252-.295-.526-.295-.825 0-.297.25-.297.523 0 .818l3.366 3.272c.25.25.524.25.822 0l3.364-3.272c.298-.295.298-.568 0-.818-.274-.273-.56-.273-.858 0L500 500.63l-2.952-2.658z'/></svg>") no-repeat 0 0;
-        content: "";
-        display: inline-block;
-        height: 5px;
-        margin-left: 0.5em;
-        margin-top: 0.2em;
-        vertical-align: middle;
-        width: 8px;
-    }
+    // &::after {
+    //     background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='496 497.5 8 5'><path fill='%23fff' d='M497.048 497.972c-.252-.295-.526-.295-.825 0-.297.25-.297.523 0 .818l3.366 3.272c.25.25.524.25.822 0l3.364-3.272c.298-.295.298-.568 0-.818-.274-.273-.56-.273-.858 0L500 500.63l-2.952-2.658z'/></svg>") no-repeat 0 0;
+    //     content: "";
+    //     display: inline-block;
+    //     height: 5px;
+    //     margin-left: 0.5em;
+    //     margin-top: 0.2em;
+    //     vertical-align: middle;
+    //     width: 8px;
+    // }
 }
 
 .user-bar__avatar {

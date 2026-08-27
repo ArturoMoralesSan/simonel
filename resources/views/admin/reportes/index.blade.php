@@ -99,7 +99,7 @@
             <div class="column-statistics">
 
                 <strong>
-                    {{ number_format($summary['productsSold'] ?? 0, 3) }}
+                    {{ number_format($summary['productsSold'] ?? 0, 2) }}
                 </strong>
 
                 <br>
