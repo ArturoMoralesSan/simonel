@@ -38,4 +38,8 @@ class Purchase extends Model
     {
         return $this->hasMany(RawMaterialLot::class);
     }
+    public function boning()
+    {
+        return $this->hasOne(PurchaseBoning::class, 'purchase_id');
+    }
 }
