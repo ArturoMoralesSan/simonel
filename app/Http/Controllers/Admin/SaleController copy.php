@@ -29,9 +29,6 @@ use Illuminate\Support\Facades\Mail;
 use Luecano\NumeroALetras\NumeroALetras;
 use Illuminate\Support\Facades\DB;
 use Exception;
-use App\Models\SellerInventoryAssignment;
-use App\Models\SellerInventoryAssignmentLot;
-use App\Models\SellerInventoryMovement;
 
 class SaleController extends Controller
 {
@@ -230,6 +227,101 @@ class SaleController extends Controller
         
     }
 
+    /* public function save(SaleRequest $request)
+    {
+        abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
+
+        dd($request);
+        $validated = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+
+            if (!$request->sale_id) {
+                $sale = new Sale;
+            } else {
+                $sale = Sale::findOrFail($request->sale_id);
+            }
+
+            $sale->user_id = $validated['client_id'];
+            $sale->comment = $validated['comment'] ?? null;
+            $sale->status = 'accepted';
+            $sale->save();
+
+            SaleProduct::where('sale_id',$sale->id)->delete();
+
+            $subtotal = 0;
+            $ivaTotal = 0;
+
+            foreach ($validated['products'] as $product) {
+
+                $quantity = (float) ($product['quantity'] ?? 1);
+                $unitPrice = (float) ($product['unit_price'] ?? 0);
+                $discount = (float) ($product['discount'] ?? 0);
+                $iva = (float) ($product['iva'] ?? 0);
+
+                $base = $quantity * $unitPrice;
+                $discounted =$base - ($base * $discount / 100);
+                $ivaAmount = $discounted * $iva / 100;
+
+                $subtotal += $discounted;
+                $ivaTotal += $ivaAmount;
+
+                $saleProduct = new SaleProduct;
+                $saleProduct->sale_id = $sale->id;
+                $saleProduct->product_id = $product['product_id'];
+                $saleProduct->quantity = $quantity;
+                $saleProduct->base_price = $unitPrice;
+                $saleProduct->discount = $discount;
+                $saleProduct->iva = $iva;
+                $saleProduct->subtotal = $discounted;
+                $saleProduct->total_with_iva = $discounted + $ivaAmount;
+                $saleProduct->save();
+            }
+
+            $total = $subtotal + $ivaTotal;
+
+            $sale->gross_amount = $request->gross_amount;
+            $sale->discount = $request->discounts;
+            $sale->total_sale_price = $subtotal;
+            $sale->iva = $ivaTotal;
+            $sale->total_with_iva = $total;
+
+            $formatter = new NumeroALetras();
+            $formatter->conector = 'Y';
+            $sale->letter = $formatter->toMoney($total, 2, 'pesos', 'centavos');
+            $sale->save();
+
+            $this->handleAcceptedSale($sale, $request);
+
+            DB::commit();
+
+            alert(
+                !$request->sale_id ? 'Se ha creado la solicitud.' : 'Se ha actualizado la solicitud.'
+            );
+
+            return response('', 204, [
+                'Redirect-To' => url('admin/ventas')
+            ]);
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            report($e);
+
+            alert(
+                $e->getMessage(),
+                'danger'
+            );
+
+            return response('', 204, [
+                'Redirect-To' => url('admin/ventas')
+            ]);
+        }
+    } */
+
     public function factura(Request $request, $id)
     {
         $request->validate([
@@ -336,41 +428,38 @@ class SaleController extends Controller
 
     private function validateProductsStock($validated)
     {
-        $seller = Auth::user();
-
-        // Buscar la asignación abierta del vendedor para hoy.
-        $assignment = SellerInventoryAssignment::query()
-            ->where('seller_id', $seller->id)
-            ->where('status', 'open')
-            ->whereDate('assignment_date', today())
-            ->first();
-
-        if (!$assignment) {
-            throw new \Exception(
-                'No tienes un inventario de vendedor abierto para el día de hoy.'
-            );
-        }
-
         foreach ($validated['products'] as $item) {
 
-            $product = Product::with('manufactured')
-                ->find($item['product_id']);
+            $product = Product::find($item['product_id']);
 
             if (!$product) {
+                throw new \Exception("El producto no existe.");
+            }
+
+
+            $lot = ProductLot::where('product_id', $product->id)
+                ->where('available_quantity', '>', 0)
+                ->where(function ($query) {
+                    $query->whereNull('expiration_date')
+                        ->orWhereDate('expiration_date', '>=', now());
+                })
+                ->orderBy('expiration_date', 'asc')
+                ->first();
+
+
+            if (!$lot) {
+
+                $name = $product->manufactured
+                    ? $product->manufactured->name
+                    : $product->name;
+
                 throw new \Exception(
-                    'El producto no existe.'
+                    "No hay lote disponible para '{$name}'. " .
+                    "El producto no tiene stock o sus lotes están caducados."
                 );
             }
 
-            $quantityRequested = (float) $item['quantity'];
-
-            $available = $assignment->lots()
-                ->whereHas('productLot', function ($query) use ($product) {
-                    $query->where('product_id', $product->id);
-                })
-                ->sum('available_quantity');
-
-            if ($available < $quantityRequested) {
+            if ($lot->available_quantity < $item['quantity']) {
 
                 $name = $product->manufactured
                     ? $product->manufactured->name
@@ -378,11 +467,7 @@ class SaleController extends Controller
 
                 throw new \Exception(
                     "Stock insuficiente para '{$name}'. " .
-                    "Disponible en tu inventario: " .
-                    number_format($available, 2) .
-                    ", solicitado: " .
-                    number_format($quantityRequested, 2) .
-                    "."
+                    "Disponible: {$lot->available_quantity}, solicitado: {$item['quantity']}."
                 );
             }
         }
@@ -472,119 +557,57 @@ class SaleController extends Controller
 
     private function handleSale(Sale $sale)
     {
-        $sellerId = Auth::id();
-
-        /*
-        * Obtener la asignación abierta del vendedor para hoy.
-        */
-        $assignment = SellerInventoryAssignment::query()
-            ->where('seller_id', $sellerId)
-            ->where('status', 'open')
-            ->whereDate('assignment_date', today())
-            ->first();
-
-        if (!$assignment) {
-            throw new \Exception(
-                'No tienes un inventario de vendedor abierto para el día de hoy.'
-            );
-        }
-
         foreach ($sale->products as $saleProduct) {
 
-            $remaining = (float) $saleProduct->quantity;
+            $remaining = $saleProduct->quantity;
 
-            /*
-            * Obtener los lotes que pertenecen al inventario
-            * asignado al vendedor para este producto.
-            */
-            $assignmentLots = SellerInventoryAssignmentLot::query()
-                ->where('assignment_id', $assignment->id)
-                ->whereHas('productLot', function ($query) use ($saleProduct) {
-                    $query->where(
-                        'product_id',
-                        $saleProduct->product_id
-                    );
-                })
-                ->where('available_quantity', '>', 0)
+            $lots = ProductLot::where('product_id',$saleProduct->product_id)
+                ->where('available_quantity','>',0)
+                ->where('status','Disponible')
+                ->orderBy('production_date')
                 ->orderBy('id')
-                ->lockForUpdate()
                 ->get();
 
-            $available = $assignmentLots->sum('available_quantity');
+            $available = $lots->sum('available_quantity');
 
             if ($available < $remaining) {
 
-                $name = $saleProduct->product->manufactured
-                    ? $saleProduct->product->manufactured->name
-                    : $saleProduct->product->name;
-
                 throw new \Exception(
-                    "No hay existencia suficiente de '{$name}' " .
-                    "en tu inventario. Disponible: " .
-                    number_format($available, 2) .
-                    ", solicitado: " .
-                    number_format($remaining, 2) .
-                    "."
+                    'No hay existencia suficiente de '
+                    .$saleProduct->product->name.
+                    '. Disponible: '.number_format($available,3).
+                    ', Solicitado: '.number_format($remaining,3)
                 );
             }
 
-            /*
-            * Consumir el inventario del vendedor.
-            */
-            foreach ($assignmentLots as $assignmentLot) {
+            foreach ($lots as $lot) {
 
                 if ($remaining <= 0) {
                     break;
                 }
 
-                $consume = min(
-                    $remaining,
-                    (float) $assignmentLot->available_quantity
-                );
+                $consume = min($remaining,$lot->available_quantity);
 
-                /*
-                * Descontar únicamente del lote asignado
-                * al vendedor.
-                */
-                $assignmentLot->available_quantity -= $consume;
+                SaleProductLot::create([
+                    'sale_product_id'=>$saleProduct->id,
+                    'product_lot_id'=>$lot->id,
+                    'quantity'=>$consume,
+                ]);
 
-                if ($assignmentLot->available_quantity < 0) {
-                    $assignmentLot->available_quantity = 0;
+                $lot->available_quantity -= $consume;
+                $lot->total_cost = $lot->available_quantity * $lot->cost_per_unit;
+
+                if ($lot->available_quantity <= 0) {
+                    $lot->available_quantity = 0;
+                    $lot->status = 'Agotado';
                 }
 
-                $assignmentLot->save();
-
-                /*
-                * Registrar movimiento de salida por venta.
-                */
-                SellerInventoryMovement::create([
-                    'assignment_id'    => $assignment->id,
-                    'seller_id'        => $sellerId,
-                    'product_lot_id'   => $assignmentLot->product_lot_id,
-                    'type'             => 'sale',
-                    'quantity'         => $consume
-                ]);
+                $lot->save();
 
                 $remaining -= $consume;
             }
-
-            /*
-            * Seguridad: la cantidad solicitada debe haberse
-            * consumido completamente.
-            */
-            if ($remaining > 0) {
-
-                $name = $saleProduct->product->manufactured
-                    ? $saleProduct->product->manufactured->name
-                    : $saleProduct->product->name;
-
-                throw new \Exception(
-                    "No fue posible completar la venta de '{$name}'."
-                );
-            }
         }
     }
-
 
     private function syncAccountReceivable(Sale $sale)
     {
@@ -767,103 +790,98 @@ class SaleController extends Controller
 
     public function orderupdate(OrderRequest $request, $id)
     {
-        abort_unless(
-            Gate::allows('view.quotations') ||
-            Gate::allows('create.quotations'),
-            403
-        );
+        abort_unless(Gate::allows('view.quotations') || Gate::allows('create.quotations'), 403);
 
         DB::beginTransaction();
 
         try {
 
-            $sale = Sale::with([
-                'products.product',
-                'user',
-                'payments'
-            ])->findOrFail($id);
+            $sale = Sale::with(['products.product', 'user', 'payments'])->findOrFail($id);
 
-            /*
-            |--------------------------------------------------------------------------
-            | ACTUALIZAR ESTADO
-            |--------------------------------------------------------------------------
-            */
+            if ($request->status == 'accepted' && $sale->status != 'accepted') {
 
-            if ($request->filled('status')) {
-
-                $sale->status = $request->status;
-
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | COMENTARIO
-            |--------------------------------------------------------------------------
-            */
-
-            if ($request->has('comment')) {
-
+                $sale->status = 'accepted';
                 $sale->comment = $request->comment;
 
+                foreach ($sale->products as $saleProduct)
+                {
+                    $remaining = $saleProduct->quantity;
+
+                    $lots = ProductLot::where('product_id', $saleProduct->product_id)
+                        ->where('available_quantity', '>', 0)
+                        ->where('status', 'Disponible')
+                        ->orderBy('production_date')
+                        ->orderBy('id')
+                        ->get();
+
+                    $available = $lots->sum('available_quantity');
+
+                    if ($available < $remaining) {
+
+                        throw new \Exception('No hay existencia suficiente de ' .
+                            $saleProduct->product->name .
+                            '. Disponible: ' .
+                            number_format($available,3) .
+                            ', Solicitado: ' .
+                            number_format($remaining,3)
+                        );
+                    }
+
+                    foreach ($lots as $lot) {
+
+                        if ($remaining <= 0) {
+                            break;
+                        }
+
+                        $consume = min($remaining, $lot->available_quantity);
+
+                        SaleProductLot::create([
+                            'sale_product_id' => $saleProduct->id,
+                            'product_lot_id'  => $lot->id,
+                            'quantity'        => $consume,
+                        ]);
+
+                        $lot->available_quantity -= $consume;
+
+                        $lot->total_cost = $lot->available_quantity * $lot->cost_per_unit;
+
+                        if ($lot->available_quantity <= 0) {
+
+                            $lot->available_quantity = 0;
+                            $lot->status = 'Agotado';
+                        }
+
+                        $lot->save();
+
+                        $remaining -= $consume;
+                    }
+                }
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | SI LA VENTA ES PAGADA
-            |--------------------------------------------------------------------------
-            */
-
-            if ($request->status === 'paid') {
+            if ($request->status == 'paid') {
 
                 $sale->status = 'paid';
-
                 $sale->is_paid = 1;
-
                 $sale->finish_date = now()->format('Y-m-d');
-
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | ACTUALIZAR PAGOS
-            |--------------------------------------------------------------------------
-            */
+            $sale->save();
 
             $sale->payments()->detach();
 
-            for (
-                $i = 1;
-                $i <= (int) $request->payments_count;
-                $i++
-            ) {
+            for ($i = 1;$i <= $request->payments_count;$i++) {
 
-                $paymentId = $request->input(
-                    "payment{$i}_pago"
-                );
-
-                if (!$paymentId) {
+                if (!$request->input('payment'.$i.'_pago')) {
                     continue;
                 }
 
                 $sale->payments()->attach(
-                    $paymentId,
+                    $request->input('payment'.$i.'_pago'),
                     [
-                        'cost' => $request->input(
-                            "payment{$i}_cost",
-                            0
-                        )
+                        'cost' => $request->input('payment'.$i.'_cost', 0)
                     ]
                 );
-
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | GUARDAR
-            |--------------------------------------------------------------------------
-            */
-
-            $sale->save();
 
             DB::commit();
 
@@ -873,22 +891,81 @@ class SaleController extends Controller
                 'Redirect-To' => url('admin/ventas')
             ]);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
 
             DB::rollBack();
 
-            report($e);
-
-            alert(
-                $e->getMessage(),
-                'danger'
-            );
+            alert($e->getMessage(), 'danger');
 
             return response('', 204, [
                 'Redirect-To' => url('admin/ventas')
             ]);
         }
     }
+    
+
+    /* private function handleAcceptedSale(Sale $sale, $request)
+    {
+        if ($sale->status !== 'accepted') {
+            return;
+        }
+
+        $sale->comment = $request->comment;
+
+        foreach ($sale->products as $saleProduct) {
+
+            $remaining = $saleProduct->quantity;
+
+            $lots = ProductLot::where('product_id', $saleProduct->product_id)
+                ->where('available_quantity', '>', 0)
+                ->where('status', 'Disponible')
+                ->orderBy('production_date')
+                ->orderBy('id')
+                ->get();
+
+            $available = $lots->sum('available_quantity');
+
+            if ($available < $remaining) {
+                throw new \Exception(
+                    'No hay existencia suficiente de ' .
+                    $saleProduct->product->name .
+                    '. Disponible: ' .
+                    number_format($available, 3) .
+                    ', Solicitado: ' .
+                    number_format($remaining, 3)
+                );
+            }
+
+            foreach ($lots as $lot) {
+
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $consume = min($remaining, $lot->available_quantity);
+
+                SaleProductLot::create([
+                    'sale_product_id' => $saleProduct->id,
+                    'product_lot_id' => $lot->id,
+                    'quantity' => $consume,
+                ]);
+
+                $lot->available_quantity -= $consume;
+                $lot->total_cost = $lot->available_quantity * $lot->cost_per_unit;
+
+                if ($lot->available_quantity <= 0) {
+                    $lot->available_quantity = 0;
+                    $lot->status = 'Agotado';
+                }
+
+                $lot->save();
+
+                $remaining -= $consume;
+            }
+        }
+
+        $sale->save();
+    } */
 
     public function edit($id)
     {

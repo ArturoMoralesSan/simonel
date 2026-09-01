@@ -144,4 +144,12 @@ class User extends Authenticatable
         return $this->hasOne(Customer::class)->withTrashed();
     }
 
+    public function sellerInventoryAssignments()
+    {
+        return $this->hasMany(
+            SellerInventoryAssignment::class,
+            'seller_id'
+        );
+    }
+
 }

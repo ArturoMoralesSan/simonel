@@ -15,12 +15,15 @@ class StoreUserCustomerRequest extends FormRequest
     public function rules()
     {
         $rules = [
+
             'business_name'   => 'required|string|max:255',
             'email'           => 'nullable|email',
             'rfc'             => 'nullable|string|max:13|min:12',
             'trade_name'      => 'nullable|string|max:255',
             'tax_regime'      => 'nullable|string|max:255',
+            'customer_type'   => 'nullable|string|max:255',
             'phone'           => 'required|digits:10',
+
             'street'          => 'nullable|string|max:255',
             'ext_number'      => 'nullable|string|max:20',
             'int_number'      => 'nullable|string|max:20',
@@ -33,10 +36,27 @@ class StoreUserCustomerRequest extends FormRequest
             'colony'          => 'nullable|string|max:255',
             'postal_code'     => 'nullable|string|max:10',
 
-            // Crédito
+            /*
+            |--------------------------------------------------------------------------
+            | Precios preferenciales
+            |--------------------------------------------------------------------------
+            */
+
+            'item_count' => 'nullable|integer|min:0',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Crédito
+            |--------------------------------------------------------------------------
+            */
         ];
 
-        // Validación de RFC, nombre comercial y correo
+        /*
+        |--------------------------------------------------------------------------
+        | Validación de RFC, nombre comercial y correo
+        |--------------------------------------------------------------------------
+        */
+
         if ($this->customer_id === null) {
 
             $rules['trade_name'] .= '|unique:customers,trade_name';
@@ -48,16 +68,48 @@ class StoreUserCustomerRequest extends FormRequest
             $rules['email'] .= '|unique:users,email,' . $this->user_id;
         }
 
-        // Solo Admin y SuperAdmin pueden registrar crédito
+        /*
+        |--------------------------------------------------------------------------
+        | Precios preferenciales
+        |--------------------------------------------------------------------------
+        */
+
+        $priceCount = (int) ($this->price_count ?? 0);
+
+        $rules['price_count'] = 'nullable|integer|min:0';
+
+        for ($i = 1; $i <= $priceCount; $i++) {
+
+            $rules['price' . $i . '_product_id'] =
+                'required|integer|exists:products,id';
+
+            $rules['price' . $i . '_price'] =
+                'required|numeric|min:0';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Solo Admin y SuperAdmin pueden registrar crédito
+        |--------------------------------------------------------------------------
+        */
+
         $canManageCredit =
             Auth::user()->isSuperAdmin() ||
             Auth::user()->isAdmin();
 
-        // Si tiene crédito y es Admin/SuperAdmin,
-        // los datos del crédito son obligatorios.
+        /*
+        |--------------------------------------------------------------------------
+        | Crédito
+        |--------------------------------------------------------------------------
+        */
+
         if ((int) $this->credit === 1 && $canManageCredit) {
-            $rules['credit_limit'] = 'required|numeric|min:1';
-            $rules['credit_days']  = 'required|integer|min:1|max:365';
+
+            $rules['credit_limit'] =
+                'required|numeric|min:1';
+
+            $rules['credit_days'] =
+                'required|integer|min:1|max:365';
         }
 
         return $rules;

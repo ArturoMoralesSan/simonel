@@ -37,6 +37,7 @@ use App\Http\Controllers\Admin\CustomerCreditAuthorizationController;
 use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\InitialWarehouseController;
+use App\Http\Controllers\Admin\InventorySellerController;
 
 
 /*
@@ -233,6 +234,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::post('inventario/{id}/actualizar', [InventoryProductController::class, 'update']);
     Route::delete('inventario/eliminar/{id}', [InventoryProductController::class, 'delete']);
 
+    Route::get('inventario-vendedores', [InventorySellerController::class, 'index']);
+    Route::get('agregar-inventario-vendedores', [InventorySellerController::class, 'create']);
+    Route::post('inventario-vendedores/crear', [InventorySellerController::class, 'storeMovement']);
+    Route::get('inventario-vendedores/{id}/detalle', [InventorySellerController::class, 'details']);
+    Route::post('inventario-vendedores-movimiento/{id}/actualizar', [InventorySellerController::class, 'updateMovement']);
+    Route::get('inventario-vendedores/{id}/editar', [InventorySellerController::class, 'edit']);
+    Route::post('inventario-vendedores/{id}/actualizar', [InventorySellerController::class, 'update']);
+    Route::delete('inventario-vendedores/eliminar/{id}', [InventorySellerController::class, 'delete']);
+    Route::post('inventario-vendedores/{id}/cerrar', [InventorySellerController::class, 'close'])
+    ->name('admin.inventario-vendedores.close');
      //inventario por sucursales de autoservicio
     Route::get('inventario-clientes', [InventoryController::class, 'index']);
     Route::get('agregar-inventario-clientes', [InventoryController::class, 'create']);

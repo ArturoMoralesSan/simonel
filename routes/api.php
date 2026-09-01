@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\InventorySellerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ Route::post('/notifications/read', [NotificationController::class, 'markAsRead']
 
 Route::get('/inventory', [InventoryController::class, 'getByProduct']);
 Route::get('/inventory-clients', [InventoryController::class, 'getByClient']);
+Route::get('/inventory-sellers', [InventorySellerController::class, 'getBySeller']);
 Route::get('/inventory-warehouse', [InventoryController::class, 'inventoryWarehouse']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

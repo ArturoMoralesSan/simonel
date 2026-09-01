@@ -41,6 +41,7 @@ import AddProductsForm from './components/AddProductsForm.vue';
 import RoleSelect from './components/RoleSelect.vue';
 import InventoryWarehouse from './components/InventoryWarehouse.vue';
 import InitialWarehouseForm from '../main/components/forms/initial-warehouse-form/InitialWarehouseForm.vue';
+import InventorySellerForm from './components/InventorySellerForm.vue';
 
 
 (function() {
@@ -92,6 +93,7 @@ import InitialWarehouseForm from '../main/components/forms/initial-warehouse-for
     Vue.component('product-order-form', ProductionOrderForm);
     Vue.component('role-select', RoleSelect);
     Vue.component('initial-warehouse-form', InitialWarehouseForm);
+    Vue.component('inventory-seller-form', InventorySellerForm);
 
 
 

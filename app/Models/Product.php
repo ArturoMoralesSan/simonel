@@ -47,5 +47,10 @@ class Product extends Model
     {
         return $this->belongsTo(ManufacturedProduct::class, 'manufactured_product_id')->withTrashed();
     }
+
+    public function customerPrices()
+    {
+        return $this->hasMany(CustomerProductPrice::class);
+    }
 }
 

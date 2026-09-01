@@ -28,6 +28,7 @@
                 :is-admin="{{ $isSuperAdmin ? 'true' : 'false' }}"
                 :regimen="{{ $regimenLabel }}"
                 :sellers='@json($sellers)'
+                :products="{{ $products }}"
             >
             </customer-form>
         </div>

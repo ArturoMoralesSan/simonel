@@ -233,6 +233,58 @@
         </section>
 
         @if($isSuperAdmin)
+            {{-- Precios preferenciales --}}
+            <section class="db-panel mt-8">
+
+                <h3 class="db-panel__title">
+                    Precios preferenciales
+                </h3>
+
+                @if($customer->productPrices->count())
+
+                    <table class="table">
+
+                        <thead>
+                            <tr>
+                                <th>
+                                    Producto
+                                </th>
+
+                                <th>
+                                    Precio preferencial
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach($customer->productPrices as $price)
+
+                                <tr>
+                                    <td>
+                                        {{ $price->product->manufactured->name ?? '-' }}
+                                    </td>
+
+                                    <td>
+                                        ${{ number_format($price->price, 2) }}
+                                    </td>
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                @else
+
+                    <p class="text-center">
+                        No existen precios preferenciales asignados.
+                    </p>
+
+                @endif
+
+            </section>
             <section class="db-panel mt-8">
 
                 <h3 class="db-panel__title">
@@ -252,7 +304,7 @@
                             name="customer_id"
                             v-model="fields.customer_id"
                             maxlength="10"
-                            :initial="{{ $customer->id }}"
+                            :initial="{{ json_encode((string) $customer->id) }}"
                         >
                         </text-field>
 

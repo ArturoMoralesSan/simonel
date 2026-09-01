@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserCustomerRequest;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\CustomerProductPrice;
+use App\Models\Product;
 use App\Models\CustomerCreditSetting;
 use Illuminate\Support\Facades\Gate;
 use Hash;
@@ -61,9 +63,10 @@ class CustomerController extends Controller
 
         $customer = Customer::with([
             'user',
-            'creditAuthorizations.authorizer'
-        ])
-        ->findOrFail($id);
+            'creditSetting',
+            'creditAuthorizations.authorizer',
+            'productPrices.product.manufactured'
+        ])->findOrFail($id);
         
         $isSuperAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
 
@@ -85,7 +88,9 @@ class CustomerController extends Controller
         ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
         ->orderBy('name')
         ->pluck('full_name', 'id');
-
+        $products = Product::with('manufactured')
+            ->get()
+            ->pluck('manufactured.name', 'id');
         $regimenLabel = collect([
             'resico_pf' => 'RESICO - Persona Física',
             'sueldos_salarios' => 'Sueldos y Salarios',
@@ -105,30 +110,40 @@ class CustomerController extends Controller
             'fines_no_lucrativos' => 'Personas Morales con Fines No Lucrativos',
         ]);
 
-        return view('admin.clientes.crear', compact('isSuperAdmin', 'sellers', 'regimenLabel'));
+        return view('admin.clientes.crear', compact('isSuperAdmin', 'sellers', 'regimenLabel', 'products'));
     }
 
 
-    public function save(StoreUserCustomerRequest  $request)
+    public function save(StoreUserCustomerRequest $request)
     {
-        abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
+        abort_unless(
+            Gate::allows('view.customers') || Gate::allows('create.customers'),
+            403
+        );
+
 
         if ($request->customer_id == null) {
-            $user  = new User;
+            $user = new User;
         } else {
             $user = User::find($request->user_id);
         }
 
+
         $seller_id = Auth::id();
 
-        if (Auth::user()->isSuperAdmin() || Auth::user()->isAdmin() && $request->filled('seller_id')) {
+        if (
+            Auth::user()->isSuperAdmin() ||
+            (Auth::user()->isAdmin() && $request->filled('seller_id'))
+        ) {
             $seller_id = $request->seller_id;
         }
+
 
         $user->name    = $request->business_name;
         $user->email   = $request->email;
         $user->role_id = 2;
         $user->save();
+
 
         if ($request->customer_id == null) {
             $customer = new Customer;
@@ -144,6 +159,9 @@ class CustomerController extends Controller
         $customer->customer_type = $request->customer_type;
         $customer->phone         = $request->phone;
         $customer->email         = $request->email;
+
+    
+
         $customer->street          = $request->street;
         $customer->ext_number      = $request->ext_number;
         $customer->int_number      = $request->int_number;
@@ -155,31 +173,78 @@ class CustomerController extends Controller
         $customer->population      = $request->population;
         $customer->colony          = $request->colony;
         $customer->postal_code     = $request->postal_code;
+
+        
+
         $customer->seller_id = $seller_id;
+
         $customer->save();
+
+
+        $customer->productPrices()->delete();
+
+        for ($i = 1; $i <= ($request->price_count ?? 0); $i++) {
+
+            $product_id = $request->input(
+                'price' . $i . '_product_id'
+            );
+
+            $price = $request->input(
+                'price' . $i . '_price'
+            );
+
+            if ($product_id && $price !== null && $price !== '') {
+
+                $productPrice = new CustomerProductPrice;
+
+                $productPrice->customer_id = $customer->id;
+                $productPrice->product_id  = $product_id;
+                $productPrice->price       = $price;
+
+                $productPrice->save();
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Crédito
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->credit == 1) {
 
-        
-            CustomerCreditSetting::updateOrCreate(['customer_id' => $customer->id],
+            CustomerCreditSetting::updateOrCreate(
                 [
-                    'enabled' => $request->credit,
-                    'credit_limit' => $request->credit_limit,
-                    'credit_days'  => $request->credit_days,
+                    'customer_id' => $customer->id
+                ],
+                [
+                    'enabled'       => $request->credit,
+                    'credit_limit'  => $request->credit_limit,
+                    'credit_days'   => $request->credit_days,
                     'block_on_debt' => 0,
-                    'authorized_by'  => Auth::id(),
-                    'authorized_at'=> Carbon::now()
-
+                    'authorized_by' => Auth::id(),
+                    'authorized_at' => Carbon::now()
                 ]
             );
-
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mensaje
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->customer_id == null) {
             alert('Se ha agregado un cliente.');
         } else {
             alert('Se ha editado un cliente.');
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redirección
+        |--------------------------------------------------------------------------
+        */
 
         return response('', 204, [
             'Redirect-To' => url('admin/clientes/')
@@ -190,13 +255,16 @@ class CustomerController extends Controller
     {
         abort_unless(Gate::allows('view.customers') || Gate::allows('create.customers'), 403);
 
-        $user = Customer::with('creditSetting')->findOrFail($id);
-    
+        $user = Customer::with(['creditSetting', 'productPrices'])->findOrFail($id);    
         $isSuperAdmin = auth()->user()->isSuperAdmin() || auth()->user()->isAdmin();
 
+        $products = Product::with('manufactured')
+            ->get()
+            ->pluck('manufactured.name', 'id');
         $sellers = User::whereHas('role', function ($query) {
             $query->where('key_name', 'vendedores');
         })
+        
         ->selectRaw("id, CONCAT(name, ' ', last_name) AS full_name")
         ->orderBy('name')
         ->pluck('full_name', 'id');
@@ -220,7 +288,7 @@ class CustomerController extends Controller
             'fines_no_lucrativos' => 'Personas Morales con Fines No Lucrativos',
         ]);
 
-        return view('admin.clientes.editar', compact('user', 'isSuperAdmin', 'sellers', 'regimenLabel'));
+        return view('admin.clientes.editar', compact('user', 'isSuperAdmin', 'sellers', 'regimenLabel', 'products'));
     }
 
     public function destroy($id)

@@ -28,6 +28,7 @@
                 :regimen="{{ $regimenLabel }}"
                 :sellers='@json($sellers)'              
                 :user="{}"
+                :products="{{ $products }}"
             >
             </customer-form>
         </div>
