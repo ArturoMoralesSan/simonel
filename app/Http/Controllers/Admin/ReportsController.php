@@ -11,6 +11,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\RawMaterialLot; 
+use App\Models\ProductLot;
+use App\Models\Warehouse;
 use PDF; 
 
 class ReportsController extends Controller
@@ -18,6 +21,7 @@ class ReportsController extends Controller
     /**
      * Reportes
      */
+
     public function index(Request $request)
     {
         $dateNow = Carbon::now();
@@ -44,16 +48,135 @@ class ReportsController extends Controller
             ->unique()
             ->values();
 
+        /*
+        |--------------------------------------------------------------------------
+        | ALMACENES
+        |--------------------------------------------------------------------------
+        */
+
+        $rawMaterialWarehouses = $this->rawMaterialWarehouseResume();
+
+        $productWarehouses = $this->productWarehouseResume();
+
         return view('admin.reportes.index', [
-            'start_date'    => $start_date,
-            'end_date'      => $end_date,
-            'summary'       => $this->summary($sales),
-            'sellers'       => $this->sellerResume($sales),
-            'products'      => $this->productResume($sales),
-            'customers'     => $this->customerResume($sales),
-            'payments'      => $this->paymentResume($sales),
+
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+
+            /*
+            |--------------------------------------------------------------------------
+            | VENTAS
+            |--------------------------------------------------------------------------
+            */
+
+            'summary' => $this->summary($sales),
+            'sellers' => $this->sellerResume($sales),
+            'products' => $this->productResume($sales),
+            'customers' => $this->customerResume($sales),
+            'payments' => $this->paymentResume($sales),
             'paymentMethods' => $paymentMethods,
+
+            /*
+            |--------------------------------------------------------------------------
+            | ALMACENES
+            |--------------------------------------------------------------------------
+            */
+
+            'rawMaterialWarehouses' => $rawMaterialWarehouses,
+            'productWarehouses' => $productWarehouses,
+
         ]);
+    }
+
+    private function rawMaterialWarehouseResume()
+    {
+        $lots = RawMaterialLot::with([
+            'warehouse',
+            'material',
+        ])
+        ->where('available_quantity', '>', 0)
+        ->get();
+
+        return $lots
+            ->groupBy('warehouse_id')
+            ->map(function ($warehouseLots) {
+
+                $warehouse = $warehouseLots->first()->warehouse;
+
+                return (object) [
+
+                    'id' => $warehouse->id ?? null,
+
+                    'name' => $warehouse->name ?? 'Sin almacén',
+
+                    'lots_count' => $warehouseLots->count(),
+
+                    'materials_count' => $warehouseLots
+                        ->pluck('raw_material_id')
+                        ->unique()
+                        ->count(),
+
+                    'quantity' => $warehouseLots
+                        ->sum(function ($lot) {
+                            return (float) $lot->available_quantity;
+                        }),
+
+                    'total' => $warehouseLots
+                        ->sum(function ($lot) {
+
+                            return
+                                (float) $lot->available_quantity *
+                                (float) $lot->cost;
+                        }),
+
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
+    }
+
+    private function productWarehouseResume()
+    {
+        $lots = ProductLot::with([
+            'warehouse',
+            'product',
+        ])
+        ->where('available_quantity', '>', 0)
+        ->get();
+
+        return $lots
+            ->groupBy('warehouse_id')
+            ->map(function ($warehouseLots) {
+
+                $warehouse = $warehouseLots->first()->warehouse;
+
+                return (object) [
+
+                    'id' => $warehouse->id ?? null,
+
+                    'name' => $warehouse->name ?? 'Sin almacén',
+
+                    'lots_count' => $warehouseLots->count(),
+
+                    'products_count' => $warehouseLots
+                        ->pluck('product_id')
+                        ->unique()
+                        ->count(),
+
+                    'quantity' => $warehouseLots
+                        ->sum(function ($lot) {
+                            return (float) $lot->available_quantity;
+                        }),
+
+                    'total' => $warehouseLots
+                        ->sum(function ($lot) {
+                            return (float) $lot->total_cost;
+                        }),
+
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
     }
 
     /**
@@ -656,4 +779,156 @@ class ReportsController extends Controller
         ])
         ->get();
     }
+
+    /**
+     * ============================================================
+     * PDF - TODOS LOS ALMACENES DE MATERIAS PRIMAS
+     * ============================================================
+     */
+    public function printRawMaterialWarehouses(Request $request)
+    {
+        $start_date = $request->start_date ?: now()->format('Y-m-d');
+        $end_date   = $request->end_date ?: now()->format('Y-m-d');
+
+        $warehouses = $this->rawMaterialWarehouseResume();
+
+        $pdf = PDF::loadView('admin.pdf.raw-material-warehouses', [
+            'warehouses' => $warehouses,
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+        ]);
+
+        return $pdf->stream(
+            "almacenes-materias-primas-{$start_date}-{$end_date}.pdf"
+        );
+    }
+
+
+    /**
+     * ============================================================
+     * PDF - ALMACÉN INDIVIDUAL DE MATERIAS PRIMAS
+     * ============================================================
+     */
+    public function printRawMaterialWarehouse(Request $request, $id)
+    {
+        $start_date = $request->start_date ?: now()->format('Y-m-d');
+        $end_date   = $request->end_date ?: now()->format('Y-m-d');
+
+        $warehouse = Warehouse::findOrFail($id);
+
+        $lots = RawMaterialLot::with([
+            'warehouse',
+            'material',
+        ])
+        ->where('warehouse_id', $id)
+        ->where('available_quantity', '>', 0)
+        ->get();
+
+        $summary = (object) [
+            'lots_count' => $lots->count(),
+
+            'materials_count' => $lots
+                ->pluck('raw_material_id')
+                ->unique()
+                ->count(),
+
+            'quantity' => $lots->sum(function ($lot) {
+                return (float) $lot->available_quantity;
+            }),
+
+            'total' => $lots->sum(function ($lot) {
+                return
+                    (float) $lot->available_quantity *
+                    (float) $lot->cost;
+            }),
+        ];
+
+        $pdf = PDF::loadView('admin.pdf.raw-material-warehouse', [
+            'warehouse' => $warehouse,
+            'lots'      => $lots,
+            'summary'   => $summary,
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+        ]);
+
+        return $pdf->stream(
+            "almacen-materias-primas-{$warehouse->id}.pdf"
+        );
+    }
+
+
+    /**
+     * ============================================================
+     * PDF - TODOS LOS ALMACENES DE PRODUCTO TERMINADO
+     * ============================================================
+     */
+    public function printProductWarehouses(Request $request)
+    {
+        $start_date = $request->start_date ?: now()->format('Y-m-d');
+        $end_date   = $request->end_date ?: now()->format('Y-m-d');
+
+        $warehouses = $this->productWarehouseResume();
+
+        $pdf = PDF::loadView('admin.pdf.product-warehouses', [
+            'warehouses' => $warehouses,
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+        ]);
+
+        return $pdf->stream(
+            "almacenes-productos-{$start_date}-{$end_date}.pdf"
+        );
+    }
+
+
+    /**
+     * ============================================================
+     * PDF - ALMACÉN INDIVIDUAL DE PRODUCTO TERMINADO
+     * ============================================================
+     */
+    public function printProductWarehouse(Request $request, $id)
+    {
+        $start_date = $request->start_date ?: now()->format('Y-m-d');
+        $end_date   = $request->end_date ?: now()->format('Y-m-d');
+
+        $warehouse = Warehouse::findOrFail($id);
+
+        $lots = ProductLot::with([
+            'warehouse',
+            'product.manufactured',
+        ])
+        ->where('warehouse_id', $id)
+        ->where('available_quantity', '>', 0)
+        ->get();
+
+        $summary = (object) [
+            'lots_count' => $lots->count(),
+
+            'products_count' => $lots
+                ->pluck('product_id')
+                ->unique()
+                ->count(),
+
+            'quantity' => $lots->sum(function ($lot) {
+                return (float) $lot->available_quantity;
+            }),
+
+            'total' => $lots->sum(function ($lot) {
+                return (float) $lot->total_cost;
+            }),
+        ];
+
+        $pdf = PDF::loadView('admin.pdf.product-warehouse', [
+            'warehouse' => $warehouse,
+            'lots'      => $lots,
+            'summary'   => $summary,
+            'start_date' => $start_date,
+            'end_date'   => $end_date,
+        ]);
+
+        return $pdf->stream(
+            "almacen-productos-{$warehouse->id}.pdf"
+        );
+    }
+
 }

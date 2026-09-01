@@ -1,7 +1,12 @@
 @extends('layout.dashboard-master')
 
 @section('meta.title', 'Reportes')
-@section('meta.tab_title', 'Reportes | ' . config('app.name'))
+
+@section(
+    'meta.tab_title',
+    'Reportes | ' . config('app.name')
+)
+
 @section('css_classes', 'dashboard')
 
 @section('content')
@@ -49,9 +54,9 @@
     @include('components.alert')
 
 
-    {{-- =========================
+    {{-- =========================================================
         RESUMEN GENERAL
-    ========================== --}}
+    ========================================================== --}}
 
     <section class="db-panel mb-8">
 
@@ -60,7 +65,11 @@
             <div class="column-statistics">
 
                 <strong>
-                    $ {{ number_format($summary['totalSales'] ?? 0, 2) }}
+                    $
+                    {{ number_format(
+                        $summary['totalSales'] ?? 0,
+                        2
+                    ) }}
                 </strong>
 
                 <br>
@@ -73,7 +82,9 @@
             <div class="column-statistics">
 
                 <strong>
-                    {{ number_format($summary['salesCount'] ?? 0) }}
+                    {{ number_format(
+                        $summary['salesCount'] ?? 0
+                    ) }}
                 </strong>
 
                 <br>
@@ -86,7 +97,9 @@
             <div class="column-statistics">
 
                 <strong>
-                    {{ number_format($summary['customersCount'] ?? 0) }}
+                    {{ number_format(
+                        $summary['customersCount'] ?? 0
+                    ) }}
                 </strong>
 
                 <br>
@@ -99,7 +112,10 @@
             <div class="column-statistics">
 
                 <strong>
-                    {{ number_format($summary['productsSold'] ?? 0, 2) }}
+                    {{ number_format(
+                        $summary['productsSold'] ?? 0,
+                        2
+                    ) }}
                 </strong>
 
                 <br>
@@ -114,12 +130,14 @@
 
 
 
+    {{-- =========================================================
+        VENDEDORES / PRODUCTOS
+    ========================================================== --}}
+
     <div class="md:row">
 
 
-        {{-- =========================================================
-            VENDEDORES
-        ========================================================== --}}
+        {{-- VENDEDORES --}}
 
         <div class="md:col-1/2">
 
@@ -130,7 +148,9 @@
                     Resumen por vendedores
 
                     <a
-                        href="{{ url('admin/reportes/vendedores/pdf') }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        href="{{ url(
+                            'admin/reportes/vendedores/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
                         class="btn btn-nowrap btn--xs table-resource__button"
                     >
                         Imprimir todo
@@ -165,9 +185,6 @@
                                         Total vendido
                                     </th>
 
-
-                                    {{-- MÉTODOS DE PAGO --}}
-
                                     @foreach($paymentMethods as $method)
 
                                         <th>
@@ -175,7 +192,6 @@
                                         </th>
 
                                     @endforeach
-
 
                                     <th>
                                         PDF
@@ -193,9 +209,6 @@
                                     :key="seller.id"
                                 >
 
-
-                                    {{-- VENDEDOR --}}
-
                                     <td data-label="Vendedor">
 
                                         @{{ seller.name }}
@@ -203,20 +216,21 @@
                                     </td>
 
 
-                                    {{-- VENTAS --}}
-
                                     <td data-label="Ventas">
 
-                                        @{{ Number(seller.sales_count || 0).toLocaleString('en-US') }}
+                                        @{{ Number(
+                                            seller.sales_count || 0
+                                        ).toLocaleString('en-US') }}
 
                                     </td>
 
 
-                                    {{-- TOTAL VENDIDO --}}
-
                                     <td data-label="Total vendido">
 
-                                        $ @{{ Number(seller.total_sales || 0).toLocaleString('en-US', {
+                                        $
+                                        @{{ Number(
+                                            seller.total_sales || 0
+                                        ).toLocaleString('en-US', {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         }) }}
@@ -224,15 +238,22 @@
                                     </td>
 
 
-                                    {{-- MÉTODOS DE PAGO --}}
-
                                     @foreach($paymentMethods as $method)
 
                                         @php
-                                            $paymentKey = 'payment_' . \Illuminate\Support\Str::slug($method, '_');
+
+                                            $paymentKey =
+                                                'payment_' .
+                                                \Illuminate\Support\Str::slug(
+                                                    $method,
+                                                    '_'
+                                                );
+
                                         @endphp
 
-                                        <td data-label="{{ ucfirst($method) }}">
+                                        <td
+                                            data-label="{{ ucfirst($method) }}"
+                                        >
 
                                             <span
                                                 v-text="
@@ -249,8 +270,6 @@
 
                                     @endforeach
 
-
-                                    {{-- PDF --}}
 
                                     <td data-label="PDF">
 
@@ -280,9 +299,7 @@
 
 
 
-        {{-- =========================================================
-            PRODUCTOS
-        ========================================================== --}}
+        {{-- PRODUCTOS --}}
 
         <div class="md:col-1/2">
 
@@ -293,7 +310,9 @@
                     Resumen de productos
 
                     <a
-                        href="{{ url('admin/reportes/productos/pdf') }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        href="{{ url(
+                            'admin/reportes/productos/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
                         class="btn btn-nowrap btn--xs table-resource__button"
                     >
                         Imprimir todo
@@ -348,7 +367,6 @@
                                     :key="product.id"
                                 >
 
-
                                     <td data-label="Producto">
 
                                         @{{ product.name }}
@@ -358,14 +376,18 @@
 
                                     <td data-label="Ventas">
 
-                                        @{{ Number(product.sales_count || 0).toLocaleString('en-US') }}
+                                        @{{ Number(
+                                            product.sales_count || 0
+                                        ).toLocaleString('en-US') }}
 
                                     </td>
 
 
                                     <td data-label="Cantidad">
 
-                                        @{{ Number(product.quantity || 0).toLocaleString('en-US', {
+                                        @{{ Number(
+                                            product.quantity || 0
+                                        ).toLocaleString('en-US', {
                                             minimumFractionDigits: 3,
                                             maximumFractionDigits: 3
                                         }) }}
@@ -375,7 +397,10 @@
 
                                     <td data-label="Total">
 
-                                        $ @{{ Number(product.total || 0).toLocaleString('en-US', {
+                                        $
+                                        @{{ Number(
+                                            product.total || 0
+                                        ).toLocaleString('en-US', {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         }) }}
@@ -413,12 +438,14 @@
 
 
 
+    {{-- =========================================================
+        CLIENTES / MÉTODOS DE PAGO
+    ========================================================== --}}
+
     <div class="md:row mt-8">
 
 
-        {{-- =========================================================
-            CLIENTES
-        ========================================================== --}}
+        {{-- CLIENTES --}}
 
         <div class="md:col-1/2">
 
@@ -429,7 +456,9 @@
                     Resumen de clientes
 
                     <a
-                        href="{{ url('admin/reportes/clientes/pdf') }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        href="{{ url(
+                            'admin/reportes/clientes/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
                         class="btn btn-nowrap btn--xs table-resource__button"
                     >
                         Imprimir todo
@@ -480,7 +509,6 @@
                                     :key="customer.id"
                                 >
 
-
                                     <td data-label="Clientes">
 
                                         @{{ customer.name }}
@@ -490,14 +518,19 @@
 
                                     <td data-label="Compras">
 
-                                        @{{ Number(customer.sales_count || 0).toLocaleString('en-US') }}
+                                        @{{ Number(
+                                            customer.sales_count || 0
+                                        ).toLocaleString('en-US') }}
 
                                     </td>
 
 
                                     <td data-label="Total">
 
-                                        $ @{{ Number(customer.total || 0).toLocaleString('en-US', {
+                                        $
+                                        @{{ Number(
+                                            customer.total || 0
+                                        ).toLocaleString('en-US', {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         }) }}
@@ -533,9 +566,7 @@
 
 
 
-        {{-- =========================================================
-            MÉTODOS DE PAGO
-        ========================================================== --}}
+        {{-- MÉTODOS DE PAGO --}}
 
         <div class="md:col-1/2">
 
@@ -546,7 +577,9 @@
                     Resumen por métodos de pago
 
                     <a
-                        href="{{ url('admin/reportes/pagos/pdf') }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        href="{{ url(
+                            'admin/reportes/pagos/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
                         class="btn btn-nowrap btn--xs table-resource__button"
                     >
                         Imprimir todo
@@ -597,7 +630,6 @@
                                     :key="payment.id"
                                 >
 
-
                                     <td data-label="Método de pago">
 
                                         @{{ payment.name }}
@@ -607,14 +639,19 @@
 
                                     <td data-label="Cantidad de operaciones">
 
-                                        @{{ Number(payment.operations || 0).toLocaleString('en-US') }}
+                                        @{{ Number(
+                                            payment.operations || 0
+                                        ).toLocaleString('en-US') }}
 
                                     </td>
 
 
                                     <td data-label="Total">
 
-                                        $ @{{ Number(payment.total || 0).toLocaleString('en-US', {
+                                        $
+                                        @{{ Number(
+                                            payment.total || 0
+                                        ).toLocaleString('en-US', {
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2
                                         }) }}
@@ -650,6 +687,301 @@
 
     </div>
 
+
+
+    {{-- =========================================================
+        ALMACENES
+    ========================================================== --}}
+
+    <div class="md:row mt-8">
+
+
+        {{-- =====================================================
+            ALMACENES DE MATERIAS PRIMAS
+        ====================================================== --}}
+
+        <div class="md:col-1/2">
+
+            <section class="db-panel">
+
+                <h3 class="db-panel__title d-flex items-center justify-between">
+
+                    Resumen por almacén de materias primas
+
+                    <a
+                        href="{{ url(
+                            'admin/reportes/primas/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        class="btn btn-nowrap btn--xs table-resource__button"
+                    >
+                        Imprimir todo
+                    </a>
+
+                </h3>
+
+
+                <div class="md:row mb-4">
+
+                    <resource-table
+                        :breakpoint="800"
+                        :model="{{ $rawMaterialWarehouses }}"
+                        inline-template
+                    >
+
+                        <table class="table size-caption mx-auto md:table--responsive">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Almacén
+                                    </th>
+
+                                    <th>
+                                        Lotes
+                                    </th>
+
+                                    <th>
+                                        Materias primas
+                                    </th>
+
+                                    <th>
+                                        Cantidad
+                                    </th>
+
+                                    <th>
+                                        Total
+                                    </th>
+
+                                    <th>
+                                        PDF
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr
+                                    v-for="warehouse in resourceList"
+                                    :key="warehouse.id"
+                                >
+
+                                    <td data-label="Almacén">
+
+                                        @{{ warehouse.name }}
+
+                                    </td>
+
+
+                                    <td data-label="Lotes">
+
+                                        @{{ Number(
+                                            warehouse.lots_count || 0
+                                        ).toLocaleString('en-US') }}
+
+                                    </td>
+
+
+                                    <td data-label="Materias primas">
+
+                                        @{{ Number(
+                                            warehouse.materials_count || 0
+                                        ).toLocaleString('en-US') }}
+
+                                    </td>
+
+
+                                    <td data-label="Cantidad">
+
+                                        @{{ Number(
+                                            warehouse.quantity || 0
+                                        ).toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) }}
+
+                                    </td>
+
+
+                                    <td data-label="Total">
+
+                                        $
+                                        @{{ Number(
+                                            warehouse.total || 0
+                                        ).toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) }}
+
+                                    </td>
+                                    <td>
+                                        <link-pdf
+                                            :branchid="warehouse.id"
+                                            url="/admin/reportes/primas/"
+                                            startdate="{{ request('start_date') }}"
+                                            enddate="{{ request('end_date') }}"
+                                        >
+                                        </link-pdf>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </resource-table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+
+        {{-- =====================================================
+            ALMACENES DE PRODUCTOS TERMINADOS
+        ====================================================== --}}
+
+        <div class="md:col-1/2">
+
+            <section class="db-panel">
+
+                <h3 class="db-panel__title d-flex items-center justify-between">
+
+                    Resumen por Almacén de producto terminado
+
+                    <a
+                        href="{{ url(
+                            'admin/reportes/terminado/pdf'
+                        ) }}?start_date={{ $start_date }}&end_date={{ $end_date }}"
+                        class="btn btn-nowrap btn--xs table-resource__button"
+                    >
+                        Imprimir todo
+                    </a>
+
+                </h3>
+
+
+                <div class="md:row mb-4">
+
+                    <resource-table
+                        :breakpoint="800"
+                        :model="{{ $productWarehouses }}"
+                        inline-template
+                    >
+
+                        <table class="table size-caption mx-auto md:table--responsive">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Almacén
+                                    </th>
+
+                                    <th>
+                                        Lotes
+                                    </th>
+
+                                    <th>
+                                        Productos
+                                    </th>
+
+                                    <th>
+                                        Cantidad
+                                    </th>
+
+                                    <th>
+                                        Total
+                                    </th>
+                                    <th>
+                                        PDF
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr
+                                    v-for="warehouse in resourceList"
+                                    :key="warehouse.id"
+                                >
+
+                                    <td data-label="Almacén">
+
+                                        @{{ warehouse.name }}
+
+                                    </td>
+
+
+                                    <td data-label="Lotes">
+
+                                        @{{ Number(
+                                            warehouse.lots_count || 0
+                                        ).toLocaleString('en-US') }}
+
+                                    </td>
+
+
+                                    <td data-label="Productos">
+
+                                        @{{ Number(
+                                            warehouse.products_count || 0
+                                        ).toLocaleString('en-US') }}
+
+                                    </td>
+
+
+                                    <td data-label="Cantidad">
+
+                                        @{{ Number(
+                                            warehouse.quantity || 0
+                                        ).toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) }}
+
+                                    </td>
+
+
+                                    <td data-label="Total">
+
+                                        $
+                                        @{{ Number(
+                                            warehouse.total || 0
+                                        ).toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) }}
+
+                                    </td>
+                                    <td>
+                                        <link-pdf
+                                            :branchid="warehouse.id"
+                                            url="/admin/reportes/terminado/"
+                                            startdate="{{ request('start_date') }}"
+                                            enddate="{{ request('end_date') }}"
+                                        >
+                                        </link-pdf>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </resource-table>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>
 
 @endsection

@@ -328,6 +328,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('/reportes/productos/pdf',[ReportsController::class, 'printProducts']);
     Route::get('/reportes/clientes/pdf', [ReportsController::class, 'printCustomers']);
     Route::get('/reportes/pagos/pdf', [ReportsController::class, 'printPayments']);
+
+    Route::get('/reportes/primas/pdf', [ReportsController::class, 'printRawMaterialWarehouses']);
+    Route::get('/reportes/primas/{id}', [ReportsController::class, 'printRawMaterialWarehouse']);
+    Route::get('/reportes/terminado/pdf', [ReportsController::class, 'printProductWarehouses']);
+    Route::get('/reportes/terminado/{id}',[ReportsController::class, 'printProductWarehouse']);
     
     //Password
     Route::view('cambiar-contrasena', 'principal.cambiar-contrasena');
