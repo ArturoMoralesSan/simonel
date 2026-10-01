@@ -50,7 +50,7 @@ class SupplierController extends Controller
         alert('Se ha creado un proveedor.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/proveedores')
+            'Redirect-To' => url('admin/agregar-proveedores')
         ]);
     }
 

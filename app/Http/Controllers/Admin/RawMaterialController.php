@@ -65,7 +65,7 @@ class RawMaterialController extends Controller
         alert('Se ha agregado un elemento.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/materia-prima/')
+            'Redirect-To' => url('admin/agregar-materia-prima/')
         ]);
     }
 

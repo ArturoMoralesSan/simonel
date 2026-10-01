@@ -26,6 +26,14 @@
                 <img class="search-form_icon" src="{{ url('img/svg/search.svg') }}" alt="">
             </template>
         </form-search>
+        <div class="mb-4">
+            <a
+                class="btn btn--success btn--sm"
+                href="{{ url('admin/agregar-cliente') }}"
+            >
+                + Agregar
+            </a>
+        </div>
         <section class="db-panel">
             <h3 class="db-panel__title">
                 Lista de clientes

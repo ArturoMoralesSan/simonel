@@ -247,7 +247,7 @@ class CustomerController extends Controller
         */
 
         return response('', 204, [
-            'Redirect-To' => url('admin/clientes/')
+            'Redirect-To' => url('admin/agregar-cliente/')
         ]);
     }
 

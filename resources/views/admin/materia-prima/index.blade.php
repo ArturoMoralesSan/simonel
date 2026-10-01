@@ -30,6 +30,14 @@
                 >
             </template>
         </form-search>
+        <div class="mb-4">
+            <a
+                class="btn btn--success btn--sm"
+                href="{{ url('admin/agregar-materia-prima') }}"
+            >
+                + Agregar
+            </a>
+        </div>
         <section class="db-panel">
             <h3 class="db-panel__title">
                 Lista de materia prima

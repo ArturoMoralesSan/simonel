@@ -49,7 +49,7 @@ class ManufacturedProductController extends Controller
         alert('Se ha agregado un elemento.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/catalogo/')
+            'Redirect-To' => url('admin/agregar-catalogo/')
         ]);
     }
 

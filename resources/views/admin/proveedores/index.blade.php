@@ -18,7 +18,7 @@
     </p>
 </div>
 
-<div class="fluid-container mb-16">
+<div class="fluid-container mb-16">    
 
     <form-search
         selected="{{ request('search') }}"
@@ -31,13 +31,24 @@
             >
         </template>
     </form-search>
-
+    
     @include('components.alert')
+
+    <div class="mb-4">
+        <a
+            class="btn btn--success btn--sm"
+            href="{{ url('admin/agregar-proveedores') }}"
+        >
+            + Agregar
+        </a>
+    </div>
+
 
     <section class="db-panel">
         <h3 class="db-panel__title">
             Lista de proveedores
         </h3>
+
 
         @if (!$supplierItems->count())
 

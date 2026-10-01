@@ -407,7 +407,7 @@ public function save(PurchaseRequest $request)
     alert('La compra se ha guardado correctamente.');
 
     return response('', 204, [
-        'Redirect-To' => url('admin/compras')
+        'Redirect-To' => url('admin/agregar-compras')
     ]);
 }
 
