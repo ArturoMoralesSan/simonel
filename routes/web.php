@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\ReportsController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\InitialWarehouseController;
 use App\Http\Controllers\Admin\InventorySellerController;
+use App\Http\Controllers\Admin\PlanningProjectionController;
 
 
 /*
@@ -294,26 +295,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('tipos-pagos/{id}/actualizar', [PaymentController::class, 'update']);
     Route::delete('tipos-pagos/eliminar/{id}', [PaymentController::class, 'delete']);
 
-    //Tipo de gastos
-    Route::get('tipos-gastos', [TypeExpenseController::class, 'index']);
-    Route::view('agregar-tipos-gastos', 'admin.tipogastos.crear');
-    Route::post('tipos-gastos/crear', [TypeExpenseController::class, 'save']);
-    Route::get('tipos-gastos/{id}/editar', [TypeExpenseController::class, 'edit']);
-    Route::put('tipos-gastos/{id}/actualizar', [TypeExpenseController::class, 'update']);
-    Route::delete('tipos-gastos/eliminar/{id}', [TypeExpenseController::class, 'delete']);
-
-    //Estudios
-    Route::get('estudios', [StudyController::class, 'index']);
-    Route::view('agregar-estudios', 'admin.estudios.crear');
-    Route::post('estudios/crear', [StudyController::class, 'save']);
-    Route::get('estudios/{id}/editar', [StudyController::class, 'edit']);
-    Route::put('estudios/{id}/actualizar', [StudyController::class, 'update']);
-    Route::delete('estudios/eliminar/{id}', [StudyController::class, 'delete']);
-    
-    // Estadísticas
-    Route::get('estadisticas-servicios', [StatisticsController::class, 'index']);
-
-    Route::get('estadisticas-gastos', [StatisticsController::class, 'gastos']);
 
     //Usuarios
     Route::get('usuarios', [UserController::class, 'index']);
@@ -336,5 +317,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     
     //Password
     Route::view('cambiar-contrasena', 'principal.cambiar-contrasena');
-    Route::post('cambiar-contrasena', 'Auth\PasswordController@update');
+    //Route::post('cambiar-contrasena', 'Auth\PasswordController@update');
+
+    Route::get('/proyecciones', [PlanningProjectionController::class, 'index'])->name('proyecciones.index');
 });

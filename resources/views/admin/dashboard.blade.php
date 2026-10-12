@@ -29,6 +29,10 @@
                 <a href="{{ url('admin/estadistica-diaria') }}">
                     Ver estadística diaria
                 </a>
+                <br>
+                <a href="{{ url('admin/proyecciones') }}">
+                    Proyecciones
+                </a>
             @endif
         </p>
 
