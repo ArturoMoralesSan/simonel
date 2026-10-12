@@ -111,6 +111,7 @@
                                     `products[${index}][quantity]`
                                 "
                                 min="1"
+                                step="0.0001"
                                 @input="
                                     updateSubtotal(index)
                                 "
